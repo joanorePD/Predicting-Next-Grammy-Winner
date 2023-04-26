@@ -42,20 +42,19 @@ lecturer).
      first started the project, together with the actionable insights that you found through
      the process.
 
-
-  In this process, technical skills only are not sufficient. One essential skill you need is
+In this process, technical skills only are not sufficient. One essential skill you need is
   to be able to tell a clear and actionable story.
 
 6. Deliveries.
    Every team is supposed to produce:
 
-      A final report detailing the data collection, analysis, and results. This should also
+     - A final report detailing the data collection, analysis, and results. This should also
        contain the R commands and the corresponding outputs. The use of Markdown
        with knitr is suggested.
-      A slide presentation. The presentation time is 30 minutes for a group of 3 and
+     - A slide presentation. The presentation time is 30 minutes for a group of 3 and
        20 minutes for a group of 2.
-      Both the report and the slides are to be uploaded on a suitable “Assignment”
+     - Both the report and the slides are to be uploaded on a suitable “Assignment”
        on the Moodle page of the course at least four days before the date of the
        exam.
-      Please, register to the exam on uniweb at least one week before the exam and
+     - Please, register to the exam on uniweb at least one week before the exam and
        send an email to the lecturer with the names of the members of your group.
