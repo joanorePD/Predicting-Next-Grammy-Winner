@@ -17,7 +17,13 @@ df = df[c('X.x', 'Artist.x', 'Track', 'Album', 'Album_type', 'Danceability', "En
 
 df$winner <- ifelse(!is.na(df$GrammyAward),TRUE, FALSE)
 
+
 audio_f <- df[c('Danceability', "Energy", "Key", "Loudness", "Speechiness", "Acousticness", "Instrumentalness", "Liveness", "Valence", "Tempo")]
 
-cor(audio_f)
+library(corrplot)
+library(RColorBrewer)
 
+M <-cor(audio_f)
+corrplot(M, type="upper", order="hclust", col=brewer.pal(n=8, name="RdYlBu"))
+         
+         
