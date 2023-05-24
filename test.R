@@ -1,8 +1,10 @@
 setwd("/Users/joanorellanarios/Library/CloudStorage/GoogleDrive-joanorellanarios@gmail.com/La meva unitat/Master/Second Semester/Statistical Learning Mod B/SL_Project")
 
+
 sp_y <- read.csv("Spotify_Youtube.csv", sep=',')
 sp_y$unique <- paste(sp_y$Artist, "_", sp_y$Track)
 grammy <- read.csv("grammySongs.csv", sep=',')
+
 grammy$unique <- paste(grammy$Artist, "_", grammy$Name)
 
 library(dplyr)

@@ -216,7 +216,7 @@ pre code {
 
 <!-- rnb-text-begin -->
 <blockquote>
-<p>This is a suggested approach that Chat GPT gave us (not bad at all)</p>
+<p>This is a suggested approach that ChatGPT gave us (not bad at all)</p>
 </blockquote>
 <div id="define-the-research-questions" class="section level1">
 <h1>1. Define the Research Questions</h1>
@@ -235,11 +235,61 @@ pre code {
 <p>We start of by reading the CSV files we have previously downloaded.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BfeSA8LSByZWFkLmNzdihcIlNwb3RpZnlfWW91dHViZS5jc3ZcIiwgc2VwPScsJylcbnNwX3kkdW5pcXVlIDwtIHBhc3RlKHNwX3kkQXJ0aXN0LCBcIl9cIiwgc3BfeSRUcmFjaylcbmdyYW1teSA8LSByZWFkLmNzdihcImdyYW1teVNvbmdzLmNzdlwiLCBzZXA9JywnKVxuZ3JhbW15JHVuaXF1ZSA8LSBwYXN0ZShncmFtbXkkQXJ0aXN0LCBcIl9cIiwgZ3JhbW15JE5hbWUpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BfeSA8LSByZWFkLmNzdihcIlNwb3RpZnlfWW91dHViZS5jc3ZcIiwgc2VwPScsJylcbiNzcF95JHVuaXF1ZSA8LSBwYXN0ZShzcF95JEFydGlzdCwgXCJfXCIsIHNwX3kkVHJhY2spXG5ncmFtbXkgPC0gcmVhZC5jc3YoXCJncmFtbXlTb25ncy5jc3ZcIiwgc2VwPScsJylcbiNncmFtbXkkdW5pcXVlIDwtIHBhc3RlKGdyYW1teSRBcnRpc3QsIFwiX1wiLCBncmFtbXkkTmFtZSlcbmBgYCJ9 -->
 <pre class="r"><code>sp_y &lt;- read.csv(&quot;Spotify_Youtube.csv&quot;, sep=&#39;,&#39;)
-sp_y$unique &lt;- paste(sp_y$Artist, &quot;_&quot;, sp_y$Track)
+#sp_y$unique &lt;- paste(sp_y$Artist, &quot;_&quot;, sp_y$Track)
 grammy &lt;- read.csv(&quot;grammySongs.csv&quot;, sep=&#39;,&#39;)
-grammy$unique &lt;- paste(grammy$Artist, &quot;_&quot;, grammy$Name)</code></pre>
+#grammy$unique &lt;- paste(grammy$Artist, &quot;_&quot;, grammy$Name)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The grammy dataset contains a lot of information in the titles of the songs that may lead to mismatches when joined with the sp_y dataset. That is why we have to clean it first so the joining of both dataframes can be done without problems. To do that, we are going to be using Regular Expressions.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc29uZ2luc3B5IDwtIGRhdGEuZnJhbWUoZ3JhbW15KVxuc29uZ2luc3B5JGluc3B5IDwtIGlmZWxzZShzb25naW5zcHkkdW5pcXVlICVpbiUgc3BfeSR1bmlxdWUsIFRSVUUgLCBGQUxTRSlcbmBgYCJ9 -->
+<pre class="r"><code>songinspy &lt;- data.frame(grammy)
+songinspy$inspy &lt;- ifelse(songinspy$unique %in% sp_y$unique, TRUE , FALSE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We first regularize the song and artist by using regex</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5saWJyYXJ5KHN0cmluZ3IpXG5cbiMgZmlyc3QgZm9yIHNwX3kgZGF0YWZyYW1lIFxuXG5zcF95JHJzb25nID0gc3BfeSRUcmFja1xuc3BfeSRyYXJ0aXN0ID0gc3BfeSRBcnRpc3Rcblxuc3BfeSRyc29uZyA8LSB0b2xvd2VyKHNwX3kkcnNvbmcpXG5zcF95JHJhcnRpc3QgPSB0b2xvd2VyKHNwX3kkcmFydGlzdClcblxuc3BfeSRyc29uZyA8LSBnc3ViKFwiXFxcXHMqXFxcXCguK3woP2kpXFxcXHMqZmVhdHVyaW5nLip8XFxcXHMtLipcIiwgXCJcIiwgc3BfeSRyc29uZylcbnNwX3kkcmFydGlzdCA8LSBnc3ViKFwiXFxcXHMrLipcIiwgXCJcIiwgc3BfeSRyYXJ0aXN0KVxuXG4jIHNhbWUgZm9yIGdyYW1teSBkYXRhZnJhbWUgIFxuXG5ncmFtbXkkcnNvbmcgPSBncmFtbXkkTmFtZVxuZ3JhbW15JHJhcnRpc3QgPSBncmFtbXkkQXJ0aXN0XG5cbmdyYW1teSRyc29uZyA8LSB0b2xvd2VyKGdyYW1teSRyc29uZylcbmdyYW1teSRyYXJ0aXN0ID0gdG9sb3dlcihncmFtbXkkcmFydGlzdClcblxuZ3JhbW15JHJzb25nIDwtIGdzdWIoXCJcXFxccypcXFxcKC4rfCg/aSlcXFxccypmZWF0dXJpbmcuKnxcXFxccy0uKlwiLCBcIlwiLCBncmFtbXkkcnNvbmcpXG5ncmFtbXkkcmFydGlzdCA8LSBnc3ViKFwiXFxcXHMrLipcIiwgXCJcIiwgZ3JhbW15JHJhcnRpc3QpXG5cbmBgYCJ9 -->
+<pre class="r"><code>
+library(stringr)
+
+# first for sp_y dataframe 
+
+sp_y$rsong = sp_y$Track
+sp_y$rartist = sp_y$Artist
+
+sp_y$rsong &lt;- tolower(sp_y$rsong)
+sp_y$rartist = tolower(sp_y$rartist)
+
+sp_y$rsong &lt;- gsub(&quot;\\s*\\(.+|(?i)\\s*featuring.*|\\s-.*&quot;, &quot;&quot;, sp_y$rsong)
+sp_y$rartist &lt;- gsub(&quot;\\s+.*&quot;, &quot;&quot;, sp_y$rartist)
+
+# same for grammy dataframe  
+
+grammy$rsong = grammy$Name
+grammy$rartist = grammy$Artist
+
+grammy$rsong &lt;- tolower(grammy$rsong)
+grammy$rartist = tolower(grammy$rartist)
+
+grammy$rsong &lt;- gsub(&quot;\\s*\\(.+|(?i)\\s*featuring.*|\\s-.*&quot;, &quot;&quot;, grammy$rsong)
+grammy$rartist &lt;- gsub(&quot;\\s+.*&quot;, &quot;&quot;, grammy$rartist)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Change the unique fields</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BfeSR1bmlxdWUgPC0gcGFzdGUoc3BfeSRyYXJ0aXN0LCBcIl9cIiwgc3BfeSRyc29uZylcbmdyYW1teSR1bmlxdWUgPC0gcGFzdGUoZ3JhbW15JHJhcnRpc3QsIFwiX1wiLCBncmFtbXkkcnNvbmcpXG5gYGAifQ== -->
+<pre class="r"><code>sp_y$unique &lt;- paste(sp_y$rartist, &quot;_&quot;, sp_y$rsong)
+grammy$unique &lt;- paste(grammy$rartist, &quot;_&quot;, grammy$rsong)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -257,6 +307,129 @@ grammy &lt;- grammy[!duplicated(grammy), ]</code></pre>
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BfeSR3aW5uZXIgPC0gaWZlbHNlKHNwX3kkdW5pcXVlICVpbiUgZ3JhbW15LCBUUlVFICwgRkFMU0UpXG5gYGAifQ== -->
 <pre class="r"><code>sp_y$winner &lt;- ifelse(sp_y$unique %in% grammy, TRUE , FALSE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29sbmFtZXMoc3BfeSlcbmBgYCJ9 -->
+<pre class="r"><code>colnames(sp_y)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Then we get rid of all the columns that do not provide any valuable information.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BfeSA9IHNwX3lbYygnQXJ0aXN0JywgJ1RyYWNrJywgJ0FsYnVtJywgJ0FsYnVtX3R5cGUnLCAnRGFuY2VhYmlsaXR5JywgXCJFbmVyZ3lcIiwgXCJLZXlcIiwgXCJMb3VkbmVzc1wiLCBcIlNwZWVjaGluZXNzXCIsIFwiQWNvdXN0aWNuZXNzXCIsIFwiSW5zdHJ1bWVudGFsbmVzc1wiLCBcIkxpdmVuZXNzXCIsIFwiVmFsZW5jZVwiLCBcIlRlbXBvXCIsIFwiRHVyYXRpb25fbXNcIiwgXCJWaWV3c1wiLCBcIkxpa2VzXCIsIFwiQ29tbWVudHNcIiwgXCJ3aW5uZXJcIildXG5gYGAifQ== -->
+<pre class="r"><code>sp_y = sp_y[c(&#39;Artist&#39;, &#39;Track&#39;, &#39;Album&#39;, &#39;Album_type&#39;, &#39;Danceability&#39;, &quot;Energy&quot;, &quot;Key&quot;, &quot;Loudness&quot;, &quot;Speechiness&quot;, &quot;Acousticness&quot;, &quot;Instrumentalness&quot;, &quot;Liveness&quot;, &quot;Valence&quot;, &quot;Tempo&quot;, &quot;Duration_ms&quot;, &quot;Views&quot;, &quot;Likes&quot;, &quot;Comments&quot;, &quot;winner&quot;)]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5saWJyYXJ5KGRwbHlyKVxuXG5uX2Rpc3RpbmN0KGdyYW1teSRyc29uZylcbmBgYCJ9 -->
+<pre class="r"><code>
+library(dplyr)
+
+n_distinct(grammy$rsong)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM2MVxuIn0= -->
+<pre><code>[1] 361</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShzcF95KVxuYGBgIn0= -->
+<pre class="r"><code>summary(sp_y)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgIFggICAgICAgICAgICBBcnRpc3QgICAgICAgICAgVXJsX3Nwb3RpZnkgICAgICAgICAgIFRyYWNrICAgICAgICAgIFxuIE1pbi4gICA6ICAgIDAgICBMZW5ndGg6MjA3MTggICAgICAgTGVuZ3RoOjIwNzE4ICAgICAgIExlbmd0aDoyMDcxOCAgICAgIFxuIDFzdCBRdS46IDUxNzkgICBDbGFzcyA6Y2hhcmFjdGVyICAgQ2xhc3MgOmNoYXJhY3RlciAgIENsYXNzIDpjaGFyYWN0ZXIgIFxuIE1lZGlhbiA6MTAzNTggICBNb2RlICA6Y2hhcmFjdGVyICAgTW9kZSAgOmNoYXJhY3RlciAgIE1vZGUgIDpjaGFyYWN0ZXIgIFxuIE1lYW4gICA6MTAzNTggICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIDNyZCBRdS46MTU1MzggICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIE1heC4gICA6MjA3MTcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICAgIEFsYnVtICAgICAgICAgICAgQWxidW1fdHlwZSAgICAgICAgICAgIFVyaSAgICAgICAgICAgICBEYW5jZWFiaWxpdHkgICBcbiBMZW5ndGg6MjA3MTggICAgICAgTGVuZ3RoOjIwNzE4ICAgICAgIExlbmd0aDoyMDcxOCAgICAgICBNaW4uICAgOjAuMDAwMCAgXG4gQ2xhc3MgOmNoYXJhY3RlciAgIENsYXNzIDpjaGFyYWN0ZXIgICBDbGFzcyA6Y2hhcmFjdGVyICAgMXN0IFF1LjowLjUxODAgIFxuIE1vZGUgIDpjaGFyYWN0ZXIgICBNb2RlICA6Y2hhcmFjdGVyICAgTW9kZSAgOmNoYXJhY3RlciAgIE1lZGlhbiA6MC42MzcwICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBNZWFuICAgOjAuNjE5OCAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgM3JkIFF1LjowLjc0MDIgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE1heC4gICA6MC45NzUwICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBOQSdzICAgOjIgICAgICAgXG4gICAgIEVuZXJneSAgICAgICAgICAgICAgIEtleSAgICAgICAgICBMb3VkbmVzcyAgICAgICAgU3BlZWNoaW5lc3MgICAgIFxuIE1pbi4gICA6MC4wMDAwMjAzICAgTWluLiAgIDogMC4wICAgTWluLiAgIDotNDYuMjUxICAgTWluLiAgIDowLjAwMDAwICBcbiAxc3QgUXUuOjAuNTA3MDAwMCAgIDFzdCBRdS46IDIuMCAgIDFzdCBRdS46IC04Ljg1OCAgIDFzdCBRdS46MC4wMzU3MCAgXG4gTWVkaWFuIDowLjY2NjAwMDAgICBNZWRpYW4gOiA1LjAgICBNZWRpYW4gOiAtNi41MzYgICBNZWRpYW4gOjAuMDUwNTAgIFxuIE1lYW4gICA6MC42MzUyNTAzICAgTWVhbiAgIDogNS4zICAgTWVhbiAgIDogLTcuNjcyICAgTWVhbiAgIDowLjA5NjQ2ICBcbiAzcmQgUXUuOjAuNzk4MDAwMCAgIDNyZCBRdS46IDguMCAgIDNyZCBRdS46IC00LjkzMSAgIDNyZCBRdS46MC4xMDMwMCAgXG4gTWF4LiAgIDoxLjAwMDAwMDAgICBNYXguICAgOjExLjAgICBNYXguICAgOiAgMC45MjAgICBNYXguICAgOjAuOTY0MDAgIFxuIE5BJ3MgICA6MiAgICAgICAgICAgTkEncyAgIDoyICAgICAgTkEncyAgIDoyICAgICAgICAgTkEncyAgIDoyICAgICAgICBcbiAgQWNvdXN0aWNuZXNzICAgICAgIEluc3RydW1lbnRhbG5lc3MgICAgICAgTGl2ZW5lc3MgICAgICAgICBWYWxlbmNlICAgICAgICAgICBUZW1wbyAgICAgIFxuIE1pbi4gICA6MC4wMDAwMDExICAgTWluLiAgIDowLjAwMDAwMDAgICBNaW4uICAgOjAuMDE0NSAgIE1pbi4gICA6MC4wMDAwICAgTWluLiAgIDogIDAuMCAgXG4gMXN0IFF1LjowLjA0NTIwMDAgICAxc3QgUXUuOjAuMDAwMDAwMCAgIDFzdCBRdS46MC4wOTQxICAgMXN0IFF1LjowLjMzOTAgICAxc3QgUXUuOiA5Ny4wICBcbiBNZWRpYW4gOjAuMTkzMDAwMCAgIE1lZGlhbiA6MC4wMDAwMDI0ICAgTWVkaWFuIDowLjEyNTAgICBNZWRpYW4gOjAuNTM3MCAgIE1lZGlhbiA6MTIwLjAgIFxuIE1lYW4gICA6MC4yOTE1MzUzICAgTWVhbiAgIDowLjA1NTk2MTYgICBNZWFuICAgOjAuMTkzNSAgIE1lYW4gICA6MC41Mjk5ICAgTWVhbiAgIDoxMjAuNiAgXG4gM3JkIFF1LjowLjQ3NzI1MDAgICAzcmQgUXUuOjAuMDAwNDYzMCAgIDNyZCBRdS46MC4yMzcwICAgM3JkIFF1LjowLjcyNjIgICAzcmQgUXUuOjEzOS45ICBcbiBNYXguICAgOjAuOTk2MDAwMCAgIE1heC4gICA6MS4wMDAwMDAwICAgTWF4LiAgIDoxLjAwMDAgICBNYXguICAgOjAuOTkzMCAgIE1heC4gICA6MjQzLjQgIFxuIE5BJ3MgICA6MiAgICAgICAgICAgTkEncyAgIDoyICAgICAgICAgICBOQSdzICAgOjIgICAgICAgIE5BJ3MgICA6MiAgICAgICAgTkEncyAgIDoyICAgICAgXG4gIER1cmF0aW9uX21zICAgICAgVXJsX3lvdXR1YmUgICAgICAgICAgIFRpdGxlICAgICAgICAgICAgIENoYW5uZWwgICAgICAgICBcbiBNaW4uICAgOiAgMzA5ODUgICBMZW5ndGg6MjA3MTggICAgICAgTGVuZ3RoOjIwNzE4ICAgICAgIExlbmd0aDoyMDcxOCAgICAgIFxuIDFzdCBRdS46IDE4MDAxMCAgIENsYXNzIDpjaGFyYWN0ZXIgICBDbGFzcyA6Y2hhcmFjdGVyICAgQ2xhc3MgOmNoYXJhY3RlciAgXG4gTWVkaWFuIDogMjEzMjg0ICAgTW9kZSAgOmNoYXJhY3RlciAgIE1vZGUgIDpjaGFyYWN0ZXIgICBNb2RlICA6Y2hhcmFjdGVyICBcbiBNZWFuICAgOiAyMjQ3MTggICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIDNyZCBRdS46IDI1MjQ0MyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gTWF4LiAgIDo0Njc2MDU4ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiBOQSdzICAgOjIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICAgICBWaWV3cyAgICAgICAgICAgICAgIExpa2VzICAgICAgICAgICAgIENvbW1lbnRzICAgICAgICBEZXNjcmlwdGlvbiAgICAgICBcbiBNaW4uICAgOjAuMDAwZSswMCAgIE1pbi4gICA6ICAgICAgIDAgICBNaW4uICAgOiAgICAgICAwICAgTGVuZ3RoOjIwNzE4ICAgICAgXG4gMXN0IFF1LjoxLjgyNmUrMDYgICAxc3QgUXUuOiAgIDIxNTgxICAgMXN0IFF1LjogICAgIDUwOSAgIENsYXNzIDpjaGFyYWN0ZXIgIFxuIE1lZGlhbiA6MS40NTBlKzA3ICAgTWVkaWFuIDogIDEyNDQ4MSAgIE1lZGlhbiA6ICAgIDMyNzcgICBNb2RlICA6Y2hhcmFjdGVyICBcbiBNZWFuICAgOjkuMzk0ZSswNyAgIE1lYW4gICA6ICA2NjMzNDEgICBNZWFuICAgOiAgIDI3NTE5ICAgICAgICAgICAgICAgICAgICAgXG4gM3JkIFF1Ljo3LjA0MGUrMDcgICAzcmQgUXUuOiAgNTIyMTQ4ICAgM3JkIFF1LjogICAxNDM2MCAgICAgICAgICAgICAgICAgICAgIFxuIE1heC4gICA6OC4wODBlKzA5ICAgTWF4LiAgIDo1MDc4ODY1MiAgIE1heC4gICA6MTYwODMxMzggICAgICAgICAgICAgICAgICAgICBcbiBOQSdzICAgOjQ3MCAgICAgICAgIE5BJ3MgICA6NTQxICAgICAgICBOQSdzICAgOjU2OSAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICBMaWNlbnNlZCAgICAgICAgIG9mZmljaWFsX3ZpZGVvICAgICAgICAgU3RyZWFtICAgICAgICAgICAgIHJzb25nICAgICAgICAgIFxuIExlbmd0aDoyMDcxOCAgICAgICBMZW5ndGg6MjA3MTggICAgICAgTWluLiAgIDo2LjU3NGUrMDMgICBMZW5ndGg6MjA3MTggICAgICBcbiBDbGFzcyA6Y2hhcmFjdGVyICAgQ2xhc3MgOmNoYXJhY3RlciAgIDFzdCBRdS46MS43NjdlKzA3ICAgQ2xhc3MgOmNoYXJhY3RlciAgXG4gTW9kZSAgOmNoYXJhY3RlciAgIE1vZGUgIDpjaGFyYWN0ZXIgICBNZWRpYW4gOjQuOTY4ZSswNyAgIE1vZGUgIDpjaGFyYWN0ZXIgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTWVhbiAgIDoxLjM1OWUrMDggICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDNyZCBRdS46MS4zODRlKzA4ICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBNYXguICAgOjMuMzg3ZSswOSAgICAgICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTkEncyAgIDo1NzYgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgIHJhcnRpc3QgICAgICAgICAgICAgdW5pcXVlICAgICAgICAgICAgd2lubmVyICAgICAgIFxuIExlbmd0aDoyMDcxOCAgICAgICBMZW5ndGg6MjA3MTggICAgICAgTW9kZSA6bG9naWNhbCAgXG4gQ2xhc3MgOmNoYXJhY3RlciAgIENsYXNzIDpjaGFyYWN0ZXIgICBGQUxTRToyMDU3MSAgICBcbiBNb2RlICA6Y2hhcmFjdGVyICAgTW9kZSAgOmNoYXJhY3RlciAgIFRSVUUgOjE0NyAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4ifQ== -->
+<pre><code>       X            Artist          Url_spotify           Track          
+ Min.   :    0   Length:20718       Length:20718       Length:20718      
+ 1st Qu.: 5179   Class :character   Class :character   Class :character  
+ Median :10358   Mode  :character   Mode  :character   Mode  :character  
+ Mean   :10358                                                           
+ 3rd Qu.:15538                                                           
+ Max.   :20717                                                           
+                                                                         
+    Album            Album_type            Uri             Danceability   
+ Length:20718       Length:20718       Length:20718       Min.   :0.0000  
+ Class :character   Class :character   Class :character   1st Qu.:0.5180  
+ Mode  :character   Mode  :character   Mode  :character   Median :0.6370  
+                                                          Mean   :0.6198  
+                                                          3rd Qu.:0.7402  
+                                                          Max.   :0.9750  
+                                                          NA&#39;s   :2       
+     Energy               Key          Loudness        Speechiness     
+ Min.   :0.0000203   Min.   : 0.0   Min.   :-46.251   Min.   :0.00000  
+ 1st Qu.:0.5070000   1st Qu.: 2.0   1st Qu.: -8.858   1st Qu.:0.03570  
+ Median :0.6660000   Median : 5.0   Median : -6.536   Median :0.05050  
+ Mean   :0.6352503   Mean   : 5.3   Mean   : -7.672   Mean   :0.09646  
+ 3rd Qu.:0.7980000   3rd Qu.: 8.0   3rd Qu.: -4.931   3rd Qu.:0.10300  
+ Max.   :1.0000000   Max.   :11.0   Max.   :  0.920   Max.   :0.96400  
+ NA&#39;s   :2           NA&#39;s   :2      NA&#39;s   :2         NA&#39;s   :2        
+  Acousticness       Instrumentalness       Liveness         Valence           Tempo      
+ Min.   :0.0000011   Min.   :0.0000000   Min.   :0.0145   Min.   :0.0000   Min.   :  0.0  
+ 1st Qu.:0.0452000   1st Qu.:0.0000000   1st Qu.:0.0941   1st Qu.:0.3390   1st Qu.: 97.0  
+ Median :0.1930000   Median :0.0000024   Median :0.1250   Median :0.5370   Median :120.0  
+ Mean   :0.2915353   Mean   :0.0559616   Mean   :0.1935   Mean   :0.5299   Mean   :120.6  
+ 3rd Qu.:0.4772500   3rd Qu.:0.0004630   3rd Qu.:0.2370   3rd Qu.:0.7262   3rd Qu.:139.9  
+ Max.   :0.9960000   Max.   :1.0000000   Max.   :1.0000   Max.   :0.9930   Max.   :243.4  
+ NA&#39;s   :2           NA&#39;s   :2           NA&#39;s   :2        NA&#39;s   :2        NA&#39;s   :2      
+  Duration_ms      Url_youtube           Title             Channel         
+ Min.   :  30985   Length:20718       Length:20718       Length:20718      
+ 1st Qu.: 180010   Class :character   Class :character   Class :character  
+ Median : 213284   Mode  :character   Mode  :character   Mode  :character  
+ Mean   : 224718                                                           
+ 3rd Qu.: 252443                                                           
+ Max.   :4676058                                                           
+ NA&#39;s   :2                                                                 
+     Views               Likes             Comments        Description       
+ Min.   :0.000e+00   Min.   :       0   Min.   :       0   Length:20718      
+ 1st Qu.:1.826e+06   1st Qu.:   21581   1st Qu.:     509   Class :character  
+ Median :1.450e+07   Median :  124481   Median :    3277   Mode  :character  
+ Mean   :9.394e+07   Mean   :  663341   Mean   :   27519                     
+ 3rd Qu.:7.040e+07   3rd Qu.:  522148   3rd Qu.:   14360                     
+ Max.   :8.080e+09   Max.   :50788652   Max.   :16083138                     
+ NA&#39;s   :470         NA&#39;s   :541        NA&#39;s   :569                          
+   Licensed         official_video         Stream             rsong          
+ Length:20718       Length:20718       Min.   :6.574e+03   Length:20718      
+ Class :character   Class :character   1st Qu.:1.767e+07   Class :character  
+ Mode  :character   Mode  :character   Median :4.968e+07   Mode  :character  
+                                       Mean   :1.359e+08                     
+                                       3rd Qu.:1.384e+08                     
+                                       Max.   :3.387e+09                     
+                                       NA&#39;s   :576                           
+   rartist             unique            winner       
+ Length:20718       Length:20718       Mode :logical  
+ Class :character   Class :character   FALSE:20571    
+ Mode  :character   Mode  :character   TRUE :147      
+                                                      
+                                                      
+                                                      
+                                                      </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We proceed to delete all the rows with NA’s.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BfeSA9IG5hLm9taXQoc3BfeSlcbmBgYCJ9 -->
+<pre class="r"><code>sp_y = na.omit(sp_y)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShzcF95KVxuYGBgIn0= -->
+<pre class="r"><code>summary(sp_y)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2lubmVycyA9IHNwX3lbc3BfeSR3aW5uZXIgPT0gVFJVRV1cbmBgYCJ9 -->
+<pre class="r"><code>winners = sp_y[sp_y$winner == TRUE]</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -287,7 +460,7 @@ grammy &lt;- grammy[!duplicated(grammy), ]</code></pre>
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiU0wgUHJvamVjdCIKb3V0cHV0OgogIGh0bWxfbm90ZWJvb2s6IGRlZmF1bHQKICBwZGZfZG9jdW1lbnQ6IGRlZmF1bHQKLS0tCgo+VGhpcyBpcyBhIHN1Z2dlc3RlZCBhcHByb2FjaCB0aGF0IENoYXQgR1BUIGdhdmUgdXMgKG5vdCBiYWQgYXQgYWxsKQoKIyAxLiBEZWZpbmUgdGhlIFJlc2VhcmNoIFF1ZXN0aW9ucwoKQ2xlYXJseSBzdGF0ZSB0aGUgcmVzZWFyY2ggcXVlc3Rpb25zIHlvdSB3YW50IHRvIGFuc3dlciB0aHJvdWdoIHlvdXIgYW5hbHlzaXMuIEZvciBleGFtcGxlOgoKKiBIb3cgZG8gdGhlIFNwb3RpZnkgc3RhdGlzdGljcyAoZS5nLiwgc3RyZWFtcywgYXVkaW8gZmVhdHVyZXMpIG9mIGEgc29uZyBpbmZsdWVuY2UgaXRzIHByb2JhYmlsaXR5IG9mIHdpbm5pbmcgYSBHcmFtbXk/CiogSG93IGRvIHRoZSBZb3VUdWJlIHN0YXRpc3RpY3MgKGUuZy4sIHZpZXdzKSBvZiBhIHNvbmcgaW5mbHVlbmNlIGl0cyBwcm9iYWJpbGl0eSBvZiB3aW5uaW5nIGEgR3JhbW15PwoKIyAyLiBEYXRhIENvbGxlY3Rpb24KCiMgMy4gRGF0YSBQcmVwYXJhdGlvbgoKT25jZSB5b3UgaGF2ZSBjb2xsZWN0ZWQgdGhlIGRhdGEsIHlvdSdsbCBuZWVkIHRvIHByZXBhcmUgaXQgZm9yIGFuYWx5c2lzLiBUaGlzIHN0ZXAgbWF5IGludm9sdmUgY2xlYW5pbmcgdGhlIGRhdGEsIGhhbmRsaW5nIG1pc3NpbmcgdmFsdWVzLCBhbmQgdHJhbnNmb3JtaW5nIHRoZSBkYXRhIGludG8gYSBzdWl0YWJsZSBmb3JtYXQgZm9yIGFuYWx5c2lzLiBFbnN1cmUgdGhhdCB0aGUgZGF0YSBmcm9tIGJvdGggU3BvdGlmeSBhbmQgWW91VHViZSBhcmUgYWxpZ25lZCB3aXRoIGVhY2ggb3RoZXIgYW5kIGNhbiBiZSBtYXRjaGVkIGJhc2VkIG9uIGNvbW1vbiBpZGVudGlmaWVycyAoZS5nLiwgc29uZyB0aXRsZSwgYXJ0aXN0LCB5ZWFyKS4KCldlIHN0YXJ0IG9mIGJ5IHJlYWRpbmcgdGhlIENTViBmaWxlcyB3ZSBoYXZlIHByZXZpb3VzbHkgZG93bmxvYWRlZC4KCmBgYHtyfQpzcF95IDwtIHJlYWQuY3N2KCJTcG90aWZ5X1lvdXR1YmUuY3N2Iiwgc2VwPScsJykKc3BfeSR1bmlxdWUgPC0gcGFzdGUoc3BfeSRBcnRpc3QsICJfIiwgc3BfeSRUcmFjaykKZ3JhbW15IDwtIHJlYWQuY3N2KCJncmFtbXlTb25ncy5jc3YiLCBzZXA9JywnKQpncmFtbXkkdW5pcXVlIDwtIHBhc3RlKGdyYW1teSRBcnRpc3QsICJfIiwgZ3JhbW15JE5hbWUpCmBgYAoKV2Ugb25seSBuZWVkIHRvIGtub3cgaWYgdGhlIHNvbmcgd29uIGFuIGF3YXJkIG9yIG5vdCwgbm8gbWF0dGVyIHdoaWNoIG9uZSBpdCBpcy4gVGhhdCBpcyB3aHkgd2Ugb25seSBrZWVwIHRoZSBmaWVsZCAndW5pcXVlJyBmcm9tIHRoZSBncmFtbXkgZGF0YWZyYW1lIGFuZCB3ZSByZW1vdmUgYWxsIHRoZSBkdXBsaWNhdGVzLgoKYGBge3J9CmdyYW1teSA8LSBncmFtbXlbYygndW5pcXVlJyldCmdyYW1teSA8LSBncmFtbXlbIWR1cGxpY2F0ZWQoZ3JhbW15KSwgXQpgYGAKCldlIGNyZWF0ZSBhIG5ldyBjb2x1bW4gJ3dpbm5lcicgaW4gdGhlIHNwX3kgZGF0YWZyYW1lLiBUaGlzIGlzIGEgYm9vbGVhbiB0eXBlIGNvbHVtbiB3aGljaCB2YWx1ZSBpcyB0cnVlIGlmIHRoZSBzb25nIGhhcyBiZWVuIGF3YXJkZWQgYSBncmFtbXkuCgpgYGB7cn0Kc3BfeSR3aW5uZXIgPC0gaWZlbHNlKHNwX3kkdW5pcXVlICVpbiUgZ3JhbW15LCBUUlVFICwgRkFMU0UpCmBgYAoKIyA0LiBFeHBsb3JhdG9yeSBEYXRhIEFuYWx5c2lzCgpQZXJmb3JtIGV4cGxvcmF0b3J5IGRhdGEgYW5hbHlzaXMgdG8gdW5kZXJzdGFuZCB0aGUgY2hhcmFjdGVyaXN0aWNzIG9mIHlvdXIgZGF0YS4gVGhpcyBzdGVwIHdpbGwgaGVscCB5b3UgaWRlbnRpZnkgYW55IHBhdHRlcm5zIG9yIGluc2lnaHRzIHRoYXQgbWF5IGd1aWRlIHlvdXIgYW5hbHlzaXMuIFZpc3VhbGl6ZSB0aGUgZGF0YSwgY2FsY3VsYXRlIHN1bW1hcnkgc3RhdGlzdGljcywgYW5kIGxvb2sgZm9yIGNvcnJlbGF0aW9ucyBiZXR3ZWVuIGRpZmZlcmVudCB2YXJpYWJsZXMuCgojIDUuIEZlYXR1cmUgU2VsZWN0aW9uCgpEZXRlcm1pbmUgd2hpY2ggdmFyaWFibGVzIGZyb20gYm90aCB0aGUgU3BvdGlmeSBhbmQgWW91VHViZSBkYXRhc2V0cyBhcmUgcmVsZXZhbnQgZm9yIHlvdXIgYW5hbHlzaXMuIFlvdSBjYW4gdXNlIHRlY2huaXF1ZXMgc3VjaCBhcyBjb3JyZWxhdGlvbiBhbmFseXNpcyBvciBmZWF0dXJlIGltcG9ydGFuY2UgbWV0aG9kcyB0byBpZGVudGlmeSB0aGUgbW9zdCBpbmZsdWVudGlhbCBmZWF0dXJlcy4KCiMgNi4gTW9kZWwgRGV2ZWxvcG1lbnQKCkJ1aWxkIGEgcHJlZGljdGl2ZSBtb2RlbCB0byBhc3Nlc3MgdGhlIGluZmx1ZW5jZSBvZiBTcG90aWZ5IGFuZCBZb3VUdWJlIHN0YXRpc3RpY3Mgb24gdGhlIHByb2JhYmlsaXR5IG9mIHdpbm5pbmcgYSBHcmFtbXkuIFlvdSBjYW4gdXNlIHRlY2huaXF1ZXMgc3VjaCBhcyBsb2dpc3RpYyByZWdyZXNzaW9uLCByYW5kb20gZm9yZXN0cywgb3IgZ3JhZGllbnQgYm9vc3RpbmcgYWxnb3JpdGhtcy4gVGhlIEdyYW1teSB3aW4gKDEgb3IgMCkgd2lsbCBiZSB0aGUgdGFyZ2V0IHZhcmlhYmxlLCBhbmQgdGhlIHJlbGV2YW50IGZlYXR1cmVzIGZyb20gYm90aCBkYXRhc2V0cyB3aWxsIGJlIHRoZSBpbnB1dCB2YXJpYWJsZXMuCgojIDcuIE1vZGVsIEV2YWx1YXRpb24KCkV2YWx1YXRlIHRoZSBwZXJmb3JtYW5jZSBvZiB5b3VyIG1vZGVsIHVzaW5nIGFwcHJvcHJpYXRlIGV2YWx1YXRpb24gbWV0cmljcyBzdWNoIGFzIGFjY3VyYWN5LCBwcmVjaXNpb24sIHJlY2FsbCwgb3IgYXJlYSB1bmRlciB0aGUgUk9DIGN1cnZlLiBDcm9zcy12YWxpZGF0aW9uIHRlY2huaXF1ZXMgY2FuIGhlbHAgZW5zdXJlIHRoZSByb2J1c3RuZXNzIG9mIHlvdXIgcmVzdWx0cy4KCiMgOC4gSW50ZXJwcmV0YXRpb24gYW5kIENvbmNsdXNpb24KCkludGVycHJldCB0aGUgcmVzdWx0cyBvZiB5b3VyIGFuYWx5c2lzIGFuZCBkcmF3IGNvbmNsdXNpb25zIGJhc2VkIG9uIHlvdXIgZmluZGluZ3MuIERpc2N1c3MgdGhlIHNpZ25pZmljYW5jZSBhbmQgaW5mbHVlbmNlIG9mIFNwb3RpZnkgYW5kIFlvdVR1YmUgc3RhdGlzdGljcyBvbiB0aGUgcHJvYmFiaWxpdHkgb2Ygd2lubmluZyBhIEdyYW1teS4KCiMgOS4gRG9jdW1lbnRhdGlvbiBhbmQgVmlzdWFsaXphdGlvbgoKRG9jdW1lbnQgeW91ciBwcm9qZWN0LCBpbmNsdWRpbmcgdGhlIHN0ZXBzIHlvdSBmb2xsb3dlZCwgdGhlIGRhdGEgc291cmNlcywgdGhlIGFuYWx5c2lzIHRlY2huaXF1ZXMgdXNlZCwgYW5kIHRoZSByZXN1bHRzIG9idGFpbmVkLiBVc2UgdmlzdWFsaXphdGlvbnMgc3VjaCBhcyBjaGFydHMsIGdyYXBocywgb3IgdGFibGVzIHRvIHByZXNlbnQgeW91ciBmaW5kaW5ncyBlZmZlY3RpdmVseS4=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiU0wgUHJvamVjdCIKb3V0cHV0OgogIHBkZl9kb2N1bWVudDogZGVmYXVsdAogIGh0bWxfbm90ZWJvb2s6IGRlZmF1bHQKLS0tCgo+VGhpcyBpcyBhIHN1Z2dlc3RlZCBhcHByb2FjaCB0aGF0IENoYXRHUFQgZ2F2ZSB1cyAobm90IGJhZCBhdCBhbGwpCgojIDEuIERlZmluZSB0aGUgUmVzZWFyY2ggUXVlc3Rpb25zCgpDbGVhcmx5IHN0YXRlIHRoZSByZXNlYXJjaCBxdWVzdGlvbnMgeW91IHdhbnQgdG8gYW5zd2VyIHRocm91Z2ggeW91ciBhbmFseXNpcy4gRm9yIGV4YW1wbGU6CgoqIEhvdyBkbyB0aGUgU3BvdGlmeSBzdGF0aXN0aWNzIChlLmcuLCBzdHJlYW1zLCBhdWRpbyBmZWF0dXJlcykgb2YgYSBzb25nIGluZmx1ZW5jZSBpdHMgcHJvYmFiaWxpdHkgb2Ygd2lubmluZyBhIEdyYW1teT8KKiBIb3cgZG8gdGhlIFlvdVR1YmUgc3RhdGlzdGljcyAoZS5nLiwgdmlld3MpIG9mIGEgc29uZyBpbmZsdWVuY2UgaXRzIHByb2JhYmlsaXR5IG9mIHdpbm5pbmcgYSBHcmFtbXk/CgojIDIuIERhdGEgQ29sbGVjdGlvbgoKIyAzLiBEYXRhIFByZXBhcmF0aW9uCgpPbmNlIHlvdSBoYXZlIGNvbGxlY3RlZCB0aGUgZGF0YSwgeW91J2xsIG5lZWQgdG8gcHJlcGFyZSBpdCBmb3IgYW5hbHlzaXMuIFRoaXMgc3RlcCBtYXkgaW52b2x2ZSBjbGVhbmluZyB0aGUgZGF0YSwgaGFuZGxpbmcgbWlzc2luZyB2YWx1ZXMsIGFuZCB0cmFuc2Zvcm1pbmcgdGhlIGRhdGEgaW50byBhIHN1aXRhYmxlIGZvcm1hdCBmb3IgYW5hbHlzaXMuIEVuc3VyZSB0aGF0IHRoZSBkYXRhIGZyb20gYm90aCBTcG90aWZ5IGFuZCBZb3VUdWJlIGFyZSBhbGlnbmVkIHdpdGggZWFjaCBvdGhlciBhbmQgY2FuIGJlIG1hdGNoZWQgYmFzZWQgb24gY29tbW9uIGlkZW50aWZpZXJzIChlLmcuLCBzb25nIHRpdGxlLCBhcnRpc3QsIHllYXIpLgoKV2Ugc3RhcnQgb2YgYnkgcmVhZGluZyB0aGUgQ1NWIGZpbGVzIHdlIGhhdmUgcHJldmlvdXNseSBkb3dubG9hZGVkLgoKYGBge3J9CnNwX3kgPC0gcmVhZC5jc3YoIlNwb3RpZnlfWW91dHViZS5jc3YiLCBzZXA9JywnKQojc3BfeSR1bmlxdWUgPC0gcGFzdGUoc3BfeSRBcnRpc3QsICJfIiwgc3BfeSRUcmFjaykKZ3JhbW15IDwtIHJlYWQuY3N2KCJncmFtbXlTb25ncy5jc3YiLCBzZXA9JywnKQojZ3JhbW15JHVuaXF1ZSA8LSBwYXN0ZShncmFtbXkkQXJ0aXN0LCAiXyIsIGdyYW1teSROYW1lKQpgYGAKClRoZSBncmFtbXkgZGF0YXNldCBjb250YWlucyBhIGxvdCBvZiBpbmZvcm1hdGlvbiBpbiB0aGUgdGl0bGVzIG9mIHRoZSBzb25ncyB0aGF0IG1heSBsZWFkIHRvIG1pc21hdGNoZXMgd2hlbiBqb2luZWQgd2l0aCB0aGUgc3BfeSBkYXRhc2V0LiBUaGF0IGlzIHdoeSB3ZSBoYXZlIHRvIGNsZWFuIGl0IGZpcnN0IHNvIHRoZSBqb2luaW5nIG9mIGJvdGggZGF0YWZyYW1lcyBjYW4gYmUgZG9uZSB3aXRob3V0IHByb2JsZW1zLiBUbyBkbyB0aGF0LCB3ZSBhcmUgZ29pbmcgdG8gYmUgdXNpbmcgUmVndWxhciBFeHByZXNzaW9ucy4KCmBgYHtyfQpzb25naW5zcHkgPC0gZGF0YS5mcmFtZShncmFtbXkpCnNvbmdpbnNweSRpbnNweSA8LSBpZmVsc2Uoc29uZ2luc3B5JHVuaXF1ZSAlaW4lIHNwX3kkdW5pcXVlLCBUUlVFICwgRkFMU0UpCmBgYAoKV2UgZmlyc3QgcmVndWxhcml6ZSB0aGUgc29uZyBhbmQgYXJ0aXN0IGJ5IHVzaW5nIHJlZ2V4CgpgYGB7cn0KCmxpYnJhcnkoc3RyaW5ncikKCiMgZmlyc3QgZm9yIHNwX3kgZGF0YWZyYW1lIAoKc3BfeSRyc29uZyA9IHNwX3kkVHJhY2sKc3BfeSRyYXJ0aXN0ID0gc3BfeSRBcnRpc3QKCnNwX3kkcnNvbmcgPC0gdG9sb3dlcihzcF95JHJzb25nKQpzcF95JHJhcnRpc3QgPSB0b2xvd2VyKHNwX3kkcmFydGlzdCkKCnNwX3kkcnNvbmcgPC0gZ3N1YigiXFxzKlxcKC4rfCg/aSlcXHMqZmVhdHVyaW5nLip8XFxzLS4qIiwgIiIsIHNwX3kkcnNvbmcpCnNwX3kkcmFydGlzdCA8LSBnc3ViKCJcXHMrLioiLCAiIiwgc3BfeSRyYXJ0aXN0KQoKIyBzYW1lIGZvciBncmFtbXkgZGF0YWZyYW1lICAKCmdyYW1teSRyc29uZyA9IGdyYW1teSROYW1lCmdyYW1teSRyYXJ0aXN0ID0gZ3JhbW15JEFydGlzdAoKZ3JhbW15JHJzb25nIDwtIHRvbG93ZXIoZ3JhbW15JHJzb25nKQpncmFtbXkkcmFydGlzdCA9IHRvbG93ZXIoZ3JhbW15JHJhcnRpc3QpCgpncmFtbXkkcnNvbmcgPC0gZ3N1YigiXFxzKlxcKC4rfCg/aSlcXHMqZmVhdHVyaW5nLip8XFxzLS4qIiwgIiIsIGdyYW1teSRyc29uZykKZ3JhbW15JHJhcnRpc3QgPC0gZ3N1YigiXFxzKy4qIiwgIiIsIGdyYW1teSRyYXJ0aXN0KQoKYGBgCgpDaGFuZ2UgdGhlIHVuaXF1ZSBmaWVsZHMKCmBgYHtyfQpzcF95JHVuaXF1ZSA8LSBwYXN0ZShzcF95JHJhcnRpc3QsICJfIiwgc3BfeSRyc29uZykKZ3JhbW15JHVuaXF1ZSA8LSBwYXN0ZShncmFtbXkkcmFydGlzdCwgIl8iLCBncmFtbXkkcnNvbmcpCmBgYAoKV2Ugb25seSBuZWVkIHRvIGtub3cgaWYgdGhlIHNvbmcgd29uIGFuIGF3YXJkIG9yIG5vdCwgbm8gbWF0dGVyIHdoaWNoIG9uZSBpdCBpcy4gVGhhdCBpcyB3aHkgd2Ugb25seSBrZWVwIHRoZSBmaWVsZCAndW5pcXVlJyBmcm9tIHRoZSBncmFtbXkgZGF0YWZyYW1lIGFuZCB3ZSByZW1vdmUgYWxsIHRoZSBkdXBsaWNhdGVzLgoKYGBge3J9CmdyYW1teSA8LSBncmFtbXlbYygndW5pcXVlJyldCmdyYW1teSA8LSBncmFtbXlbIWR1cGxpY2F0ZWQoZ3JhbW15KSwgXQpgYGAKCldlIGNyZWF0ZSBhIG5ldyBjb2x1bW4gJ3dpbm5lcicgaW4gdGhlIHNwX3kgZGF0YWZyYW1lLiBUaGlzIGlzIGEgYm9vbGVhbiB0eXBlIGNvbHVtbiB3aGljaCB2YWx1ZSBpcyB0cnVlIGlmIHRoZSBzb25nIGhhcyBiZWVuIGF3YXJkZWQgYSBncmFtbXkuCgpgYGB7cn0Kc3BfeSR3aW5uZXIgPC0gaWZlbHNlKHNwX3kkdW5pcXVlICVpbiUgZ3JhbW15LCBUUlVFICwgRkFMU0UpCmBgYAoKYGBge3J9CmNvbG5hbWVzKHNwX3kpCmBgYAoKVGhlbiB3ZSBnZXQgcmlkIG9mIGFsbCB0aGUgY29sdW1ucyB0aGF0IGRvIG5vdCBwcm92aWRlIGFueSB2YWx1YWJsZSBpbmZvcm1hdGlvbi4gCgpgYGB7cn0Kc3BfeSA9IHNwX3lbYygnQXJ0aXN0JywgJ1RyYWNrJywgJ0FsYnVtJywgJ0FsYnVtX3R5cGUnLCAnRGFuY2VhYmlsaXR5JywgIkVuZXJneSIsICJLZXkiLCAiTG91ZG5lc3MiLCAiU3BlZWNoaW5lc3MiLCAiQWNvdXN0aWNuZXNzIiwgIkluc3RydW1lbnRhbG5lc3MiLCAiTGl2ZW5lc3MiLCAiVmFsZW5jZSIsICJUZW1wbyIsICJEdXJhdGlvbl9tcyIsICJWaWV3cyIsICJMaWtlcyIsICJDb21tZW50cyIsICJ3aW5uZXIiKV0KYGBgCgoKYGBge3J9CgpsaWJyYXJ5KGRwbHlyKQoKbl9kaXN0aW5jdChncmFtbXkkcnNvbmcpCgpgYGAKCmBgYHtyfQpzdW1tYXJ5KHNwX3kpCmBgYAoKV2UgcHJvY2VlZCB0byBkZWxldGUgYWxsIHRoZSByb3dzIHdpdGggTkEncy4KCmBgYHtyfQpzcF95ID0gbmEub21pdChzcF95KQpgYGAKCmBgYHtyfQpzdW1tYXJ5KHNwX3kpCmBgYAoKYGBge3J9Cndpbm5lcnMgPSBzcF95W3NwX3kkd2lubmVyID09IFRSVUVdCmBgYAoKIyA0LiBFeHBsb3JhdG9yeSBEYXRhIEFuYWx5c2lzCgpQZXJmb3JtIGV4cGxvcmF0b3J5IGRhdGEgYW5hbHlzaXMgdG8gdW5kZXJzdGFuZCB0aGUgY2hhcmFjdGVyaXN0aWNzIG9mIHlvdXIgZGF0YS4gVGhpcyBzdGVwIHdpbGwgaGVscCB5b3UgaWRlbnRpZnkgYW55IHBhdHRlcm5zIG9yIGluc2lnaHRzIHRoYXQgbWF5IGd1aWRlIHlvdXIgYW5hbHlzaXMuIFZpc3VhbGl6ZSB0aGUgZGF0YSwgY2FsY3VsYXRlIHN1bW1hcnkgc3RhdGlzdGljcywgYW5kIGxvb2sgZm9yIGNvcnJlbGF0aW9ucyBiZXR3ZWVuIGRpZmZlcmVudCB2YXJpYWJsZXMuCgojIDUuIEZlYXR1cmUgU2VsZWN0aW9uCgpEZXRlcm1pbmUgd2hpY2ggdmFyaWFibGVzIGZyb20gYm90aCB0aGUgU3BvdGlmeSBhbmQgWW91VHViZSBkYXRhc2V0cyBhcmUgcmVsZXZhbnQgZm9yIHlvdXIgYW5hbHlzaXMuIFlvdSBjYW4gdXNlIHRlY2huaXF1ZXMgc3VjaCBhcyBjb3JyZWxhdGlvbiBhbmFseXNpcyBvciBmZWF0dXJlIGltcG9ydGFuY2UgbWV0aG9kcyB0byBpZGVudGlmeSB0aGUgbW9zdCBpbmZsdWVudGlhbCBmZWF0dXJlcy4KCiMgNi4gTW9kZWwgRGV2ZWxvcG1lbnQKCkJ1aWxkIGEgcHJlZGljdGl2ZSBtb2RlbCB0byBhc3Nlc3MgdGhlIGluZmx1ZW5jZSBvZiBTcG90aWZ5IGFuZCBZb3VUdWJlIHN0YXRpc3RpY3Mgb24gdGhlIHByb2JhYmlsaXR5IG9mIHdpbm5pbmcgYSBHcmFtbXkuIFlvdSBjYW4gdXNlIHRlY2huaXF1ZXMgc3VjaCBhcyBsb2dpc3RpYyByZWdyZXNzaW9uLCByYW5kb20gZm9yZXN0cywgb3IgZ3JhZGllbnQgYm9vc3RpbmcgYWxnb3JpdGhtcy4gVGhlIEdyYW1teSB3aW4gKDEgb3IgMCkgd2lsbCBiZSB0aGUgdGFyZ2V0IHZhcmlhYmxlLCBhbmQgdGhlIHJlbGV2YW50IGZlYXR1cmVzIGZyb20gYm90aCBkYXRhc2V0cyB3aWxsIGJlIHRoZSBpbnB1dCB2YXJpYWJsZXMuCgojIDcuIE1vZGVsIEV2YWx1YXRpb24KCkV2YWx1YXRlIHRoZSBwZXJmb3JtYW5jZSBvZiB5b3VyIG1vZGVsIHVzaW5nIGFwcHJvcHJpYXRlIGV2YWx1YXRpb24gbWV0cmljcyBzdWNoIGFzIGFjY3VyYWN5LCBwcmVjaXNpb24sIHJlY2FsbCwgb3IgYXJlYSB1bmRlciB0aGUgUk9DIGN1cnZlLiBDcm9zcy12YWxpZGF0aW9uIHRlY2huaXF1ZXMgY2FuIGhlbHAgZW5zdXJlIHRoZSByb2J1c3RuZXNzIG9mIHlvdXIgcmVzdWx0cy4KCiMgOC4gSW50ZXJwcmV0YXRpb24gYW5kIENvbmNsdXNpb24KCkludGVycHJldCB0aGUgcmVzdWx0cyBvZiB5b3VyIGFuYWx5c2lzIGFuZCBkcmF3IGNvbmNsdXNpb25zIGJhc2VkIG9uIHlvdXIgZmluZGluZ3MuIERpc2N1c3MgdGhlIHNpZ25pZmljYW5jZSBhbmQgaW5mbHVlbmNlIG9mIFNwb3RpZnkgYW5kIFlvdVR1YmUgc3RhdGlzdGljcyBvbiB0aGUgcHJvYmFiaWxpdHkgb2Ygd2lubmluZyBhIEdyYW1teS4KCiMgOS4gRG9jdW1lbnRhdGlvbiBhbmQgVmlzdWFsaXphdGlvbgoKRG9jdW1lbnQgeW91ciBwcm9qZWN0LCBpbmNsdWRpbmcgdGhlIHN0ZXBzIHlvdSBmb2xsb3dlZCwgdGhlIGRhdGEgc291cmNlcywgdGhlIGFuYWx5c2lzIHRlY2huaXF1ZXMgdXNlZCwgYW5kIHRoZSByZXN1bHRzIG9idGFpbmVkLiBVc2UgdmlzdWFsaXphdGlvbnMgc3VjaCBhcyBjaGFydHMsIGdyYXBocywgb3IgdGFibGVzIHRvIHByZXNlbnQgeW91ciBmaW5kaW5ncyBlZmZlY3RpdmVseS4=</div>
 
 
 

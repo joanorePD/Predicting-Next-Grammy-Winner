@@ -1,11 +1,11 @@
 ---
 title: "SL Project"
 output:
-  html_notebook: default
   pdf_document: default
+  html_notebook: default
 ---
 
->This is a suggested approach that Chat GPT gave us (not bad at all)
+>This is a suggested approach that ChatGPT gave us (not bad at all)
 
 # 1. Define the Research Questions
 
@@ -24,9 +24,53 @@ We start of by reading the CSV files we have previously downloaded.
 
 ```{r}
 sp_y <- read.csv("Spotify_Youtube.csv", sep=',')
-sp_y$unique <- paste(sp_y$Artist, "_", sp_y$Track)
+#sp_y$unique <- paste(sp_y$Artist, "_", sp_y$Track)
 grammy <- read.csv("grammySongs.csv", sep=',')
-grammy$unique <- paste(grammy$Artist, "_", grammy$Name)
+#grammy$unique <- paste(grammy$Artist, "_", grammy$Name)
+```
+
+The grammy dataset contains a lot of information in the titles of the songs that may lead to mismatches when joined with the sp_y dataset. That is why we have to clean it first so the joining of both dataframes can be done without problems. To do that, we are going to be using Regular Expressions.
+
+```{r}
+songinspy <- data.frame(grammy)
+songinspy$inspy <- ifelse(songinspy$unique %in% sp_y$unique, TRUE , FALSE)
+```
+
+We first regularize the song and artist by using regex
+
+```{r}
+
+library(stringr)
+
+# first for sp_y dataframe 
+
+sp_y$rsong = sp_y$Track
+sp_y$rartist = sp_y$Artist
+
+sp_y$rsong <- tolower(sp_y$rsong)
+sp_y$rartist = tolower(sp_y$rartist)
+
+sp_y$rsong <- gsub("\\s*\\(.+|(?i)\\s*featuring.*|\\s-.*", "", sp_y$rsong)
+sp_y$rartist <- gsub("\\s+.*", "", sp_y$rartist)
+
+# same for grammy dataframe  
+
+grammy$rsong = grammy$Name
+grammy$rartist = grammy$Artist
+
+grammy$rsong <- tolower(grammy$rsong)
+grammy$rartist = tolower(grammy$rartist)
+
+grammy$rsong <- gsub("\\s*\\(.+|(?i)\\s*featuring.*|\\s-.*", "", grammy$rsong)
+grammy$rartist <- gsub("\\s+.*", "", grammy$rartist)
+
+```
+
+Change the unique fields
+
+```{r}
+sp_y$unique <- paste(sp_y$rartist, "_", sp_y$rsong)
+grammy$unique <- paste(grammy$rartist, "_", grammy$rsong)
 ```
 
 We only need to know if the song won an award or not, no matter which one it is. That is why we only keep the field 'unique' from the grammy dataframe and we remove all the duplicates.
@@ -40,6 +84,43 @@ We create a new column 'winner' in the sp_y dataframe. This is a boolean type co
 
 ```{r}
 sp_y$winner <- ifelse(sp_y$unique %in% grammy, TRUE , FALSE)
+```
+
+```{r}
+colnames(sp_y)
+```
+
+Then we get rid of all the columns that do not provide any valuable information. 
+
+```{r}
+sp_y = sp_y[c('Artist', 'Track', 'Album', 'Album_type', 'Danceability', "Energy", "Key", "Loudness", "Speechiness", "Acousticness", "Instrumentalness", "Liveness", "Valence", "Tempo", "Duration_ms", "Views", "Likes", "Comments", "winner")]
+```
+
+
+```{r}
+
+library(dplyr)
+
+n_distinct(grammy$rsong)
+
+```
+
+```{r}
+summary(sp_y)
+```
+
+We proceed to delete all the rows with NA's.
+
+```{r}
+sp_y = na.omit(sp_y)
+```
+
+```{r}
+summary(sp_y)
+```
+
+```{r}
+winners = sp_y[sp_y$winner == TRUE]
 ```
 
 # 4. Exploratory Data Analysis
