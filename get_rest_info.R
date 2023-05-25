@@ -237,8 +237,27 @@ for (i in 1:nrow(final_df_n)) {
   }
 }
 
+# Find columns with list elements
+list_columns <- sapply(final_df_n, is.list)
+
+# Print the column names with list elements
+print(names(list_columns)[list_columns])
+
 save(final_df_n, file = "final_df_n.RData")
+
+final_df_n$genres <- sapply(final_df_n$genres, toString)
+final_df_n$artist_name <- sapply(final_df_n$artist_name, toString)
+
 
 # Save dataframe as a CSV file
 write.csv(final_df_n, "final_df_n.csv")
+
+# Compute genre frequencies
+genre_counts <- table(final_df_n$genres)
+
+# Sort genre frequencies in descending order and take top 10
+top_10_genres <- head(sort(genre_counts, decreasing = TRUE), 10)
+
+# Plot bar chart
+barplot(top_10_genres, main = "Top 10 Genres", xlab = "Genres", ylab = "Count", las = 2)
 
