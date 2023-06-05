@@ -1,4 +1,4 @@
-# Load thenecessary packages
+# Load the necessary packages
 library(httr)
 library(jsonlite)
 library(dplyr)
@@ -12,13 +12,25 @@ library(stringdist)
 setwd("/Users/joanorellanarios/Library/CloudStorage/GoogleDrive-joanorellanarios@gmail.com/La meva unitat/Master/Second Semester/Statistical Learning Mod B/SL_Project")
 
 # Set up your API credentials for Spotify and YouTube
-spotify_client_id <- '74a2687466954d4e92633e8f0f370cce'
-spotify_client_secret <- '953a979b453d49c582a46ce3034f818b'
+#spotify_client_id <- '74a2687466954d4e92633e8f0f370cce'
+#spotify_client_secret <- '953a979b453d49c582a46ce3034f818b'
+
+client_ids <- c('57abed2d54534b1f95b70d674aedf5d8', '80f9fede3ffe465ea696f0d2c27ad5c5',
+                'ba70d73f54904db698438f2953815210', 'c4395de6a4e540e99bffd3d2f6be14f4',
+                '74a2687466954d4e92633e8f0f370cce', 'ebe882b66bc543b08550a5bf31bd59d0')
+
+client_secrets <- c('8f6215f6c1f6413da48c04938cac0ab7', '2729fc14045d449c8f6489ae96f0472c',
+                    '50e5fc54f7254501b43414092361626d', '0f71fdc18faa4a9f879a9a19277e7430',
+                    '953a979b453d49c582a46ce3034f818b', 'b693aab3e9d44aa28565aa570cf7efad')
+
+cont <- 1
+idx <- 1
+
+spotify_client_id <- client_ids[idx]
+spotify_client_secret <- client_secrets[idx]
 
 Sys.setenv(SPOTIFY_CLIENT_ID = spotify_client_id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = spotify_client_secret)
-
-cont <- 0
 
 get_artist_id <- function(track_id) {
   
@@ -187,11 +199,15 @@ get_artist_top_tracks<- function(artist_id) {
 }
 
 get_total_info <- function(track_id, artist_id) {
-  cont <<- cont + 1
   cat("\014")  
   cat("Progress: ", 100*cont/5533, " %")
-  if (cont == 4900) {
-    Sys.sleep(1000)
+  cont <<- cont + 1
+  if (cont %% 1500 == 0) {
+    idx <<- idx + 1
+    spotify_client_id <<- client_ids[idx]
+    spotify_client_secret <<- client_secrets[idx]
+    Sys.setenv(SPOTIFY_CLIENT_ID = spotify_client_id)
+    Sys.setenv(SPOTIFY_CLIENT_SECRET = spotify_client_secret)
   }
   return(c(get_track_name(track_id), get_artist_info(artist_id), get_audio_features(track_id)))
 }
@@ -220,22 +236,10 @@ final_df <- list_total_tracks %>%
   mutate(general = map2(track_id, artist_id, get_total_info))
 
 final_df_n <- final_df
-  
-for (i in 1:4985) {
-  # Access values of each row using the row index 'i'
-  names(final_df_n[[4]][[i]])[3] <- 'artist_name'
-}
 
 # Unnest the 'track_info' column into separate columns
 final_df_n <- final_df_n %>%
   unnest_wider(general, names_sep=NULL)
-
-for (i in 1:nrow(final_df_n)) {
-  # Access values of each row using the row index 'i'
-  if (is.vector(final_df_n$genres[[i]])) {
-    final_df_n$genres[[i]] <- final_df_n$genres[[i]][1]
-  }
-}
 
 # Find columns with list elements
 list_columns <- sapply(final_df_n, is.list)
@@ -247,17 +251,8 @@ save(final_df_n, file = "final_df_n.RData")
 
 final_df_n$genres <- sapply(final_df_n$genres, toString)
 final_df_n$artist_name <- sapply(final_df_n$artist_name, toString)
-
+final_df_n$artist_id <- sapply(final_df_n$artist_id, toString)
 
 # Save dataframe as a CSV file
 write.csv(final_df_n, "final_df_n.csv")
-
-# Compute genre frequencies
-genre_counts <- table(final_df_n$genres)
-
-# Sort genre frequencies in descending order and take top 10
-top_10_genres <- head(sort(genre_counts, decreasing = TRUE), 10)
-
-# Plot bar chart
-barplot(top_10_genres, main = "Top 10 Genres", xlab = "Genres", ylab = "Count", las = 2)
 

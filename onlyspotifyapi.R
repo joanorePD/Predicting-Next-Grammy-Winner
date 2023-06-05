@@ -73,8 +73,8 @@ get_track_info <- function(Song, Artist) {
   
   cont <<- cont + 1
   if (success == TRUE) {
-    #cat("\014")  
-    #cat("Progress: ", 100*cont/415, " %")
+    cat("\014")  
+    cat("Progress: ", 100*cont/415, " %")
     return(list(artist = artist, song = song, track_id = track_id, requires_check = requires_check))
     #return(c(list(artist = artist, name = name, year = year, track_id = track_id, href = href), get_artist_info(artist_id), get_audio_features(track_id)))
   } else {
