@@ -11,7 +11,7 @@ get_grammy_total <- function() {
   
   awards <- data.frame(matrix(ncol = 5, nrow = 0))
   
-  for (edition in 1:65) {
+  for (edition in 35:65) {
     
     suffix <- 'th'
     
@@ -33,13 +33,12 @@ get_grammy_total <- function() {
     }
     
     # Construct the API request URL (sometimes the endpoint code needs to be updated, just go to the website https://www.grammy.com/awards/62nd-annual-grammy-awards-2019 and get the new one using the network on developer tools)
-    url <- paste0("https://www.grammy.com/_next/data/Hq63thf7aVSoQ0gkXzHZG/awards/", edition, suffix, "-annual-grammy-awards", year1, ".json")
+    url <- paste0("https://www.grammy.com/_next/data/4_vzGRQnqGNjjCD161852/awards/", edition, suffix, "-annual-grammy-awards", year1, ".json")
     params <- list(
       slug = paste0(edition, suffix, "-annual-grammy-awards")
     )
-    
     # Send the API request
-    response <- httr::GET(url, add_headers(Authorization = token), query = params)
+    response <- httr::GET(url, query = params)
     
     if (http_status(response)$category == "Success") {
       
@@ -55,7 +54,7 @@ get_grammy_total <- function() {
       for (category in categories) {
         #print(category$title[1])
         for (nomination in category$nominations) {
-          if ((category$title[[1]]$name == 'Song Of The Year') | (category$title[[1]]$name == 'Record Of The Year')) {
+          if ((category$title[[1]]$name == 'Best Rock Song')) {
             if (nomination$displayLine2[[1]] != '') {
               if (substr(nomination$displayLine2[[1]][[1]], 1, 1) == '<') {
                 rartist <- str_match(nomination$displayLine2[[1]], "<a[^>]*>([^<]*)</a>")
@@ -81,5 +80,5 @@ get_grammy_total <- function() {
 }
 
 grammyspoti <- get_grammy_total()
-grammyspoti <- grammyspoti[!duplicated(grammyspoti[c(4,5)]),]
+#grammyspoti <- grammyspoti[!duplicated(grammyspoti[c(4,5)]),]
 write.csv(grammyspoti, "grammy.csv", row.names=TRUE)

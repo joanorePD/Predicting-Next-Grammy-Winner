@@ -103,23 +103,3 @@ grammyspoti <- grammyspoti %>%
 
 write.csv(grammyspoti, "grammy_trackid.csv", row.names=TRUE)
 
-#compare <- grammyspoti[c('Year', 'Song', 'name', 'Artist', 'artist', 'unique', 'href', 'search_for', 'GrammyAward')]
-
-matches_song <- logical(length(grammyspoti$Song))
-matches_artist <- logical(length(grammyspoti$Artist))
-
-# Compare the titles using fuzzy string matching
-
-for (i in 1:length(grammyspoti$Song)) {
-  matches_song[i] <- stringdist::stringdist(tolower(grammyspoti$Song[i]), tolower(grammyspoti$name[i]), method = "jw") <= 0.4
-}
-
-for (i in 1:length(grammyspoti$Artist)) {
-  matches_artist[i] <- stringdist::stringdist(grammyspoti$Artist[i], grammyspoti$artist[i], method = "jw") <= 0.4
-}
-
-grammyspoti$bool_song <- matches_song
-grammyspoti$bool_artist <- matches_artist
-
-grammyspoti$bool_total <- ifelse(grammyspoti$bool_song == TRUE & grammyspoti$bool_artist == TRUE, TRUE, FALSE)
-

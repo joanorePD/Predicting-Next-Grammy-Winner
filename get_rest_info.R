@@ -164,7 +164,7 @@ get_artist_info<- function(artist_id) {
 get_artist_top_tracks<- function(artist_id) {
   
   access_token <- get_spotify_access_token()
-  track_df <- data.frame(matrix(ncol = 3, nrow = 0))
+  track_df <- data.frame(matrix(ncol = 4, nrow = 0))
   
   tracks <- list()
   
@@ -177,7 +177,7 @@ get_artist_top_tracks<- function(artist_id) {
   # Send the API request
   response <- httr::GET(url, add_headers(Authorization = token))
   
-  x <- c("IsWinner", "track_id", "artist_id")
+  x <- c("Year", "IsWinner", "track_id", "artist_id")
   colnames(track_df) <- x
   
   if (http_status(response)$category == "Success") {
@@ -186,7 +186,7 @@ get_artist_top_tracks<- function(artist_id) {
     track_info <- jsonlite::fromJSON(httr::content(response, "text"))
     # Extract relevant information from the response
     for (track in track_info$tracks$id) {
-      track_df[nrow(track_df) + 1,] <- c('Nothing', track, artist_id)
+      track_df[nrow(track_df) + 1,] <- c("Undefined", 'Nothing', track, artist_id)
     }
     
     return(track_df)
@@ -200,9 +200,9 @@ get_artist_top_tracks<- function(artist_id) {
 
 get_total_info <- function(track_id, artist_id) {
   cat("\014")  
-  cat("Progress: ", 100*cont/5533, " %")
+  cat("Progress: ", 100*cont/1665, " %")
   cont <<- cont + 1
-  if (cont %% 1500 == 0) {
+  if (cont %% 500 == 0) {
     idx <<- idx + 1
     spotify_client_id <<- client_ids[idx]
     spotify_client_secret <<- client_secrets[idx]
@@ -224,11 +224,12 @@ list_tracks$artist_id <- lapply(list_tracks$artist_id, as.list)
 list_tracks <- unnest(list_tracks, artist_id)
 
 list_top_tracks <- data.frame()
+
 for (i in 1:nrow(list_tracks)) {
   list_top_tracks <- rbind(list_top_tracks, get_artist_top_tracks(list_tracks$artist_id[[i]]))
 }
 
-list_total_tracks <- rbind(list_tracks[c('IsWinner', 'track_id', 'artist_id')], list_top_tracks[c('IsWinner', 'track_id', 'artist_id')])
+list_total_tracks <- rbind(list_tracks[c('Year', 'IsWinner', 'track_id', 'artist_id')], list_top_tracks[c('Year', 'IsWinner', 'track_id', 'artist_id')])
 
 # Apply the get_track_name
 final_df <- list_total_tracks %>%
