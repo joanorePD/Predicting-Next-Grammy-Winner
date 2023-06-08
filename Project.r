@@ -58,6 +58,8 @@ data$key = as.factor(data$key)
 
 data$IsWinner = as.factor(data$IsWinner)
 
+data$time_signature = as.factor(data$time_signature)
+
 #Giving row names
 
 summary(data)
@@ -87,6 +89,8 @@ sum(training_set$IsWinner == 1)/ sum(training_set$IsWinner == 0)
 
 # Exploratory Data Analysis
 
-
+cor_matrix = cor(training_set[,c(-1, -2, -10, -13, -15)])
+corrplot(cor_matrix)
+pairs(training_set[,c(-1, -2, -10, -13, -15)])
 
 
