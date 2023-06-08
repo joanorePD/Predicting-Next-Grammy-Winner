@@ -1,4 +1,6 @@
-# Select the relevant variable 
+### Data Preprocessing
+
+#Selecting the relevant variables
 
 data = final_df_n_str
 
@@ -59,6 +61,31 @@ row.names(data) = names
 
 summary(data)
 
+summary(data$IsWinner)
+
+# Splitting training and test set
+
+training_size = floor(0.8 * nrow(data))
+
+set.seed(42)
+
+train_ind = sample(seq_len(nrow(data)), size = training_size)
+
+training_set = data[train_ind,]
+
+test_set = data[-train_ind,]
+
+summary(training_set)
+
+#Checking if the ratio is preserved
+
+sum(data$IsWinner == 1)/ sum(data$IsWinner == 0)
+sum(training_set$IsWinner == 1)/ sum(training_set$IsWinner == 0)
+
+
+###############################################################################
+
+# Exploratory Data Analysis
 
 
 
