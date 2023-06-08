@@ -39,6 +39,9 @@ data = data[,c("IsWinner", "Year", "followers", "acousticness", "danceability", 
                "energy", "instrumentalness", "key", "liveness", "loudness", "mode",
                "tempo", "time_signature", "valence")]
 
+data = cbind(names = names, data)
+
+
 #Casting variables
 
 data$IsWinner[data$IsWinner == "Winner"] = 1
@@ -56,8 +59,6 @@ data$key = as.factor(data$key)
 data$IsWinner = as.factor(data$IsWinner)
 
 #Giving row names
-
-row.names(data) = names
 
 summary(data)
 
@@ -81,7 +82,6 @@ summary(training_set)
 
 sum(data$IsWinner == 1)/ sum(data$IsWinner == 0)
 sum(training_set$IsWinner == 1)/ sum(training_set$IsWinner == 0)
-
 
 ###############################################################################
 
