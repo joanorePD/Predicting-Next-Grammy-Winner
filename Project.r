@@ -1,5 +1,10 @@
 ### Data Preprocessing
 
+install.packages("correlation")
+
+library(ggplot2)
+library(correlation)
+
 #Selecting the relevant variables
 
 data = final_df_n_str
@@ -28,6 +33,14 @@ data[789,]
 data[669,]
 
 data = data[-c(669, 789, 914),]
+
+sum(data$Year < 1992)
+
+nrow(data)
+
+data = data[!data$Year < 1992,]
+
+
 
 #Creating row names
 
@@ -91,6 +104,44 @@ sum(training_set$IsWinner == 1)/ sum(training_set$IsWinner == 0)
 
 cor_matrix = cor(training_set[,c(-1, -2, -10, -13, -15)])
 corrplot(cor_matrix)
-pairs(training_set[,c(-1, -2, -10, -13, -15)])
+pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
+
+summary(training_set)
+
+correlation(training_set[,c(-1, -2, -10, -13, -15)], partial = TRUE)
+
+
+
+ggplot(data = training_set, aes(danceability, valence)) + geom_jitter(color = "blue")
+ggplot(data = training_set, aes(loudness, energy)) + geom_jitter(color = "blue")
+ggplot(data = training_set, aes(acousticness, energy)) + geom_jitter(color = "blue")
+
+
+#Weird song veeeeeeeeeeeeeeeeeeeeeeeery long 
+which.max(data$duration_ms)
+data[504, ]
+
+##############
+
+attach(training_set)
+
+par(mfrow= c(2, 5))
+
+hist(followers)
+hist(acousticness)
+hist(danceability)
+hist(duration_ms)
+hist(energy)
+hist(instrumentalness)
+hist(liveness)
+hist(loudness)
+hist(tempo)
+hist(valence)
+
+par(mfrow = c(1, 1))
+
+
+
+
 
 
