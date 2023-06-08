@@ -52,6 +52,7 @@ summarized_df_genre <- final_df_n_str %>%
 
 save(final_df_n_str, file = "final_df_n_str.RData")
 
+load("final_df_n_str.RData")
 # Count the occurrences of each genre
 genre_counts <- table(na.omit(summarized_df_genre$genre))
 
