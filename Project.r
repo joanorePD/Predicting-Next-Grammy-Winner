@@ -2,15 +2,15 @@
 
 load("final_df_n_str.RData")
 
-install.packages("correlation")
-install.packages("confintr")
+#install.packages("correlation")
+#install.packages("confintr")
 
 library(confintr)
 library(ggplot2)
 library(correlation)
 library(corrplot)
 
-#Selecting the relevant variables
+# Selecting the relevant variables
 
 data = final_df_n_str
 
@@ -19,7 +19,7 @@ data = data[,c("track_name", "artist_name", "IsWinner", "Year","year", "follower
                "energy", "instrumentalness", "key", "liveness", "loudness", "mode",
                "tempo", "time_signature", "valence")]
 
-#Merge the two year variable
+# Merge the two year variable
 
 data$Year[data$Year == "Undefined"] <- data$year[data$Year == "Undefined"]
 
@@ -27,7 +27,7 @@ data = data[,c("track_name","artist_name", "IsWinner", "Year", "followers", "aco
                "energy", "instrumentalness", "key", "liveness", "loudness", "mode",
                "tempo", "time_signature", "valence")]
 
-#Eliminating duplicates
+# Eliminating duplicates
 
 data$track_name == "Closing Time"
 data$track_name == "Smells Like Teen Spirit"
@@ -47,11 +47,11 @@ data = data[!data$Year < 1992,]
 
 
 
-#Creating row names
+# Creating row names
 
 names = paste0(data$track_name, " - ", data$artist_name)
 
-#Eliminating unusable variables
+# Eliminating unusable variables
 
 data = data[,c("IsWinner", "Year", "followers", "acousticness", "danceability", "duration_ms",
                "energy", "instrumentalness", "key", "liveness", "loudness", "mode",
@@ -60,11 +60,13 @@ data = data[,c("IsWinner", "Year", "followers", "acousticness", "danceability", 
 data = cbind(names = names, data)
 
 
-#Casting variables
+# Casting variables
 
 data$IsWinner[data$IsWinner == "Winner"] = 1
 data$IsWinner[data$IsWinner == "Nominee"] = 1
 data$IsWinner[data$IsWinner == "Nothing"] = 0
+
+#data$IsWinner <- ifelse((data$IsWinner == 'Winner' | data$IsWinner == 'Nominee'), 1, 0)
 
 data$IsWinner = as.integer(data$IsWinner)
 
@@ -74,11 +76,10 @@ data$mode = as.factor(data$mode)
 
 data$key = as.factor(data$key)
 
-data$IsWinner = as.factor(data$IsWinner)
 
 data$time_signature = as.factor(data$time_signature)
 
-#Giving row names
+# Giving row names
 
 summary(data)
 
@@ -98,7 +99,7 @@ test_set = data[-train_ind,]
 
 summary(training_set)
 
-#Checking if the ratio is preserved
+# Checking if the ratio is preserved
 
 sum(data$IsWinner == 1)/ sum(data$IsWinner == 0)
 sum(training_set$IsWinner == 1)/ sum(training_set$IsWinner == 0)
@@ -254,7 +255,6 @@ hist(loudness)
 hist(tempo)
 hist(valence)
 
-
 # Categorical variables
 
 par(mfrow = c(1, 3))
@@ -263,7 +263,7 @@ barplot(table(key), main = "Key distribution")
 barplot(table(mode), main = "Mode")
 barplot(table(time_signature), main = "Time signature")
 
-#Relationship between dependent and independent variables
+# Relationships between dependent and independent variables
 
 par(mfrow= c(2, 5))
 
@@ -280,10 +280,50 @@ boxplot(valence ~ IsWinner)
 
 par(mfrow = c(1, 1))
 
+chisq.test(key, IsWinner)
+chisq.test(mode, IsWinner)
+chisq.test(time_signature, IsWinner)
+
+cramersv(matrix(c(as.numeric(key), as.numeric(IsWinner)), ncol = 2))
+cramersv(matrix(c(as.numeric(mode), as.numeric(IsWinner)), ncol = 2))
+cramersv(matrix(c(as.numeric(time_signature), as.numeric(IsWinner)), ncol = 2))
+
+table(mode, IsWinner)
+table(time_signature, IsWinner)
+
 ###############################################################################
 
 ### Model fitting 
 
+library(MASS)
+
+logistic = glm(IsWinner ~ ., data = training_set[,c(-1,-2)], family = "binomial")
+
+summary(logistic)
+
+help(step)
+
+n = dim(training_set)[1]
+
+logistic_backward = step(logistic, direction = "backward", k = log(n), trace = 1)
+
+logistic_forward = step(logistic, direction = "forward", k = log(n), trace = 1)
 
 
+log_back = stepAIC(logistic, direction = "backward")
+
+log_for = stepAIC(logistic, direction = "forward")
+
+log_both =  stepAIC(logistic, direction = "both")
+
+
+logistic_reduced = glm(IsWinner ~ danceability + loudness + followers + valence + duration_ms + acousticness, data = training_set,  family = "binomial")
+
+summary(logistic_reduced)
+
+test_set[2]
+
+predict(logistic_reduced, newdata = test_set[2])
+
+help(predict)
 
