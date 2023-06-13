@@ -4,7 +4,11 @@ load("final_df_n_str.RData")
 
 #install.packages("correlation")
 #install.packages("confintr")
+#install.packages("ROSE")
 
+library(pROC)
+library(MASS)
+library(ROSE)
 library(confintr)
 library(ggplot2)
 library(correlation)
@@ -295,20 +299,21 @@ table(time_signature, IsWinner)
 
 ### Model fitting 
 
-library(MASS)
+## Oversampling
+
+oversampled_train_data = ovun.sample(IsWinner ~., data = training_set[-1], method = "over", p = 0.5, seed = 42)$data
+
+# Checking oversampled training set balance
+
+sum(oversampled_train_data$IsWinner == 0)
+sum(oversampled_train_data$IsWinner == 1) 
+
+## Simple logistic model
 
 logistic = glm(IsWinner ~ ., data = training_set[,c(-1,-2)], family = "binomial")
-
 summary(logistic)
 
-help(step)
-
-n = dim(training_set)[1]
-
-logistic_backward = step(logistic, direction = "backward", k = log(n), trace = 1)
-
-logistic_forward = step(logistic, direction = "forward", k = log(n), trace = 1)
-
+# Stepwise variable selection
 
 log_back = stepAIC(logistic, direction = "backward")
 
@@ -316,14 +321,403 @@ log_for = stepAIC(logistic, direction = "forward")
 
 log_both =  stepAIC(logistic, direction = "both")
 
+# Fitting the reduced model
 
 logistic_reduced = glm(IsWinner ~ danceability + loudness + followers + valence + duration_ms + acousticness, data = training_set,  family = "binomial")
 
 summary(logistic_reduced)
 
-test_set[2]
+# Compiuting predictions
 
-predict(logistic_reduced, newdata = test_set[2])
+logistic_predictions = predict(logistic_reduced, newdata = test_set[,c(-1, -2)], type = "response")
 
-help(predict)
+# Threshold = 0.2
+
+logistic_predictions_02 = ifelse(logistic_predictions > 0.2, 1, 0)
+logistic_accuracy_02 = sum(logistic_predictions_02 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_predictions_02)
+
+false_positive_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[3]
+negative_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[1] + table(test_set$IsWinner, logistic_predictions_02)[2]
+typeIerror_logistic_02 = false_positive_logistic_02 / negative_logistic_02
+
+true_positive_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[4]
+positive_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[2] + table(test_set$IsWinner, logistic_predictions_02)[4]
+sensitivity_logistic_02 = true_positive_logistic_02 / positive_logistic_02
+
+# Threshold = 0.3
+
+logistic_predictions_03 = ifelse(logistic_predictions > 0.3, 1, 0)
+logistic_accuracy_03 = sum(logistic_predictions_03 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_predictions_03)
+
+false_positive_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[3]
+negative_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[1] + table(test_set$IsWinner, logistic_predictions_03)[2]
+typeIerror_logistic_03 = false_positive_logistic_03 / negative_logistic_03
+
+true_positive_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[4]
+positive_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[2] + table(test_set$IsWinner, logistic_predictions_03)[4]
+sensitivity_logistic_03 = true_positive_logistic_03 / positive_logistic_03
+
+# Threshold = 0.4
+
+logistic_predictions_04 = ifelse(logistic_predictions > 0.4, 1, 0)
+logistic_accuracy_04 = sum(logistic_predictions_04 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_predictions_04)
+
+false_positive_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[3]
+negative_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[1] + table(test_set$IsWinner, logistic_predictions_04)[2]
+typeIerror_logistic_04 = false_positive_logistic_04 / negative_logistic_04
+
+true_positive_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[4]
+positive_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[2] + table(test_set$IsWinner, logistic_predictions_04)[4]
+sensitivity_logistic_04 = true_positive_logistic_04 / positive_logistic_04
+
+
+# ROC curve
+
+roc.out <- roc(test_set$IsWinner, logistic_predictions)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
+# Fitting logistic oversampled 
+
+logistic_over = glm(as.numeric(unlist(oversampled_train_data[1])) ~ ., data = oversampled_train_data[-1], family = "binomial")
+summary(logistic_over)
+
+
+log_over_back = stepAIC(logistic_over, direction = "backward")
+
+log_over_for = stepAIC(logistic_over, direction = "forward")
+
+log_over_both =  stepAIC(logistic_over, direction = "both")
+
+response_variable_over = as.numeric(unlist(oversampled_train_data[1]))
+
+reduced_variables_over = as.matrix(oversampled_train_data[,c(2, 3, 4, 6, 8, 9, 11, 14, 15)], ncol = 9)
+
+reduced_variables_over = matrix(c(
+  as.numeric(reduced_variables_over[,1]),
+  as.numeric(reduced_variables_over[,2]),
+  as.numeric(reduced_variables_over[,3]),
+  as.numeric(reduced_variables_over[,4]),
+  as.numeric(reduced_variables_over[,5]),
+  as.factor(reduced_variables_over[,6]),
+  as.numeric(reduced_variables_over[,7]),
+  as.factor(reduced_variables_over[,8]),
+  as.numeric(reduced_variables_over[,9])
+), ncol = 9)
+
+
+colnames(reduced_variables_over) = c("Year", "followers", "acousticness", "duration_ms",
+                                     "instrumentalness", "key", "loudness", "time_signature", "valence" )
+
+head(reduced_variables_over)
+
+
+logistic_reduced_over = glm(response_variable_over ~ reduced_variables_over, data = oversampled_train_data,  family = "binomial")
+
+predictions_oversample = predict(logistic_reduced_over, newdata = test_set[,c(-1, -2)], type = "response")
+
+# Linear discriminant analysis
+
+# Checking normality of the predictors conditioned to the classes of the variable IsWinner  
+
+shapiro.test(danceability[IsWinner == 0]) # Yes
+shapiro.test(danceability[IsWinner == 1]) # Yes
+
+shapiro.test(followers[IsWinner == 0]) # No
+shapiro.test(followers[IsWinner == 1]) # No
+
+shapiro.test(acousticness[IsWinner == 0]) # No
+shapiro.test(acousticness[IsWinner == 1]) # No
+
+shapiro.test(duration_ms[IsWinner == 0]) # No
+shapiro.test(duration_ms[IsWinner == 1]) # No
+
+shapiro.test(energy[IsWinner == 0]) # No
+shapiro.test(energy[IsWinner == 1]) # No
+
+shapiro.test(instrumentalness[IsWinner == 0]) # No
+shapiro.test(instrumentalness[IsWinner == 1]) # No
+
+shapiro.test(liveness[IsWinner == 0]) # No
+shapiro.test(liveness[IsWinner == 1]) # No
+
+shapiro.test(loudness[IsWinner == 0]) # No
+shapiro.test(loudness[IsWinner == 1]) # No
+
+shapiro.test(tempo[IsWinner == 0]) # No
+shapiro.test(tempo[IsWinner == 1]) # No
+
+shapiro.test(valence[IsWinner == 0]) # No
+shapiro.test(valence[IsWinner == 1]) # No
+
+par(mfrow = c(2, 5))
+
+# danceability looking normal
+
+qqnorm(danceability[IsWinner == 0])
+grid()               
+qqline(danceability[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(danceability[IsWinner == 1])
+grid()               
+qqline(danceability[IsWinner == 1],lwd = 2, col = "red")
+
+# followers huge right tail 
+
+qqnorm(followers[IsWinner == 0])
+grid()               
+qqline(followers[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(followers[IsWinner == 1])
+grid()               
+qqline(followers[IsWinner == 1],lwd = 2, col = "red")
+
+# acousticness S shaped
+
+qqnorm(acousticness[IsWinner == 0])
+grid()               
+qqline(acousticness[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(acousticness[IsWinner == 1])
+grid()               
+qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
+
+# duration_ms  big right tail
+
+qqnorm(duration_ms[IsWinner == 0])
+grid()               
+qqline(duration_ms[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(duration_ms[IsWinner == 1])
+grid()               
+qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
+
+# energy tails not normal
+
+qqnorm(energy[IsWinner == 0])
+grid()               
+qqline(energy[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(energy[IsWinner == 1])
+grid()               
+qqline(energy[IsWinner == 1],lwd = 2, col = "red")
+
+# instrumentalness huge right tail
+
+qqnorm(instrumentalness[IsWinner == 0])
+grid()               
+qqline(instrumentalness[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(instrumentalness[IsWinner == 1])
+grid()               
+qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
+
+# liveness S shaped
+
+qqnorm(liveness[IsWinner == 0])
+grid()               
+qqline(liveness[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(liveness[IsWinner == 1])
+grid()               
+qqline(liveness[IsWinner == 1],lwd = 2, col = "red")
+
+# loudness tails not normal
+
+qqnorm(loudness[IsWinner == 0])
+grid()               
+qqline(loudness[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(loudness[IsWinner == 1])
+grid()               
+qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
+
+# tempo tails slightly not normal
+
+qqnorm(tempo[IsWinner == 0])
+grid()               
+qqline(tempo[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(tempo[IsWinner == 1])
+grid()               
+qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
+
+# valence tails slightly not normal
+
+qqnorm(valence[IsWinner == 0])
+grid()               
+qqline(valence[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(valence[IsWinner == 1])
+grid()               
+qqline(valence[IsWinner == 1],lwd = 2, col = "red")
+
+# Applying transformations to the predictors in the attempt of making them normal
+
+# followers plots improved, one passes the test
+
+b_followers <- boxcox(lm(followers ~ 1))
+lambda <- b_followers$x[which.max(b_followers$y)]
+followers_tran <- (followers ^ lambda - 1) / lambda
+
+qqnorm(followers_tran[IsWinner == 0])
+grid()               
+qqline(followers_tran[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(followers_tran[IsWinner == 1])
+grid()               
+qqline(followers_tran[IsWinner == 1],lwd = 2, col = "red")
+
+shapiro.test(followers_tran[IsWinner == 0]) # No 
+shapiro.test(followers_tran[IsWinner == 1]) # Yes
+
+# Acousticness plots improved, test not passed
+
+b_acousticness <- boxcox(lm(acousticness ~ 1))
+lambda <- b_acousticness$x[which.max(b_acousticness$y)]
+acousticness_tran <- (acousticness ^ lambda - 1) / lambda
+
+qqnorm(acousticness_tran[IsWinner == 0])
+grid()               
+qqline(acousticness_tran[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(acousticness_tran[IsWinner == 1])
+grid()               
+qqline(acousticness_tran[IsWinner == 1],lwd = 2, col = "red")
+
+shapiro.test(acousticness_tran[IsWinner == 0]) # No 
+shapiro.test(acousticness_tran[IsWinner == 1]) # No
+
+# duration_ms plots improved, test not passed
+
+b_duration_ms <- boxcox(lm(duration_ms ~ 1))
+lambda <- b_duration_ms$x[which.max(b_duration_ms$y)]
+duration_ms_tran <- (duration_ms ^ lambda - 1) / lambda
+
+qqnorm(duration_ms_tran[IsWinner == 0])
+grid()               
+qqline(duration_ms_tran[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(duration_ms_tran[IsWinner == 1])
+grid()               
+qqline(duration_ms_tran[IsWinner == 1],lwd = 2, col = "red")
+
+shapiro.test(duration_ms_tran[IsWinner == 0]) # No 
+shapiro.test(duration_ms_tran[IsWinner == 1]) # No
+
+# energy plots are pretty much the same test not passed
+
+b_energy <- boxcox(lm(energy ~ 1))
+lambda <- b_energy$x[which.max(b_energy$y)]
+energy_tran <- (energy ^ lambda - 1) / lambda
+
+qqnorm(energy_tran[IsWinner == 0])
+grid()               
+qqline(energy_tran[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(energy_tran[IsWinner == 1])
+grid()               
+qqline(energy_tran[IsWinner == 1],lwd = 2, col = "red")
+
+shapiro.test(energy_tran[IsWinner == 0]) # No 
+shapiro.test(energy_tran[IsWinner == 1]) # No
+
+# instrumentalness can't apply the boxcox transformation because there are some 0's
+# I tried to apply a linear transformation before but the plot is weird
+
+new_instrumentalness = instrumentalness + 1e-05
+
+b_instrumentalness <- boxcox(lm(new_instrumentalness ~ 1))
+lambda <- b_instrumentalness$x[which.max(b_instrumentalness$y)]
+instrumentalness_tran <- (new_instrumentalness ^ lambda - 1) / lambda
+
+qqnorm(instrumentalness_tran[IsWinner == 0])
+grid()               
+qqline(instrumentalness_tran[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(instrumentalness_tran[IsWinner == 1])
+grid()               
+qqline(instrumentalness_tran[IsWinner == 1],lwd = 2, col = "red")
+
+shapiro.test(instrumentalness_tran[IsWinner == 0]) # No 
+shapiro.test(instrumentalness_tran[IsWinner == 1]) # No
+
+# liveness plots improved a lot, test not passed because of a few points in the tails
+
+b_liveness <- boxcox(lm(liveness ~ 1))
+lambda <- b_liveness$x[which.max(b_liveness$y)]
+liveness_tran <- (liveness ^ lambda - 1) / lambda
+
+qqnorm(liveness_tran[IsWinner == 0])
+grid()               
+qqline(liveness_tran[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(liveness_tran[IsWinner == 1])
+grid()               
+qqline(liveness_tran[IsWinner == 1],lwd = 2, col = "red")
+
+shapiro.test(liveness_tran[IsWinner == 0]) # No 
+shapiro.test(liveness_tran[IsWinner == 1]) # No
+
+# loudness boxcox transformation not directly applicable because the variable
+# is always negative, I multiplied the values by -1 and then applied it, 
+# it gave very good results, but we need to pay attention to the interpretation
+
+new_loudness = loudness * (-1)
+
+b_loudness <- boxcox(lm(new_loudness ~ 1))
+lambda <- b_loudness$x[which.max(b_loudness$y)]
+loudness_tran <- (new_loudness ^ lambda - 1) / lambda
+
+qqnorm(loudness_tran[IsWinner == 0])
+grid()               
+qqline(loudness_tran[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(loudness_tran[IsWinner == 1])
+grid()               
+qqline(loudness_tran[IsWinner == 1],lwd = 2, col = "red")
+
+shapiro.test(loudness_tran[IsWinner == 0]) # Yes
+shapiro.test(loudness_tran[IsWinner == 1]) # Yes
+
+# tempo, slight improvement in the plots
+
+b_tempo <- boxcox(lm(tempo ~ 1))
+lambda <- b_tempo$x[which.max(b_tempo$y)]
+tempo_tran <- (tempo ^ lambda - 1) / lambda
+
+qqnorm(tempo_tran[IsWinner == 0])
+grid()               
+qqline(tempo_tran[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(tempo_tran[IsWinner == 1])
+grid()               
+qqline(tempo_tran[IsWinner == 1],lwd = 2, col = "red")
+
+shapiro.test(tempo_tran[IsWinner == 0]) # No
+shapiro.test(tempo_tran[IsWinner == 1]) # No
+
+# valence, pretty much the same
+
+b_valence <- boxcox(lm(valence ~ 1))
+lambda <- b_valence$x[which.max(b_valence$y)]
+valence_tran <- (valence ^ lambda - 1) / lambda
+
+qqnorm(valence_tran[IsWinner == 0])
+grid()               
+qqline(valence_tran[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(valence_tran[IsWinner == 1])
+grid()               
+qqline(valence_tran[IsWinner == 1],lwd = 2, col = "red")
+
+shapiro.test(valence_tran[IsWinner == 0]) # No
+shapiro.test(valence_tran[IsWinner == 1]) # No
+
 
