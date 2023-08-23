@@ -1,10 +1,17 @@
 ### Data Preprocessing
 
+setwd("C:/Users/crist/Desktop/University/Courses/1st year/2nd semester/Statistical learning/SL_Project")
+
 load("final_df_n_str.RData")
+
+Sys.setenv(LANG = "en") 
 
 #install.packages("correlation")
 #install.packages("confintr")
 #install.packages("ROSE")
+#install.packages("caret")
+#install.packages("glmnet")
+
 
 library(pROC)
 library(MASS)
@@ -13,6 +20,9 @@ library(confintr)
 library(ggplot2)
 library(correlation)
 library(corrplot)
+library(class)
+library(caret)
+library(glmnet)
 
 # Selecting the relevant variables
 
@@ -271,29 +281,29 @@ barplot(table(time_signature), main = "Time signature")
 
 par(mfrow= c(2, 5))
 
-boxplot(danceability ~ IsWinner)
-boxplot(followers ~ IsWinner)
-boxplot(acousticness ~ IsWinner)
-boxplot(duration_ms ~ IsWinner)
-boxplot(energy ~ IsWinner)
-boxplot(instrumentalness ~ IsWinner)
-boxplot(liveness ~ IsWinner)
-boxplot(loudness ~ IsWinner)
-boxplot(tempo ~ IsWinner)
-boxplot(valence ~ IsWinner)
+boxplot(danceability ~ training_set$IsWinner)
+boxplot(followers ~ training_set$IsWinner)
+boxplot(acousticness ~ training_set$IsWinner)
+boxplot(duration_ms ~ training_set$IsWinner)
+boxplot(energy ~ training_set$IsWinner)
+boxplot(instrumentalness ~ training_set$IsWinner)
+boxplot(liveness ~ training_set$IsWinner)
+boxplot(loudness ~ training_set$IsWinner)
+boxplot(tempo ~ training_set$IsWinner)
+boxplot(valence ~ training_set$IsWinner)
 
 par(mfrow = c(1, 1))
 
-chisq.test(key, IsWinner)
-chisq.test(mode, IsWinner)
-chisq.test(time_signature, IsWinner)
+chisq.test(key, training_set$IsWinner)
+chisq.test(mode, training_set$IsWinner)
+chisq.test(time_signature, training_set$IsWinner)
 
-cramersv(matrix(c(as.numeric(key), as.numeric(IsWinner)), ncol = 2))
-cramersv(matrix(c(as.numeric(mode), as.numeric(IsWinner)), ncol = 2))
-cramersv(matrix(c(as.numeric(time_signature), as.numeric(IsWinner)), ncol = 2))
+cramersv(matrix(c(as.numeric(key), as.numeric(training_set$IsWinner)), ncol = 2))
+cramersv(matrix(c(as.numeric(mode), as.numeric(training_set$IsWinner)), ncol = 2))
+cramersv(matrix(c(as.numeric(time_signature), as.numeric(training_set$IsWinner)), ncol = 2))
 
-table(mode, IsWinner)
-table(time_signature, IsWinner)
+table(mode, training_set$IsWinner)
+table(time_signature, training_set$IsWinner)
 
 ###############################################################################
 
@@ -301,7 +311,8 @@ table(time_signature, IsWinner)
 
 ## Oversampling
 
-oversampled_train_data = ovun.sample(IsWinner ~., data = training_set[-1], method = "over", p = 0.5, seed = 42)$data
+oversampled_train_data = ovun.sample(IsWinner ~., data = training_set[,-1], method = "over", p = 0.5, seed = 42)$data
+
 
 # Checking oversampled training set balance
 
@@ -399,7 +410,8 @@ response_variable_over = as.numeric(unlist(oversampled_train_data[1]))
 
 reduced_variables_over = as.matrix(oversampled_train_data[,c(2, 3, 4, 6, 8, 9, 11, 14, 15)], ncol = 9)
 
-reduced_variables_over = matrix(c(
+reduced_train_data_over = matrix(c(
+  response_variable_over,
   as.numeric(reduced_variables_over[,1]),
   as.numeric(reduced_variables_over[,2]),
   as.numeric(reduced_variables_over[,3]),
@@ -409,18 +421,72 @@ reduced_variables_over = matrix(c(
   as.numeric(reduced_variables_over[,7]),
   as.factor(reduced_variables_over[,8]),
   as.numeric(reduced_variables_over[,9])
-), ncol = 9)
+), ncol = 10)
 
 
-colnames(reduced_variables_over) = c("Year", "followers", "acousticness", "duration_ms",
+colnames(reduced_train_data_over) = c("IsWinner", "Year", "followers", "acousticness", "duration_ms",
                                      "instrumentalness", "key", "loudness", "time_signature", "valence" )
 
-head(reduced_variables_over)
+
+logistic_reduced_over = glm(response_variable_over ~ Year + followers + acousticness 
+                            + duration_ms + instrumentalness + key + loudness + 
+                            + time_signature + valence, data = oversampled_train_data,
+                            family = "binomial")
+
+logistic_over_predictions = predict(logistic_reduced_over, newdata = test_set[,c(-1, -2)], type = "response")
+
+# Threshold = 0.2
+
+logistic_over_predictions_02 = ifelse(logistic_over_predictions > 0.2, 1, 0)
+logistic_over_accuracy_02 = sum(logistic_over_predictions_02 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_over_predictions_02)
+
+false_positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[3]
+negative_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[1] + table(test_set$IsWinner, logistic_over_predictions_02)[2]
+typeIerror_logistic_over_02 = false_positive_logistic_over_02 / negative_logistic_over_02
+
+true_positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[4]
+positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[2] + table(test_set$IsWinner, logistic_over_predictions_02)[4]
+sensitivity_logistic_over_02 = true_positive_logistic_over_02 / positive_logistic_over_02
+
+# Threshold = 0.3
+
+logistic_over_predictions_03 = ifelse(logistic_over_predictions > 0.3, 1, 0)
+logistic_over_accuracy_03 = sum(logistic_over_predictions_03 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_over_predictions_03)
+
+false_positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[3]
+negative_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[1] + table(test_set$IsWinner, logistic_over_predictions_03)[2]
+typeIerror_logistic_over_03 = false_positive_logistic_over_03 / negative_logistic_over_03
+
+true_positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[4]
+positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[2] + table(test_set$IsWinner, logistic_over_predictions_03)[4]
+sensitivity_logistic_over_03 = true_positive_logistic_over_03 / positive_logistic_over_03
 
 
-logistic_reduced_over = glm(response_variable_over ~ reduced_variables_over, data = oversampled_train_data,  family = "binomial")
+# Threshold = 0.4
 
-predictions_oversample = predict(logistic_reduced_over, newdata = test_set[,c(-1, -2)], type = "response")
+logistic_over_predictions_04 = ifelse(logistic_over_predictions > 0.4, 1, 0)
+logistic_over_accuracy_04 = sum(logistic_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_over_predictions_04)
+
+false_positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[3]
+negative_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[1] + table(test_set$IsWinner, logistic_over_predictions_04)[2]
+typeIerror_logistic_over_04 = false_positive_logistic_over_04 / negative_logistic_over_04
+
+true_positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[4]
+positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[2] + table(test_set$IsWinner, logistic_over_predictions_04)[4]
+sensitivity_logistic_over_04 = true_positive_logistic_over_04 / positive_logistic_over_04
+
+# ROC curve
+
+roc.out <- roc(test_set$IsWinner, logistic_over_predictions)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
 
 # Linear discriminant analysis
 
@@ -456,7 +522,7 @@ shapiro.test(tempo[IsWinner == 1]) # No
 shapiro.test(valence[IsWinner == 0]) # No
 shapiro.test(valence[IsWinner == 1]) # No
 
-par(mfrow = c(2, 5))
+par(mfrow = c(1, 2))
 
 # danceability looking normal
 
@@ -562,9 +628,13 @@ qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 
 # followers plots improved, one passes the test
 
+par(mfrow = c(1, 1))
+
 b_followers <- boxcox(lm(followers ~ 1))
 lambda <- b_followers$x[which.max(b_followers$y)]
 followers_tran <- (followers ^ lambda - 1) / lambda
+
+par(mfrow = c(1, 2))
 
 qqnorm(followers_tran[IsWinner == 0])
 grid()               
@@ -579,9 +649,13 @@ shapiro.test(followers_tran[IsWinner == 1]) # Yes
 
 # Acousticness plots improved, test not passed
 
+par(mfrow = c(1, 1))
+
 b_acousticness <- boxcox(lm(acousticness ~ 1))
 lambda <- b_acousticness$x[which.max(b_acousticness$y)]
 acousticness_tran <- (acousticness ^ lambda - 1) / lambda
+
+par(mfrow = c(1, 2))
 
 qqnorm(acousticness_tran[IsWinner == 0])
 grid()               
@@ -596,9 +670,13 @@ shapiro.test(acousticness_tran[IsWinner == 1]) # No
 
 # duration_ms plots improved, test not passed
 
+par(mfrow = c(1, 1))
+
 b_duration_ms <- boxcox(lm(duration_ms ~ 1))
 lambda <- b_duration_ms$x[which.max(b_duration_ms$y)]
 duration_ms_tran <- (duration_ms ^ lambda - 1) / lambda
+
+par(mfrow = c(1, 2))
 
 qqnorm(duration_ms_tran[IsWinner == 0])
 grid()               
@@ -613,9 +691,13 @@ shapiro.test(duration_ms_tran[IsWinner == 1]) # No
 
 # energy plots are pretty much the same test not passed
 
+par(mfrow = c(1, 1))
+
 b_energy <- boxcox(lm(energy ~ 1))
 lambda <- b_energy$x[which.max(b_energy$y)]
 energy_tran <- (energy ^ lambda - 1) / lambda
+
+par(mfrow = c(1, 2))
 
 qqnorm(energy_tran[IsWinner == 0])
 grid()               
@@ -631,11 +713,15 @@ shapiro.test(energy_tran[IsWinner == 1]) # No
 # instrumentalness can't apply the boxcox transformation because there are some 0's
 # I tried to apply a linear transformation before but the plot is weird
 
+par(mfrow = c(1, 1))
+
 new_instrumentalness = instrumentalness + 1e-05
 
 b_instrumentalness <- boxcox(lm(new_instrumentalness ~ 1))
 lambda <- b_instrumentalness$x[which.max(b_instrumentalness$y)]
 instrumentalness_tran <- (new_instrumentalness ^ lambda - 1) / lambda
+
+par(mfrow = c(1, 2))
 
 qqnorm(instrumentalness_tran[IsWinner == 0])
 grid()               
@@ -650,9 +736,13 @@ shapiro.test(instrumentalness_tran[IsWinner == 1]) # No
 
 # liveness plots improved a lot, test not passed because of a few points in the tails
 
+par(mfrow = c(1, 1))
+
 b_liveness <- boxcox(lm(liveness ~ 1))
 lambda <- b_liveness$x[which.max(b_liveness$y)]
 liveness_tran <- (liveness ^ lambda - 1) / lambda
+
+par(mfrow = c(1, 2))
 
 qqnorm(liveness_tran[IsWinner == 0])
 grid()               
@@ -669,11 +759,15 @@ shapiro.test(liveness_tran[IsWinner == 1]) # No
 # is always negative, I multiplied the values by -1 and then applied it, 
 # it gave very good results, but we need to pay attention to the interpretation
 
+par(mfrow = c(1, 1))
+
 new_loudness = loudness * (-1)
 
 b_loudness <- boxcox(lm(new_loudness ~ 1))
 lambda <- b_loudness$x[which.max(b_loudness$y)]
 loudness_tran <- (new_loudness ^ lambda - 1) / lambda
+
+par(mfrow = c(1, 2))
 
 qqnorm(loudness_tran[IsWinner == 0])
 grid()               
@@ -688,9 +782,13 @@ shapiro.test(loudness_tran[IsWinner == 1]) # Yes
 
 # tempo, slight improvement in the plots
 
+par(mfrow = c(1, 1))
+
 b_tempo <- boxcox(lm(tempo ~ 1))
 lambda <- b_tempo$x[which.max(b_tempo$y)]
 tempo_tran <- (tempo ^ lambda - 1) / lambda
+
+par(mfrow = c(1, 2))
 
 qqnorm(tempo_tran[IsWinner == 0])
 grid()               
@@ -705,9 +803,13 @@ shapiro.test(tempo_tran[IsWinner == 1]) # No
 
 # valence, pretty much the same
 
+par(mfrow = c(1, 1))
+
 b_valence <- boxcox(lm(valence ~ 1))
 lambda <- b_valence$x[which.max(b_valence$y)]
 valence_tran <- (valence ^ lambda - 1) / lambda
+
+par(mfrow = c(1, 2))
 
 qqnorm(valence_tran[IsWinner == 0])
 grid()               
@@ -719,5 +821,279 @@ qqline(valence_tran[IsWinner == 1],lwd = 2, col = "red")
 
 shapiro.test(valence_tran[IsWinner == 0]) # No
 shapiro.test(valence_tran[IsWinner == 1]) # No
+
+##########################################
+
+par(mfrow = c(1, 1))
+
+b_data_followers <- boxcox(lm(data$followers ~ 1))
+lambda <- b_data_followers$x[which.max(b_data_followers$y)]
+data_followers_tran <- (data$followers ^ lambda - 1) / lambda
+
+b_data_acousticness <- boxcox(lm(data$acousticness ~ 1))
+lambda <- b_data_acousticness$x[which.max(b_data_acousticness$y)]
+data_acousticness_tran <- (data$acousticness ^ lambda - 1) / lambda
+
+b_data_duration_ms <- boxcox(lm(data$duration_ms ~ 1))
+lambda <- b_data_duration_ms$x[which.max(b_data_duration_ms$y)]
+data_duration_ms_tran <- (data$duration_ms ^ lambda - 1) / lambda
+
+b_data_liveness <- boxcox(lm(data$liveness ~ 1))
+lambda <- b_data_liveness$x[which.max(b_data_liveness$y)]
+data_liveness_tran <- (data$liveness ^ lambda - 1) / lambda
+
+neg_loudness = data$loudness * (-1)
+b_data_loudness <- boxcox(lm(neg_loudness ~ 1))
+lambda <- b_data_loudness$x[which.max(b_data_loudness$y)]
+data_loudness_tran <- (neg_loudness ^ lambda - 1) / lambda
+
+b_data_tempo <- boxcox(lm(data$tempo ~ 1))
+lambda <- b_data_tempo$x[which.max(b_data_tempo$y)]
+data_tempo_tran <- (data$tempo ^ lambda - 1) / lambda
+
+
+tran_data = matrix(c(data$IsWinner, data_followers_tran, data_acousticness_tran, data_duration_ms_tran, 
+            data$energy, data$instrumentalness, data_liveness_tran, data_loudness_tran, 
+            data_tempo_tran, data$valence), ncol = 10)
+
+training_tran_data = tran_data[train_ind,]
+
+test_tran_data = tran_data[-train_ind,]
+
+colnames_tran_data = c("IsWinner", "followers_tran", "acousticness_tran", "duration_ms_tran", "energy",
+                       "instrumentalness", "liveness_tran", "loudness_tran", "tempo_tran", "valence")
+
+colnames(training_tran_data) = colnames_tran_data
+colnames(test_tran_data) = colnames_tran_data
+colnames(tran_data) = colnames_tran_data
+
+
+training_tran_data = as.data.frame(training_tran_data)
+test_tran_data = as.data.frame(test_tran_data)
+tran_data = as.data.frame(tran_data)
+
+## LDA
+
+simple_lda = lda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
+                energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+                valence, data = training_tran_data, family = "binomial")
+
+
+pred_simple_lda = predict(simple_lda, newdata = test_tran_data, type = "Response")
+
+# ROC curve
+
+roc.out <- roc(test_set$IsWinner, as.numeric(pred_simple_lda$class) - 1)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
+# Oversampled LDA
+
+oversampled_train_tran_data = ovun.sample(IsWinner ~., data = training_tran_data, method = "over", p = 0.5, seed = 42)$data
+
+
+simple_over_lda = lda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
+                   energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+                   valence, data = oversampled_train_tran_data, family = "binomial")
+
+
+pred_simple_over_lda = predict(simple_over_lda, newdata = test_tran_data, type = "Response")
+
+# ROC curve
+
+roc.out <- roc(test_set$IsWinner, as.numeric(pred_simple_over_lda$class) - 1)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
+# Predictions
+
+# Threshold 0.4
+
+lda_over_predictions_04 = ifelse(pred_simple_over_lda$posterior[,1] > 0.4, 1, 0)
+lda_over_accuracy_04 = sum(lda_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, lda_over_predictions_04)
+
+false_positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[3]
+negative_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[1] + table(test_set$IsWinner, lda_over_predictions_04)[2]
+typeIerror_lda_over_04 = false_positive_lda_over_04 / negative_lda_over_04
+
+true_positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[4]
+positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[2] + table(test_set$IsWinner, lda_over_predictions_04)[4]
+sensitivity_lda_over_04 = true_positive_lda_over_04 / positive_lda_over_04
+
+
+# Threshold 0.5
+
+lda_over_predictions_05 = list(pred_simple_over_lda$class)
+lda_over_accuracy_05 = sum(lda_over_predictions_05 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, lda_over_predictions_05[[1]])
+
+false_positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[3]
+negative_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, lda_over_predictions_05[[1]])[2]
+typeIerror_lda_over_05 = false_positive_lda_over_05 / negative_lda_over_05
+
+true_positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[4]
+positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[2] + table(test_set$IsWinner, lda_over_predictions_05[[1]])[4]
+sensitivity_lda_over_05 = true_positive_lda_over_05 / positive_lda_over_05
+
+
+## QDA
+
+qda = qda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
+            energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+            valence, data = training_tran_data, family = "binomial")
+
+
+pred_qda = predict(qda, newdata = test_tran_data, type = "Response")
+
+# ROC
+
+roc.out <- roc(test_set$IsWinner, as.numeric(pred_qda$class) - 1)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
+# QDA oversampled
+
+qda_over = qda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
+            energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+            valence, data = oversampled_train_tran_data, family = "binomial")
+
+
+pred_qda_over = predict(qda_over, newdata = test_tran_data, type = "Response")
+
+# ROC
+
+roc.out <- roc(test_set$IsWinner, as.numeric(pred_qda_over$class) - 1)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
+# Predictions
+
+# Threshold 0.4
+
+qda_over_predictions_04 = ifelse(pred_qda_over$posterior[,1] > 0.4, 1, 0)
+qda_over_accuracy_04 = sum(qda_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, qda_over_predictions_04)
+
+false_positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[3]
+negative_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[1] + table(test_set$IsWinner, qda_over_predictions_04)[2]
+typeIerror_qda_over_04 = false_positive_qda_over_04 / negative_qda_over_04
+
+true_positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[4]
+positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[2] + table(test_set$IsWinner, qda_over_predictions_04)[4]
+sensitivity_qda_over_04 = true_positive_qda_over_04 / positive_qda_over_04
+
+
+# Threshold 0.5
+
+qda_over_predictions_05 = list(pred_qda_over$class)
+qda_over_accuracy_05 = sum(qda_over_predictions_05 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, qda_over_predictions_05[[1]])
+
+false_positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[3]
+negative_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, qda_over_predictions_05[[1]])[2]
+typeIerror_qda_over_05 = false_positive_qda_over_05 / negative_qda_over_05
+
+true_positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[4]
+positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[2] + table(test_set$IsWinner, qda_over_predictions_05[[1]])[4]
+sensitivity_qda_over_05 = true_positive_qda_over_05 / positive_qda_over_05
+
+#########################################à
+
+# Regularized regression
+
+## Ridge regression
+
+ 
+ridge_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train_data$IsWinner,
+                      alpha = 0, family = "binomial", type.measure = "class")
+
+plot(ridge_cv)
+
+pred_ridge = predict(ridge_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
+
+table(test_set$IsWinner, pred_ridge)
+
+## Lasso regression
+
+lasso_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train_data$IsWinner,
+                     alpha = 1, family = "binomial", type.measure = "class")
+
+plot(lasso_cv)
+
+pred_lasso = predict(lasso_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
+
+table(test_set$IsWinner, pred_lasso)
+
+
+# K-NN
+
+min_max_norm = function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+
+normalized_data = as.data.frame(lapply(data[,c(-1, -2, -10, -13, -15)], min_max_norm))
+
+IsWinner_norm = data$IsWinner
+
+normalized_data = cbind(IsWinner_norm, normalized_data)
+
+training_norm_data = normalized_data[train_ind,]
+
+test_norm_data = normalized_data[-train_ind,]
+
+# Selecting k
+
+kmax = 100
+
+test_error = numeric(kmax)
+
+for (k in 1:kmax) {
+  knn_pred = as.factor(knn(training_norm_data[,-1], test_norm_data[,-1],
+                            cl = training_norm_data$IsWinner_norm, k = k))
+  cm = confusionMatrix(data = knn_pred, reference = as.factor(test_norm_data$IsWinner_norm))
+  test_error[k] = 1 - cm$overall[1]
+}
+
+
+k_min = which.min(test_error)
+
+knn = knn(training_norm_data[,-1], test_norm_data[,-1],
+          cl = training_norm_data$IsWinner_norm, k = k_min)
+
+knn_pred_min = as.factor(knn)
+
+table(test_norm_data$IsWinner_norm, knn)
+
+# oversampled
+
+test_over_error = numeric(kmax)
+
+normalized_over_data = as.data.frame(lapply(oversampled_train_data[,c(-9, -12, -14)], min_max_norm))
+
+training_norm_data_over = normalized_over_data[train_ind,]
+
+for (k in 1:kmax) {
+  knn_over_pred = as.factor(knn(training_norm_data_over[,-1], test_norm_data[,-1],
+                           cl = training_norm_data$IsWinner_norm, k = k))
+  cm_over = confusionMatrix(data = knn_over_pred, reference = as.factor(test_norm_data$IsWinner_norm))
+  test_over_error[k] = 1 - cm_over$overall[1]
+}
+
+
+k_min_over = which.min(test_over_error)
+
+
+knn_over = knn(training_norm_data_over[,-1], test_norm_data[,-1],
+          cl = training_norm_data$IsWinner_norm, k = k_min_over)
+
+knn_pred_min_over = as.factor(knn_over)
+
+table(test_norm_data$IsWinner_norm, knn_over)
+
 
 
