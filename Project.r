@@ -1,7 +1,8 @@
 ### Data Preprocessing
 
-setwd("C:/Users/crist/Desktop/University/Courses/1st year/2nd semester/Statistical learning/SL_Project")
-
+# Set the working directory to this file's folder
+library("rstudioapi")
+setwd(dirname(getActiveDocumentContext()$path))
 load("final_df_n_str.RData")
 
 Sys.setenv(LANG = "en") 
@@ -129,7 +130,13 @@ attach(training_set)
 # Correlations between continuous variables
 cor_matrix = cor(training_set[,c(-1, -2, -10, -13, -15)])
 corrplot(cor_matrix)
+#pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
+
+# Send pairs() to PDF to resize and visualize better
+pdf(file = "yourPlot.pdf", width = 10, height = 8)
 pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
+dev.off()  # important!
+
 
 # Association measure for categorical variables (Cramer's V is a normalized 
 # version of the chi-square statistics)
@@ -1002,7 +1009,7 @@ true_positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]
 positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[2] + table(test_set$IsWinner, qda_over_predictions_05[[1]])[4]
 sensitivity_qda_over_05 = true_positive_qda_over_05 / positive_qda_over_05
 
-#########################################à
+#########################################C 
 
 # Regularized regression
 

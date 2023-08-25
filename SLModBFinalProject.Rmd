@@ -1,0 +1,168 @@
+---
+title: "What Makes a Song Award-Winning?"
+author: "Cristian Granchelli, Joan Orellana Rios, Cameron Kelahan"
+date: "2023-08-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Can we use attributes and metrics of songs to predict their likelihood of winning a Grammy?
+
+What common traits, if any, do award winning songs contain? Can we look at intrinsic traits of songs, combined with metrics defined by Spotify, to determine award winning musical features? In this paper, we break down our data collection, data processing, and data analysis of a dataset of roughly 1,000 popular songs, both award-winning and not.
+
+## The Data
+
+### Data Collection and Selection
+
+**JOAN TO DO**: Write how we chose the 1,000 songs originally; how we ended up with 867; and which Grammy winners we stuck with (only Grammy winners, or also Grammy nominees?)
+
+```{r warning = FALSE, echo = TRUE, message = FALSE}
+# Set the working directory to this file's folder
+library("rstudioapi")
+setwd(dirname(getActiveDocumentContext()$path))
+load("final_df_n_str.RData")
+
+Sys.setenv(LANG = "en") 
+
+# Load necessary libraries
+library(pROC)
+library(MASS)
+library(ROSE)
+library(confintr)
+library(ggplot2)
+library(correlation)
+library(corrplot)
+library(class)
+library(caret)
+library(glmnet)
+```
+
+```{r, echo = TRUE, results = 'hide'}
+# Selecting the relevant variables
+data = final_df_n_str
+data = data[,c("track_name", "artist_name", "IsWinner", "Year","year",
+               "followers", "acousticness", "danceability", "duration_ms",
+               "energy", "instrumentalness", "key", "liveness", "loudness",
+               "mode", "tempo", "time_signature", "valence")]
+
+# Merge the two year variable
+data$Year[data$Year == "Undefined"] <- data$year[data$Year == "Undefined"]
+data = data[,c("track_name","artist_name", "IsWinner", "Year", "followers",
+               "acousticness", "danceability", "duration_ms",
+               "energy", "instrumentalness", "key", "liveness", "loudness",
+               "mode", "tempo", "time_signature", "valence")]
+
+# Eliminating duplicates
+data$track_name == "Closing Time"
+data$track_name == "Smells Like Teen Spirit"
+data$track_name == "Don't Wanna Fight"
+data[914, ]
+data[789,]
+data[669,]
+
+data = data[-c(669, 789, 914),]
+
+sum(data$Year < 1992)
+nrow(data)
+data = data[!data$Year < 1992,]
+
+# Creating row names
+
+names = paste0(data$track_name, " - ", data$artist_name)
+
+# Eliminating unusable variables
+data = data[,c("IsWinner", "Year", "followers", "acousticness",
+               "danceability", "duration_ms", "energy",
+               "instrumentalness", "key", "liveness", "loudness", "mode",
+               "tempo", "time_signature", "valence")]
+data = cbind(names = names, data)
+
+# Casting variables
+data$IsWinner[data$IsWinner == "Winner"] = 1
+data$IsWinner[data$IsWinner == "Nominee"] = 1
+data$IsWinner[data$IsWinner == "Nothing"] = 0
+data$IsWinner = as.integer(data$IsWinner)
+data$Year = as.integer(data$Year)
+data$mode = as.factor(data$mode)
+data$key = as.factor(data$key)
+data$time_signature = as.factor(data$time_signature)
+
+# Giving row names
+summary(data)
+summary(data$IsWinner)
+```
+
+### Explanation of Variables
+
+In order to perform analysis of songs, we decided to use metrics that are intrinsic to music as well as artificial metrics created and measured by the music streaming giant Spotify. The intrinsic metrics we used were: duration, musical key, modality (major or minor key), tempo, time signature, and genre. Spotify also uses what they call ["audio features"](https://developer.spotify.com/documentation/web-api/reference/get-several-audio-features) (in the table below) to perform their own analysis of songs when creating playlists, suggesting music, etc. We used these professionally manufactured metrics to bolster the intrinsic metrics and increase our insight into what might make a song award-winning.
+
+Audio Feature | Definition
+------------- | -------------
+Acousticness  | A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.
+Danceability  | Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
+Energy        | Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.
+Instrumentalness | Predicts whether a track contains no vocals. "Ooh" and "aah" sounds are treated as instrumental in this context. Rap or spoken word tracks are clearly "vocal". The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content. Values above 0.5 are intended to represent instrumental tracks, but confidence is higher as the value approaches 1.0.
+Liveness      | Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live.
+Loudness      | The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db.
+Speechiness   | Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks.
+Valence       | A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
+
+Although Spotify does not openly share how they determine these metrics, we found them suitable to assist in our analysis.
+
+As a final processing step, we split the data into training and test datasets. The training dataset contains 80% of the original dataset, and the remaining 20% of the data in the test dataset will be used to test tour model against after we have trained it. It is very important to test the model on never-before-seen data to determine not only how well the model performs, but also how well the model can generalize.
+
+```{r, echo = TRUE, eval = TRUE}
+# Splitting training and test set
+training_size = floor(0.8 * nrow(data))
+set.seed(42)
+train_ind = sample(seq_len(nrow(data)), size = training_size)
+training_set = data[train_ind,]
+test_set = data[-train_ind,]
+
+summary(training_set)
+
+# Checking if the ratio is preserved
+sum(data$IsWinner == 1)/ sum(data$IsWinner == 0)
+sum(training_set$IsWinner == 1)/ sum(training_set$IsWinner == 0)
+
+training_set
+```
+
+## Exploratory Data Analysis
+
+### Relationship Between Independent Variables
+
+At first, we took a look at the continuous variables.
+
+```{r}
+attach(training_set)
+
+# Correlations between continuous variables
+cor_matrix = cor(training_set[,c(-1, -2, -10, -13, -15)])
+corrplot(cor_matrix)
+pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
+```
+
+WHY CAN'T I GET THIS PAIRS() PDF TO INSERT??
+```{r}
+knitr::include_graphics("yourPlot.pdf", error = FALSE)
+```
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

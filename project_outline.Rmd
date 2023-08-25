@@ -1,0 +1,148 @@
+---
+title: "SL Project"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+>This is a suggested approach that ChatGPT gave us (not bad at all)
+
+# 1. Define the Research Questions
+
+Clearly state the research questions you want to answer through your analysis. For example:
+
+* How do the Spotify statistics (e.g., streams, audio features) of a song influence its probability of winning a Grammy?
+* How do the YouTube statistics (e.g., views) of a song influence its probability of winning a Grammy?
+
+# 2. Data Collection
+
+# 3. Data Preparation
+
+Once you have collected the data, you'll need to prepare it for analysis. This step may involve cleaning the data, handling missing values, and transforming the data into a suitable format for analysis. Ensure that the data from both Spotify and YouTube are aligned with each other and can be matched based on common identifiers (e.g., song title, artist, year).
+
+We start of by reading the CSV files we have previously downloaded.
+
+```{r}
+sp_y <- read.csv("Spotify_Youtube.csv", sep=',')
+#sp_y$unique <- paste(sp_y$Artist, "_", sp_y$Track)
+grammy <- read.csv("grammySongs.csv", sep=',')
+#grammy$unique <- paste(grammy$Artist, "_", grammy$Name)
+```
+
+The grammy dataset contains a lot of information in the titles of the songs that may lead to mismatches when joined with the sp_y dataset. That is why we have to clean it first so the joining of both dataframes can be done without problems. To do that, we are going to be using Regular Expressions.
+
+```{r}
+songinspy <- data.frame(grammy)
+songinspy$inspy <- ifelse(songinspy$unique %in% sp_y$unique, TRUE , FALSE)
+```
+
+We first regularize the song and artist by using regex
+
+```{r}
+
+library(stringr)
+
+# first for sp_y dataframe 
+
+sp_y$rsong = sp_y$Track
+sp_y$rartist = sp_y$Artist
+
+sp_y$rsong <- tolower(sp_y$rsong)
+sp_y$rartist = tolower(sp_y$rartist)
+
+sp_y$rsong <- gsub("\\s*\\(.+|(?i)\\s*featuring.*|\\s-.*", "", sp_y$rsong)
+sp_y$rartist <- gsub("\\s+.*", "", sp_y$rartist)
+
+# same for grammy dataframe  
+
+grammy$rsong = grammy$Name
+grammy$rartist = grammy$Artist
+
+grammy$rsong <- tolower(grammy$rsong)
+grammy$rartist = tolower(grammy$rartist)
+
+grammy$rsong <- gsub("\\s*\\(.+|(?i)\\s*featuring.*|\\s-.*", "", grammy$rsong)
+grammy$rartist <- gsub("\\s+.*", "", grammy$rartist)
+
+```
+
+Change the unique fields
+
+```{r}
+sp_y$unique <- paste(sp_y$rartist, "_", sp_y$rsong)
+grammy$unique <- paste(grammy$rartist, "_", grammy$rsong)
+```
+
+We only need to know if the song won an award or not, no matter which one it is. That is why we only keep the field 'unique' from the grammy dataframe and we remove all the duplicates.
+
+```{r}
+grammy <- grammy[c('unique')]
+grammy <- grammy[!duplicated(grammy), ]
+```
+
+We create a new column 'winner' in the sp_y dataframe. This is a boolean type column which value is true if the song has been awarded a grammy.
+
+```{r}
+sp_y$winner <- ifelse(sp_y$unique %in% grammy, TRUE , FALSE)
+```
+
+```{r}
+colnames(sp_y)
+```
+
+Then we get rid of all the columns that do not provide any valuable information. 
+
+```{r}
+sp_y = sp_y[c('Artist', 'Track', 'Album', 'Album_type', 'Danceability', "Energy", "Key", "Loudness", "Speechiness", "Acousticness", "Instrumentalness", "Liveness", "Valence", "Tempo", "Duration_ms", "Views", "Likes", "Comments", "winner")]
+```
+
+
+```{r}
+
+library(dplyr)
+
+n_distinct(grammy$rsong)
+
+```
+
+```{r}
+summary(sp_y)
+```
+
+We proceed to delete all the rows with NA's.
+
+```{r}
+sp_y = na.omit(sp_y)
+```
+
+```{r}
+summary(sp_y)
+```
+
+```{r}
+winners = sp_y[sp_y$winner == TRUE]
+```
+
+# 4. Exploratory Data Analysis
+
+Perform exploratory data analysis to understand the characteristics of your data. This step will help you identify any patterns or insights that may guide your analysis. Visualize the data, calculate summary statistics, and look for correlations between different variables.
+
+# 5. Feature Selection
+
+Determine which variables from both the Spotify and YouTube datasets are relevant for your analysis. You can use techniques such as correlation analysis or feature importance methods to identify the most influential features.
+
+# 6. Model Development
+
+Build a predictive model to assess the influence of Spotify and YouTube statistics on the probability of winning a Grammy. You can use techniques such as logistic regression, random forests, or gradient boosting algorithms. The Grammy win (1 or 0) will be the target variable, and the relevant features from both datasets will be the input variables.
+
+# 7. Model Evaluation
+
+Evaluate the performance of your model using appropriate evaluation metrics such as accuracy, precision, recall, or area under the ROC curve. Cross-validation techniques can help ensure the robustness of your results.
+
+# 8. Interpretation and Conclusion
+
+Interpret the results of your analysis and draw conclusions based on your findings. Discuss the significance and influence of Spotify and YouTube statistics on the probability of winning a Grammy. What else could we have done?
+
+# 9. Documentation and Visualization
+
+Document your project, including the steps you followed, the data sources, the analysis techniques used, and the results obtained. Use visualizations such as charts, graphs, or tables to present your findings effectively.
