@@ -1014,6 +1014,8 @@ ridge_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train
 
 plot(ridge_cv)
 
+lambda_opt_ridge <- ridge_cv$lambda.min
+
 pred_ridge = predict(ridge_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
 
 table(test_set$IsWinner, pred_ridge)
@@ -1024,6 +1026,8 @@ lasso_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train
                      alpha = 1, family = "binomial", type.measure = "class")
 
 plot(lasso_cv)
+
+lambda_opt_lasso <- lasso_cv$lambda.min
 
 pred_lasso = predict(lasso_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
 
