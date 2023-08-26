@@ -1074,3 +1074,375 @@ Discuss what these tests say about the newly transformed feature
 
 (SHOULD WE COMPARE A FEW OF THE QQ PLOTS BEFORE AND AFTER THE TRANSFORMATION SIDE-BY-SIDE AS A GOOD VISUAL? fOR THE FEATURES THAT CHANGED AND FOR ONE THAT DID NOT?)
 
+### Examination of best BoxCox plots???
+
+```{r}
+par(mfrow = c(1, 1))
+
+b_data_followers <- boxcox(lm(data$followers ~ 1))
+lambda <- b_data_followers$x[which.max(b_data_followers$y)]
+data_followers_tran <- (data$followers ^ lambda - 1) / lambda
+
+b_data_acousticness <- boxcox(lm(data$acousticness ~ 1))
+lambda <- b_data_acousticness$x[which.max(b_data_acousticness$y)]
+data_acousticness_tran <- (data$acousticness ^ lambda - 1) / lambda
+
+b_data_duration_ms <- boxcox(lm(data$duration_ms ~ 1))
+lambda <- b_data_duration_ms$x[which.max(b_data_duration_ms$y)]
+data_duration_ms_tran <- (data$duration_ms ^ lambda - 1) / lambda
+
+b_data_liveness <- boxcox(lm(data$liveness ~ 1))
+lambda <- b_data_liveness$x[which.max(b_data_liveness$y)]
+data_liveness_tran <- (data$liveness ^ lambda - 1) / lambda
+
+neg_loudness = data$loudness * (-1)
+b_data_loudness <- boxcox(lm(neg_loudness ~ 1))
+lambda <- b_data_loudness$x[which.max(b_data_loudness$y)]
+data_loudness_tran <- (neg_loudness ^ lambda - 1) / lambda
+
+b_data_tempo <- boxcox(lm(data$tempo ~ 1))
+lambda <- b_data_tempo$x[which.max(b_data_tempo$y)]
+data_tempo_tran <- (data$tempo ^ lambda - 1) / lambda
+
+
+tran_data = matrix(c(data$IsWinner, data_followers_tran, data_acousticness_tran, data_duration_ms_tran, 
+            data$energy, data$instrumentalness, data_liveness_tran, data_loudness_tran, 
+            data_tempo_tran, data$valence), ncol = 10)
+
+training_tran_data = tran_data[train_ind,]
+
+test_tran_data = tran_data[-train_ind,]
+
+colnames_tran_data = c("IsWinner", "followers_tran", "acousticness_tran", "duration_ms_tran", "energy",
+                       "instrumentalness", "liveness_tran", "loudness_tran", "tempo_tran", "valence")
+
+colnames(training_tran_data) = colnames_tran_data
+colnames(test_tran_data) = colnames_tran_data
+colnames(tran_data) = colnames_tran_data
+
+
+training_tran_data = as.data.frame(training_tran_data)
+test_tran_data = as.data.frame(test_tran_data)
+tran_data = as.data.frame(tran_data)
+```
+
+Discuss what these boxcox plots show us, what what we take from them for the examination?
+
+### Examining MORE LDA???
+
+```{r}
+## LDA
+
+simple_lda = lda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
+                energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+                valence, data = training_tran_data, family = "binomial")
+
+
+pred_simple_lda = predict(simple_lda, newdata = test_tran_data, type = "Response")
+
+# ROC curve
+
+roc.out <- roc(test_set$IsWinner, as.numeric(pred_simple_lda$class) - 1)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+```
+
+Discuss the findings of the LDA and ROC curve
+
+### Oversampled LDA Examination
+
+```{r}
+# Oversampled LDA
+
+oversampled_train_tran_data = ovun.sample(IsWinner ~., data = training_tran_data, method = "over", p = 0.5, seed = 42)$data
+
+
+simple_over_lda = lda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
+                   energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+                   valence, data = oversampled_train_tran_data, family = "binomial")
+
+
+pred_simple_over_lda = predict(simple_over_lda, newdata = test_tran_data, type = "Response")
+
+# ROC curve
+
+roc.out <- roc(test_set$IsWinner, as.numeric(pred_simple_over_lda$class) - 1)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+```
+
+Discuss the oversampled LDA findings
+
+#### Predictions
+
+Making predictions ont he oversampled LDA
+
+##### Threshold = 0.4
+```{r}
+# Threshold 0.4
+
+lda_over_predictions_04 = ifelse(pred_simple_over_lda$posterior[,1] > 0.4, 1, 0)
+lda_over_accuracy_04 = sum(lda_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, lda_over_predictions_04)
+
+false_positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[3]
+negative_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[1] + table(test_set$IsWinner, lda_over_predictions_04)[2]
+typeIerror_lda_over_04 = false_positive_lda_over_04 / negative_lda_over_04
+
+true_positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[4]
+positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[2] + table(test_set$IsWinner, lda_over_predictions_04)[4]
+sensitivity_lda_over_04 = true_positive_lda_over_04 / positive_lda_over_04
+```
+
+Discuss what the 0.4 threshold finds
+
+##### Threshold = 0.5
+
+```{r}
+# Threshold 0.5
+
+lda_over_predictions_05 = list(pred_simple_over_lda$class)
+lda_over_accuracy_05 = sum(lda_over_predictions_05 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, lda_over_predictions_05[[1]])
+
+false_positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[3]
+negative_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, lda_over_predictions_05[[1]])[2]
+typeIerror_lda_over_05 = false_positive_lda_over_05 / negative_lda_over_05
+
+true_positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[4]
+positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[2] + table(test_set$IsWinner, lda_over_predictions_05[[1]])[4]
+sensitivity_lda_over_05 = true_positive_lda_over_05 / positive_lda_over_05
+
+```
+
+Discuss what the 0.5 prediction threshold finds compared to the 0.4
+
+#### QDA and ROC of the LDA and Oversampled LDA
+
+```{r}
+## QDA
+
+qda = qda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
+            energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+            valence, data = training_tran_data, family = "binomial")
+
+
+pred_qda = predict(qda, newdata = test_tran_data, type = "Response")
+
+# ROC
+
+roc.out <- roc(test_set$IsWinner, as.numeric(pred_qda$class) - 1)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
+# QDA oversampled
+
+qda_over = qda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
+            energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+            valence, data = oversampled_train_tran_data, family = "binomial")
+
+
+pred_qda_over = predict(qda_over, newdata = test_tran_data, type = "Response")
+
+# ROC
+
+roc.out <- roc(test_set$IsWinner, as.numeric(pred_qda_over$class) - 1)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+```
+
+Discuss what these show:
+
+#### Predictions
+
+Making more predictions (Using what? Clarify and explain)
+
+##### Threshold = 0.4
+
+```{r}
+# Predictions
+
+# Threshold 0.4
+
+qda_over_predictions_04 = ifelse(pred_qda_over$posterior[,1] > 0.4, 1, 0)
+qda_over_accuracy_04 = sum(qda_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, qda_over_predictions_04)
+
+false_positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[3]
+negative_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[1] + table(test_set$IsWinner, qda_over_predictions_04)[2]
+typeIerror_qda_over_04 = false_positive_qda_over_04 / negative_qda_over_04
+
+true_positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[4]
+positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[2] + table(test_set$IsWinner, qda_over_predictions_04)[4]
+sensitivity_qda_over_04 = true_positive_qda_over_04 / positive_qda_over_04
+```
+
+Discuss what this predicitons found
+
+##### Threshold = 0.5
+
+```{r}
+# Threshold 0.5
+
+qda_over_predictions_05 = list(pred_qda_over$class)
+qda_over_accuracy_05 = sum(qda_over_predictions_05 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, qda_over_predictions_05[[1]])
+
+false_positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[3]
+negative_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, qda_over_predictions_05[[1]])[2]
+typeIerror_qda_over_05 = false_positive_qda_over_05 / negative_qda_over_05
+
+true_positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[4]
+positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[2] + table(test_set$IsWinner, qda_over_predictions_05[[1]])[4]
+sensitivity_qda_over_05 = true_positive_qda_over_05 / positive_qda_over_05
+```
+
+Discuss what this prediction found at this threshold and compare it to 0.4
+
+## Regression
+
+Discuss what regression is, how it differs from what we have looked at so far, and what it may unvail
+
+### Ridge Regression
+
+Discuss what specifically this ridge regression is; benefits and drawbacks?
+
+```{r}
+## Ridge regression
+
+ 
+ridge_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train_data$IsWinner,
+                      alpha = 0, family = "binomial", type.measure = "class")
+
+plot(ridge_cv)
+
+lambda_opt_ridge <- ridge_cv$lambda.min
+
+pred_ridge = predict(ridge_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
+
+table(test_set$IsWinner, pred_ridge)
+```
+
+Discuss the results: What does it show?
+
+### Lasso Regression
+
+What is Lasso Regression? How does it differe from regression and ridge regression? What are its benefits and drawbacks?
+
+```{r}
+## Lasso regression
+
+lasso_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train_data$IsWinner,
+                     alpha = 1, family = "binomial", type.measure = "class")
+
+plot(lasso_cv)
+
+lambda_opt_lasso <- lasso_cv$lambda.min
+
+pred_lasso = predict(lasso_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
+
+table(test_set$IsWinner, pred_lasso)
+```
+
+What does this show? What insight does it give? Interpret the results.
+
+## KNN
+
+What is KNN? How does it work?
+
+```{r}
+# K-NN
+
+min_max_norm = function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+
+normalized_data = as.data.frame(lapply(data[,c(-1, -2, -10, -13, -15)], min_max_norm))
+
+IsWinner_norm = data$IsWinner
+
+normalized_data = cbind(IsWinner_norm, normalized_data)
+
+training_norm_data = normalized_data[train_ind,]
+
+test_norm_data = normalized_data[-train_ind,]
+```
+
+Discuss the overview of the model, introduce hyperparameter tuning:
+
+```{r}
+# Selecting k
+
+kmax = 100
+
+test_error = numeric(kmax)
+
+for (k in 1:kmax) {
+  knn_pred = as.factor(knn(training_norm_data[,-1], test_norm_data[,-1],
+                            cl = training_norm_data$IsWinner_norm, k = k))
+  cm = confusionMatrix(data = knn_pred, reference = as.factor(test_norm_data$IsWinner_norm))
+  test_error[k] = 1 - cm$overall[1]
+}
+
+
+k_min = which.min(test_error)
+```
+
+Discuss the selection of the k; print the value for the markdown??
+
+```{r}
+knn = knn(training_norm_data[,-1], test_norm_data[,-1],
+          cl = training_norm_data$IsWinner_norm, k = k_min)
+
+knn_pred_min = as.factor(knn)
+
+table(test_norm_data$IsWinner_norm, knn)
+```
+
+Discuss the findings of the KNN model; how we will adapt it or the data to improve it.
+
+### Oversampling
+
+Repeat the above process (Find k, fit model) using oversampled data:
+
+```{r}
+# oversampled
+
+test_over_error = numeric(kmax)
+
+normalized_over_data = as.data.frame(lapply(oversampled_train_data[,c(-9, -12, -14)], min_max_norm))
+
+training_norm_data_over = normalized_over_data[train_ind,]
+
+for (k in 1:kmax) {
+  knn_over_pred = as.factor(knn(training_norm_data_over[,-1], test_norm_data[,-1],
+                           cl = training_norm_data$IsWinner_norm, k = k))
+  cm_over = confusionMatrix(data = knn_over_pred, reference = as.factor(test_norm_data$IsWinner_norm))
+  test_over_error[k] = 1 - cm_over$overall[1]
+}
+
+
+k_min_over = which.min(test_over_error)
+
+
+knn_over = knn(training_norm_data_over[,-1], test_norm_data[,-1],
+          cl = training_norm_data$IsWinner_norm, k = k_min_over)
+
+knn_pred_min_over = as.factor(knn_over)
+
+table(test_norm_data$IsWinner_norm, knn_over)
+```
+
+Discuss the results of the oversampled model.
+
+# Results and Conclusions
+
+In the end...
+
+SHOW TABLES, GRAPHS, CHARTS, HIGHLIGHT THE MOST IMPORTANT INFORMATION ONLY. DO NOT INUNDATE THIS SECTION.
+
+Future work could expand upon our research by...
