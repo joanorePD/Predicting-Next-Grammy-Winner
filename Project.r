@@ -345,7 +345,7 @@ logistic_reduced = glm(IsWinner ~ danceability + loudness + followers + valence 
 
 summary(logistic_reduced)
 
-# Compiuting predictions
+# Computing predictions
 
 logistic_predictions = predict(logistic_reduced, newdata = test_set[,c(-1, -2)], type = "response")
 
@@ -718,10 +718,11 @@ shapiro.test(energy_tran[IsWinner == 0]) # No
 shapiro.test(energy_tran[IsWinner == 1]) # No
 
 # instrumentalness can't apply the boxcox transformation because there are some 0's
-# I tried to apply a linear transformation before but the plot is weird
+# Tried to apply a linear transformation before but the plot is weird
 
 par(mfrow = c(1, 1))
 
+# Added a tiny value to overcome the issue of 0's
 new_instrumentalness = instrumentalness + 1e-05
 
 b_instrumentalness <- boxcox(lm(new_instrumentalness ~ 1))
