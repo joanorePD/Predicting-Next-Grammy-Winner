@@ -81,8 +81,6 @@ data$IsWinner[data$IsWinner == "Winner"] = 1
 data$IsWinner[data$IsWinner == "Nominee"] = 1
 data$IsWinner[data$IsWinner == "Nothing"] = 0
 
-#data$IsWinner <- ifelse((data$IsWinner == 'Winner' | data$IsWinner == 'Nominee'), 1, 0)
-
 data$IsWinner = as.integer(data$IsWinner)
 
 data$Year = as.integer(data$Year)
@@ -94,11 +92,12 @@ data$key = as.factor(data$key)
 
 data$time_signature = as.factor(data$time_signature)
 
-# Giving row names
-
 summary(data)
 
-summary(data$IsWinner)
+# Checking balance between classes
+
+length(data$IsWinner[data$IsWinner == 0]) / (length(data$IsWinner[data$IsWinner == 0]) + length(data$IsWinner[data$IsWinner == 1]))
+length(data$IsWinner[data$IsWinner == 1]) / (length(data$IsWinner[data$IsWinner == 0]) + length(data$IsWinner[data$IsWinner == 1]))
 
 # Splitting training and test set
 
@@ -116,8 +115,11 @@ summary(training_set)
 
 # Checking if the ratio is preserved
 
-sum(data$IsWinner == 1)/ sum(data$IsWinner == 0)
-sum(training_set$IsWinner == 1)/ sum(training_set$IsWinner == 0)
+length(training_set$IsWinner[data$IsWinner == 0]) / (length(training_set$IsWinner[data$IsWinner == 0]) + length(training_set$IsWinner[data$IsWinner == 1]))
+length(training_set$IsWinner[data$IsWinner == 1]) / (length(training_set$IsWinner[data$IsWinner == 0]) + length(training_set$IsWinner[data$IsWinner == 1]))
+
+length(test_set$IsWinner[data$IsWinner == 0]) / (length(test_set$IsWinner[data$IsWinner == 0]) + length(test_set$IsWinner[data$IsWinner == 1]))
+length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$IsWinner == 0]) + length(test_set$IsWinner[data$IsWinner == 1]))
 
 ###############################################################################
 
