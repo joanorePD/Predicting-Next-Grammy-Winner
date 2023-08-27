@@ -155,13 +155,13 @@ length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$I
 
 ### Relationship Between Independent Variables
 
-At first, we took a look at the continuous variables.
+At first, we took a look at the independent variables by examining their correlation, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and we should avoid the pairing. We would prefer different variables to offer different information to our model. (CRISTIAN CHECK?)
+
+EXPLAIN WHY WE AVOID THE PAIRING? WHY IS IT A PROBLEM FOR SOME MODELS?
 
 NOTES
-Measuer of association between 2 variables
-Want to look between indep variables, bcs if they are highly correlated they carry same information, and for some models can be a problem
-- colinearity: Highly correlated variables can cause some linear models to not fit
-Would prefer different variables to give different information
+
+- collinearity: Highly correlated variables can cause some linear models to not fit
 
 ```{r, message = FALSE}
 attach(training_set)
@@ -175,12 +175,17 @@ corrplot.mixed(cor_matrix, tl.pos='lt')
 ```{r, echo=FALSE}
 knitr::include_graphics("corplot_indep_1.png")
 ```
+
+DISCUSS  THE ABOVE PLOT; POINT OUT LARGE CORELATION
+
 ```{r, eval = FALSE}
 pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
 ```
 ```{r, echo=FALSE}
 knitr::include_graphics("corplot_indep_2.png")
 ```
+
+DISCUSS THE ABOVE PLOT; TALK ABOUT THE SHAPES (BLobs, slightly linear, etc); TALK ABOUt THE RED LINES AND WHAT THEIR DIRECTION AND LINEARTY MEANS
 
 pos corr means 2 varibales change int he same direction; both grow or both decrease
 neg corr means one increases and the other decrease
