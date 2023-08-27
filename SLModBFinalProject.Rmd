@@ -15,7 +15,7 @@ What common traits, if any, do award winning rock songs contain? Can we look at 
 
 ## The Data
 
-### Data Collection and Selection
+### Data Collection and Preparation
 
 **JOAN TO DO**: Write how we chose the 1,000 songs originally; how we ended up with 867; etc.
 
@@ -355,7 +355,7 @@ table(time_signature, training_set$IsWinner)
 
 Conclusion about what we have seen; what we plan to do with it? (Model fitting next)
 
-## Model Fitting
+## Model Development
 
 Explain our approach to modeling:
 
@@ -1074,7 +1074,7 @@ Discuss what these tests say about the newly transformed feature
 
 (SHOULD WE COMPARE A FEW OF THE QQ PLOTS BEFORE AND AFTER THE TRANSFORMATION SIDE-BY-SIDE AS A GOOD VISUAL? fOR THE FEATURES THAT CHANGED AND FOR ONE THAT DID NOT?)
 
-### Examination of best BoxCox plots???
+### Examination of best BoxCox plots??? IS this Model Evaluation?
 
 ```{r}
 par(mfrow = c(1, 1))
