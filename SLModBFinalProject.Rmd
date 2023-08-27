@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Can we use attributes and metrics of rock songs to predict their likelihood of winning a Grammy?
+## Can we use attributes and metrics of rock songs to predict their likelihood of winning the Grammy for "Best Rock Song?"
 
 What common traits, if any, do award winning rock songs contain? Can we look at intrinsic traits of songs, combined with metrics defined by Spotify, to determine award winning musical features? In this paper, we break down our data collection, data processing, and data analysis of a dataset of roughly 1,000 popular songs, both award-winning and not.
 
@@ -17,7 +17,9 @@ What common traits, if any, do award winning rock songs contain? Can we look at 
 
 ### Data Collection and Preparation
 
-**JOAN TO DO**: Write how we chose the 1,000 songs originally; how we ended up with 867; etc.
+In order to investigate this, we first collected a list of every song nominated for the "Best Rock Song" Grammy. The reason that we kept it within one award, rather than include other rock related Grammy's ("Best Rock Performance," "Best Rock Album," etc.), is because they are disparate by nature and nominations are awarded for completely different reasons. The Best Rock Song Grammy competition is between individual songs, allowing us to compare them to each other and determine what attributes mold a work worthy of a nomination.
+
+In order to examine what sets these nominations apart from other rock songs, we collected the top 10 songs of each of these previously nominated artists so that we could compare the features and attributes of their popular non-nominated songs to songs that earned a nomination. This created a dataset of 1,016 popular rock songs. As a final step of processing the data, we had to remove any songs that were released prior to the creation of this Grammy in 1992. Removing all songs older than 1992 yielded a final dataset of 867 songs.
 
 ```{r warning = FALSE, echo = TRUE, message = FALSE}
 # Set the working directory to this file's folder
@@ -90,10 +92,20 @@ data$mode = as.factor(data$mode)
 data$key = as.factor(data$key)
 data$time_signature = as.factor(data$time_signature)
 
-# Giving row names
 summary(data)
-summary(data$IsWinner)
 ```
+
+```{r}
+# Checking balance between classes
+
+# Non-Grammy nominated songs
+length(data$IsWinner[data$IsWinner == 0]) / (length(data$IsWinner[data$IsWinner == 0]) + length(data$IsWinner[data$IsWinner == 1]))
+
+# Grammy nominated songs
+length(data$IsWinner[data$IsWinner == 1]) / (length(data$IsWinner[data$IsWinner == 0]) + length(data$IsWinner[data$IsWinner == 1]))
+```
+
+From the balance check, it is seen that the classes are highly imbalanced: 82% non-nominated songs, 18% nominated songs. We make note of this during the data processing stage so that we may take measures to address this during our analysis.
 
 ### Explanation of Variables
 
@@ -112,7 +124,7 @@ Valence       | A measure from 0.0 to 1.0 describing the musical positiveness co
 
 Although Spotify does not openly share how they determine these metrics, we found them suitable to assist in our analysis.
 
-As a final processing step, we split the data into training and test datasets. The training dataset contains 80% of the original dataset, and the remaining 20% of the data in the test dataset will be used to test tour model against after we have trained it. It is very important to test the model on never-before-seen data to determine not only how well the model performs, but also how well the model can generalize.
+As a final processing step, we split the data into training and test datasets. The training dataset contains 80% of the original dataset, and the remaining 20% of the data in the test dataset will be used to test our model against after we have trained it. It is very important to test the model on never-before-seen data to determine not only how well the model performs, but also how well the model can generalize.
 
 ```{r, echo = TRUE, eval = TRUE}
 # Splitting training and test set
@@ -125,10 +137,18 @@ test_set = data[-train_ind,]
 summary(training_set)
 
 # Checking if the ratio is preserved
-sum(data$IsWinner == 1)/ sum(data$IsWinner == 0)
-sum(training_set$IsWinner == 1)/ sum(training_set$IsWinner == 0)
 
-training_set
+# Ratio of training set:
+# - not-nominated
+length(training_set$IsWinner[data$IsWinner == 0]) / (length(training_set$IsWinner[data$IsWinner == 0]) + length(training_set$IsWinner[data$IsWinner == 1]))
+# - nominated
+length(training_set$IsWinner[data$IsWinner == 1]) / (length(training_set$IsWinner[data$IsWinner == 0]) + length(training_set$IsWinner[data$IsWinner == 1]))
+
+# Ratio of Test Set
+# - not-nominated
+length(test_set$IsWinner[data$IsWinner == 0]) / (length(test_set$IsWinner[data$IsWinner == 0]) + length(test_set$IsWinner[data$IsWinner == 1]))
+# - nominated
+length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$IsWinner == 0]) + length(test_set$IsWinner[data$IsWinner == 1]))
 ```
 
 ## Exploratory Data Analysis
@@ -137,19 +157,39 @@ training_set
 
 At first, we took a look at the continuous variables.
 
+NOTES
+Measuer of association between 2 variables
+Want to look between indep variables, bcs if they are highly correlated they carry same information, and for some models can be a problem
+- colinearity: Highly correlated variables can cause some linear models to not fit
+Would prefer different variables to give different information
+
 ```{r, message = FALSE}
 attach(training_set)
-
 # Correlations between continuous variables
 cor_matrix = cor(training_set[,c(-1, -2, -10, -13, -15)])
-corrplot(cor_matrix)
+```
+```{r, eval=FALSE}
+# Plot the correlation
+corrplot.mixed(cor_matrix, tl.pos='lt')
+```
+```{r, echo=FALSE}
+knitr::include_graphics("corplot_indep_1.png")
+```
+```{r, eval = FALSE}
 pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
 ```
-
-WHY CAN'T I GET THIS PAIRS() PDF TO INSERT?? Maybe it is inserted, but too big??
-```{r}
-knitr::include_graphics("yourPlot.pdf", error = FALSE)
+```{r, echo=FALSE}
+knitr::include_graphics("corplot_indep_2.png")
 ```
+
+pos corr means 2 varibales change int he same direction; both grow or both decrease
+neg corr means one increases and the other decrease
+best correlation is 0 for independent variables
+
+When looking between indep and depend var's we want correlation as high as possible
+Helps to predict
+
+Correlation is only a linear relationship; could be non-linear relationship
 
 We looked at the association measure for categorical variables utilizing Cramer's V, which is a normalized version of the chi-square statistic.
 

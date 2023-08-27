@@ -131,11 +131,16 @@ attach(training_set)
 
 # Correlations between continuous variables
 cor_matrix = cor(training_set[,c(-1, -2, -10, -13, -15)])
-corrplot(cor_matrix)
+# corrplot(cor_matrix, method='number')
+# dev.new(width=10, height=5, unit="in")
+png(file="corplot_indep_1.png",
+    width=1200, height=1000, pointsize = 26)
+corrplot.mixed(cor_matrix, tl.pos='lt')
+dev.off()
 #pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
 
-# Send pairs() to PDF to resize and visualize better
-pdf(file = "yourPlot.pdf", width = 10, height = 8)
+# Send pairs() to png to resize and visualize better
+png(file = "corplot_indep_2.png", width = 1200, height = 1000, pointsize=20)
 pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
 dev.off()  # important!
 
