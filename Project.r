@@ -357,9 +357,6 @@ cramersv(matrix(c(as.numeric(key), as.numeric(training_set$IsWinner)), ncol = 2)
 cramersv(matrix(c(as.numeric(mode), as.numeric(training_set$IsWinner)), ncol = 2))
 cramersv(matrix(c(as.numeric(time_signature), as.numeric(training_set$IsWinner)), ncol = 2))
 
-table(mode, training_set$IsWinner)
-table(time_signature, training_set$IsWinner)
-
 ###############################################################################
 
 ### Model fitting 
@@ -1163,6 +1160,3 @@ knn_over = knn(training_norm_data_over[,-1], test_norm_data[,-1],
 knn_pred_min_over = as.factor(knn_over)
 
 table(test_norm_data$IsWinner_norm, knn_over)
-
-
-

@@ -155,13 +155,9 @@ length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$I
 
 ### Relationship Between Independent Variables
 
-At first, we took a look at the variables by examining their correlation, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and we should avoid the pairing. We would prefer different variables which offer different information to our model. (CRISTIAN CHECK?)
+At first, we took a look at the variables by examining their correlation, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and we should avoid the pairing. We would prefer different variables which offer different information to our model.
 
-EXPLAIN WHY WE AVOID THE PAIRING? WHY IS IT A PROBLEM FOR SOME MODELS?
-
-NOTES
-
-- collinearity: Highly correlated variables can cause some linear models to not fit
+It was important for us to understand our data better in these regards, so that we may know which attribute pairings could give useful insight.
 
 #### Correlation Between Contiuous Variables
 
@@ -181,6 +177,10 @@ knitr::include_graphics("corplot_indep_1.png")
 
 DISCUSS  THE ABOVE PLOT; POINT OUT LARGE CORELATION
 
+The 4 major pairings of:
+- means they are not very beneficial
+- Interesting to see that a song that has high energy often has high loudness (interesting for its own sake, not necessarily for our project)
+
 ```{r, eval = FALSE}
 pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
 ```
@@ -191,6 +191,12 @@ knitr::include_graphics("corplot_indep_2.png")
 
 DISCUSS THE ABOVE PLOT; TALK ABOUT THE SHAPES (BLobs, slightly linear, etc); TALK ABOUt THE RED LINES AND WHAT THEIR DIRECTION AND LINEARTY MEANS
 
+MORE INFORMATION
+
+Evaluating with this plot, we were able to understand the shape of the data and discover outliers as well as general trends. For example, almost the entore trend line of DUration vs Instrumentalness is caused by a single outlier. It also confirmed the high coralation between loudness and energy, showing a nice upward durection of the trend line, as well as for valence and danceability (although those data have higher variability).
+
+Line is average of the dots? (CONFIRM)
+
 pos corr means 2 varibales change int he same direction; both grow or both decrease
 neg corr means one increases and the other decrease
 best correlation is 0 for independent variables
@@ -200,13 +206,9 @@ Helps to predict
 
 Correlation is only a linear relationship; could be non-linear relationship
 
-We looked at the association measure for categorical variables utilizing Cramer's V, which is a normalized version of the chi-square statistic.
-
-(CRISTIAN IS THIS CORRECT? EXPAND?)
-
 #### Correlation Between Categorical Variables
 
-In order to determine the strength of similarity between the categorical variables, we employed the Cramer's V measurement. This measurement is... (EXPAND ON CRAMER'S V MEASUREMENT)
+In order to determine the strength of similarity between the categorical variables, we employed the Cramer's V measurement. This measurement is a normalized version of the chi-square statistic, returning a value of 0 if there is no association between the categorical variables, and returning 1 if there is a perfect association in which one variable is completely determined by the other. (EXPAND ON CRAMER'S V MEASUREMENT)
 
 ```{r, warning=FALSE}
 # Association measure for categorical variables (Cramer's V is a normalized 
@@ -216,11 +218,14 @@ cramersv(matrix(c(as.numeric(key), as.numeric(time_signature)), ncol = 2))
 cramersv(matrix(c(as.numeric(mode), as.numeric(time_signature)), ncol = 2))
 ```
 
-DISCUSS THE ABOVE RESULTS
+Most valuable iformation from Cramer:
+- Not fully dissacociated from each other!
 
-#### ANOVA 
+#### ANOVA
 
-Next, we looked for associations between each of the categorical variables (Key, Mode, and Time Signature) and all of the continuous variables utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables by studying their variations. If ANOVA points out some feature combinations are significant, then that means... (EXPAND HERE BRIEFLY).
+Next, we looked for associations between each of the categorical variables (Key, Mode, and Time Signature) and all of the continuous variables utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables by studying their variations. If ANOVA points out some feature combinations are significant, then that means the attributes are different. (EXPAND HERE BRIEFLY). Chose 5% as the threshold for significance. Following combinations were significant:
+
+ANOVA makes some assumptions, which are not fully satisfied by our variables, meaning the results we obtained are not completely correct (REWORD).
 
 ```{r, warnings = FALSE}
 # Association between continuous and categorical variables
@@ -321,11 +326,13 @@ val_time.aov <- aov(valence ~ time_signature)
 summary(val_time.aov) # SIGNIFICANT
 ```
 
-The fact that x, y, z, etc. were significant leads us to etc. etc. etc. CHAT WITH CRISTIAN ABOUT THIS TOO.
+The fact that x, y, z, etc. were significant allows us to confidently say there is a strong enough correlation between those parings and we may use them in our models in a beneficial manner.
 
 #### Partial Correlations
 
 TALK ABOUT PARTIAL CORRELATIONS; WHAT ARE THEY? WHAT DO THEY SHOW?
+
+Every possible combination of continuous variables.
 
 ```{r, warnings = FALSE}
 # Partial correlations
@@ -346,7 +353,9 @@ TALK ABOUT WHY SOME MAY BE SIGNIFICANT; WHAT THAT MEANS.
 
 ### Distributions
 
-Examining the distributions of the attributes among our dataset:
+We look at distributions to better understand the data and how we can interact with it. Some models we want to use are based on assumptions that are related to distributions, often times assuming a normal distribution of data. From gauging how different variables are distributed, we can create better models by taking their distribution assumptions into account.
+
+#### Continuous
 
 ```{r, warnings = FALSE, eval=FALSE}
 # Checking distributions
@@ -371,7 +380,13 @@ hist(valence)
 knitr::include_graphics("distrib_contin_hist.png")
 ```
 
-Looking at categorical variables:
+DISCUSS CONTIN VAR'S
+
+Mention normally distributed fatures (Dance, Valence) and the amount of skew found in the others
+
+From these histograms, it is clear that the danceability feature is the most normally distributed. All others have a small skew at best (valence) to larger skews (tempo, loudness, energy) to seemingly exponential skews or individual values (duration, acousticness, followers, instrumentalness, liveness). As we build our models, we will keep these distributions in mind.
+
+#### Categorical
 
 ```{r}
 # Categorical variables
@@ -383,7 +398,11 @@ barplot(table(mode), main = "Mode")
 barplot(table(time_signature), main = "Time signature")
 ```
 
-Relationship btween dependent and independent variables:
+Evident mode of the categories in Mode and Time Signature; VERY high frequency
+
+#### Relationship Between Independent and Dependent Variables
+
+##### Continuous
 
 ```{r}
 # Relationships between dependent and independent variables
@@ -403,6 +422,14 @@ boxplot(valence ~ training_set$IsWinner, xlab='Nominee Boolean')
 ```
 
 More examination:
+- Shows difference between classes within the context of individual, continuous features
+- Energy and Valence are of use; seeing the difference in Median
+
+##### Categorical
+
+CHI SQUARED TEST
+
+Measure of association; using it between Categorical variables and the 2 classes
 
 ```{r, warning=FALSE, message=FALSE}
 par(mfrow = c(1, 1))
@@ -414,12 +441,14 @@ chisq.test(time_signature, training_set$IsWinner)
 cramersv(matrix(c(as.numeric(key), as.numeric(training_set$IsWinner)), ncol = 2))
 cramersv(matrix(c(as.numeric(mode), as.numeric(training_set$IsWinner)), ncol = 2))
 cramersv(matrix(c(as.numeric(time_signature), as.numeric(training_set$IsWinner)), ncol = 2))
-
-table(mode, training_set$IsWinner)
-table(time_signature, training_set$IsWinner)
 ```
 
+#### Summary
+
 Conclusion about what we have seen; what we plan to do with it? (Model fitting next)
+- Found they are independent; these categorical variables alone do not offer much information regarding the classification
+
+
 
 ## Model Development
 
