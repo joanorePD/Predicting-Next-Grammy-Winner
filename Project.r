@@ -282,36 +282,6 @@ hist(loudness)
 hist(tempo)
 hist(valence)
 
-# Comparison IsWinner 0 vs 1 - Tempo
-
-par(mfrow = c(1, 2))
-
-x <- data[data$IsWinner == 0,]$tempo
-
-hist(x)
-
-abline(v = mean(x),                       # Add line for mean
-       col = "red",
-       lwd = 3)
-text(x = mean(x) * 1.4,                   # Add text for mean
-     y = 150,
-     paste("Mean =", round(mean(x), digits=2)),
-     col = "red",
-     cex = 1)
-
-x <- data[data$IsWinner == 1,]$tempo
-
-hist(x)
-
-abline(v = mean(x),                       # Add line for mean
-       col = "red",
-       lwd = 3)
-text(x = mean(x) * 1.3,                   # Add text for mean
-     y = 18,
-     paste("Mean =", round(mean(x), digits=2)),
-     col = "red",
-     cex = 1)
-
 # Comparison IsWinner 0 vs 1 - Valence
 
 par(mfrow = c(1, 2))
