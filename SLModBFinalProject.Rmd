@@ -172,6 +172,7 @@ cor_matrix = cor(training_set[,c(-1, -2, -10, -13, -15)])
 # Plot the correlation
 corrplot.mixed(cor_matrix, tl.pos='lt')
 ```
+
 ```{r, echo=FALSE}
 knitr::include_graphics("corplot_indep_1.png")
 ```
@@ -181,6 +182,7 @@ DISCUSS  THE ABOVE PLOT; POINT OUT LARGE CORELATION
 ```{r, eval = FALSE}
 pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
 ```
+
 ```{r, echo=FALSE}
 knitr::include_graphics("corplot_indep_2.png")
 ```
@@ -328,9 +330,11 @@ data[504, ]
 
 TALK ABOUT WHY SOME MAY BE SIGNIFICANT; WHAT THAT MEANS.
 
+### Distributions
+
 Examining the distributions of the attributes among our dataset:
 
-```{r, warnings = FALSE}
+```{r, warnings = FALSE, eval=FALSE}
 # Checking distributions
 
 par(mfrow= c(2, 5))
@@ -348,7 +352,10 @@ hist(loudness)
 hist(tempo)
 hist(valence)
 ```
-ALSO MAY WANT TO INSERT A PDF HERE; PLOT IS CUT OFF
+
+```{r, echo=FALSE}
+knitr::include_graphics("distrib_contin_hist.png")
+```
 
 Looking at categorical variables:
 
@@ -369,16 +376,16 @@ Relationship btween dependent and independent variables:
 
 par(mfrow= c(2, 5))
 
-boxplot(danceability ~ training_set$IsWinner)
-boxplot(followers ~ training_set$IsWinner)
-boxplot(acousticness ~ training_set$IsWinner)
-boxplot(duration_ms ~ training_set$IsWinner)
-boxplot(energy ~ training_set$IsWinner)
-boxplot(instrumentalness ~ training_set$IsWinner)
-boxplot(liveness ~ training_set$IsWinner)
-boxplot(loudness ~ training_set$IsWinner)
-boxplot(tempo ~ training_set$IsWinner)
-boxplot(valence ~ training_set$IsWinner)
+boxplot(danceability ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(followers ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(acousticness ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(duration_ms ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(energy ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(instrumentalness ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(liveness ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(loudness ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(tempo ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(valence ~ training_set$IsWinner, xlab='Nominee Boolean')
 ```
 
 More examination:
@@ -731,6 +738,7 @@ What does this tell us about the danceability feature?
 ##### Followers
 ```{r}
 # followers huge right tail 
+par(mfrow = c(1, 2))
 
 qqnorm(followers[IsWinner == 0])
 grid()               
@@ -746,6 +754,7 @@ What does this tell us about the followers feature?
 ##### Acousticness
 ```{r}
 # acousticness S shaped
+par(mfrow = c(1, 2))
 
 qqnorm(acousticness[IsWinner == 0])
 grid()               
@@ -761,6 +770,7 @@ What does this tell us about the acousticness feature?
 ##### Duration
 ```{r}
 # duration_ms  big right tail
+par(mfrow = c(1, 2))
 
 qqnorm(duration_ms[IsWinner == 0])
 grid()               
@@ -776,6 +786,7 @@ What does this tell us about the duration feature?
 ##### Energy
 ```{r}
 # energy tails not normal
+par(mfrow = c(1, 2))
 
 qqnorm(energy[IsWinner == 0])
 grid()               
@@ -791,6 +802,7 @@ What does this tell us about the energy feature?
 ##### Instrumentalness
 ```{r}
 # instrumentalness huge right tail
+par(mfrow = c(1, 2))
 
 qqnorm(instrumentalness[IsWinner == 0])
 grid()               
@@ -806,6 +818,7 @@ What does this tell us about the instrumentalness feature?
 ##### Liveness
 ```{r}
 # liveness S shaped
+par(mfrow = c(1, 2))
 
 qqnorm(liveness[IsWinner == 0])
 grid()               
@@ -821,6 +834,7 @@ What does this tell us about the liveness feature?
 ##### Loudness
 ```{r}
 # loudness tails not normal
+par(mfrow = c(1, 2))
 
 qqnorm(loudness[IsWinner == 0])
 grid()               
@@ -836,6 +850,7 @@ What does this tell us about the loudness feature?
 ##### Tempo
 ```{r}
 # tempo tails slightly not normal
+par(mfrow = c(1, 2))
 
 qqnorm(tempo[IsWinner == 0])
 grid()               
@@ -851,6 +866,7 @@ What does this tell us about the tempo feature?
 ##### Valence
 ```{r}
 # valence tails slightly not normal
+par(mfrow = c(1, 2))
 
 qqnorm(valence[IsWinner == 0])
 grid()               
@@ -1483,6 +1499,10 @@ table(test_norm_data$IsWinner_norm, knn_over)
 ```
 
 Discuss the results of the oversampled model.
+
+ARE THERE ANY PLOTS WE COULD DO FOR KNN?
+
+TALK ABOUT HOW LARGE THE CHOSEN K VALUES ARE; POSSIBLE IMPROVEMENT TO ACCURACY BY INTRODUCING SOME KIND OF EARLY STOPPING WHILE HYPER TUNING
 
 # Results and Conclusions
 
