@@ -155,13 +155,15 @@ length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$I
 
 ### Relationship Between Independent Variables
 
-At first, we took a look at the independent variables by examining their correlation, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and we should avoid the pairing. We would prefer different variables to offer different information to our model. (CRISTIAN CHECK?)
+At first, we took a look at the variables by examining their correlation, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and we should avoid the pairing. We would prefer different variables which offer different information to our model. (CRISTIAN CHECK?)
 
 EXPLAIN WHY WE AVOID THE PAIRING? WHY IS IT A PROBLEM FOR SOME MODELS?
 
 NOTES
 
 - collinearity: Highly correlated variables can cause some linear models to not fit
+
+#### Correlation Between Contiuous Variables
 
 ```{r, message = FALSE}
 attach(training_set)
@@ -202,6 +204,10 @@ We looked at the association measure for categorical variables utilizing Cramer'
 
 (CRISTIAN IS THIS CORRECT? EXPAND?)
 
+#### Correlation Between Categorical Variables
+
+In order to determine the strength of similarity between the categorical variables, we employed the Cramer's V measurement. This measurement is... (EXPAND ON CRAMER'S V MEASUREMENT)
+
 ```{r, warning=FALSE}
 # Association measure for categorical variables (Cramer's V is a normalized 
 # version of the chi-square statistics)
@@ -210,7 +216,11 @@ cramersv(matrix(c(as.numeric(key), as.numeric(time_signature)), ncol = 2))
 cramersv(matrix(c(as.numeric(mode), as.numeric(time_signature)), ncol = 2))
 ```
 
-Next, we looked for associations between each of the categorical variables (Key, Mode, and Time Signature) and all of the continuous variables. Some of these were significant, meaning... (ASK CRISTIAN ABOUT THIS)
+DISCUSS THE ABOVE RESULTS
+
+#### ANOVA 
+
+Next, we looked for associations between each of the categorical variables (Key, Mode, and Time Signature) and all of the continuous variables utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables by studying their variations. If ANOVA points out some feature combinations are significant, then that means... (EXPAND HERE BRIEFLY).
 
 ```{r, warnings = FALSE}
 # Association between continuous and categorical variables
@@ -310,9 +320,13 @@ summary(tem_time.aov) # SIGNIFICANT
 val_time.aov <- aov(valence ~ time_signature)
 summary(val_time.aov) # SIGNIFICANT
 ```
+
 The fact that x, y, z, etc. were significant leads us to etc. etc. etc. CHAT WITH CRISTIAN ABOUT THIS TOO.
 
-TALK ABOUT PARTIAL CORRELAtIONS
+#### Partial Correlations
+
+TALK ABOUT PARTIAL CORRELATIONS; WHAT ARE THEY? WHAT DO THEY SHOW?
+
 ```{r, warnings = FALSE}
 # Partial correlations
 correlation(training_set[,c(-1, -2, -10, -13, -15)], partial = TRUE)

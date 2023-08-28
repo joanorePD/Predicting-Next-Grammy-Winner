@@ -272,15 +272,15 @@ par(mfrow= c(2, 5))
  
 # Continuous variables
 
-hist(followers)
-hist(danceability)
-hist(duration_ms)
-hist(energy)
-hist(instrumentalness)
-hist(liveness)
-hist(loudness)
-hist(tempo)
-hist(valence)
+hist(followers, main='Followers')
+hist(danceability, main='Danceability')
+hist(duration_ms, main='Duration')
+hist(energy, main='Energy')
+hist(instrumentalness, main='Instrumentalness')
+hist(liveness, main='Liveness')
+hist(loudness, main='Loudness')
+hist(tempo, main='Tempo')
+hist(valence, main='Valence')
 
 # Comparison IsWinner 0 vs 1 - Tempo
 
@@ -366,16 +366,16 @@ barplot(table(x), main = "Key: Nominated/Winner")
 
 par(mfrow= c(2, 5))
 
-boxplot(danceability ~ training_set$IsWinner)
-boxplot(followers ~ training_set$IsWinner)
-boxplot(acousticness ~ training_set$IsWinner)
-boxplot(duration_ms ~ training_set$IsWinner)
-boxplot(energy ~ training_set$IsWinner)
-boxplot(instrumentalness ~ training_set$IsWinner)
-boxplot(liveness ~ training_set$IsWinner)
-boxplot(loudness ~ training_set$IsWinner)
-boxplot(tempo ~ training_set$IsWinner)
-boxplot(valence ~ training_set$IsWinner)
+boxplot(danceability ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(followers ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(acousticness ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(duration_ms ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(energy ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(instrumentalness ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(liveness ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(loudness ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(tempo ~ training_set$IsWinner, xlab='Nominee Boolean')
+boxplot(valence ~ training_set$IsWinner, xlab='Nominee Boolean')
 
 par(mfrow = c(1, 1))
 
@@ -607,9 +607,8 @@ shapiro.test(tempo[IsWinner == 1]) # No
 shapiro.test(valence[IsWinner == 0]) # No
 shapiro.test(valence[IsWinner == 1]) # No
 
-par(mfrow = c(1, 2))
-
 # danceability looking normal
+par(mfrow = c(1, 2))
 
 qqnorm(danceability[IsWinner == 0])
 grid()               
@@ -619,7 +618,8 @@ qqnorm(danceability[IsWinner == 1])
 grid()               
 qqline(danceability[IsWinner == 1],lwd = 2, col = "red")
 
-# followers huge right tail 
+# followers huge right tail
+par(mfrow = c(1, 2))
 
 qqnorm(followers[IsWinner == 0])
 grid()               
@@ -630,6 +630,7 @@ grid()
 qqline(followers[IsWinner == 1],lwd = 2, col = "red")
 
 # acousticness S shaped
+par(mfrow = c(1, 2))
 
 qqnorm(acousticness[IsWinner == 0])
 grid()               
@@ -640,6 +641,7 @@ grid()
 qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 
 # duration_ms  big right tail
+par(mfrow = c(1, 2))
 
 qqnorm(duration_ms[IsWinner == 0])
 grid()               
@@ -650,6 +652,7 @@ grid()
 qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
 
 # energy tails not normal
+par(mfrow = c(1, 2))
 
 qqnorm(energy[IsWinner == 0])
 grid()               
@@ -660,6 +663,7 @@ grid()
 qqline(energy[IsWinner == 1],lwd = 2, col = "red")
 
 # instrumentalness huge right tail
+par(mfrow = c(1, 2))
 
 qqnorm(instrumentalness[IsWinner == 0])
 grid()               
@@ -670,6 +674,7 @@ grid()
 qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 
 # liveness S shaped
+par(mfrow = c(1, 2))
 
 qqnorm(liveness[IsWinner == 0])
 grid()               
@@ -680,6 +685,7 @@ grid()
 qqline(liveness[IsWinner == 1],lwd = 2, col = "red")
 
 # loudness tails not normal
+par(mfrow = c(1, 2))
 
 qqnorm(loudness[IsWinner == 0])
 grid()               
@@ -690,6 +696,7 @@ grid()
 qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
 
 # tempo tails slightly not normal
+par(mfrow = c(1, 2))
 
 qqnorm(tempo[IsWinner == 0])
 grid()               
@@ -700,6 +707,7 @@ grid()
 qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
 
 # valence tails slightly not normal
+par(mfrow = c(1, 2))
 
 qqnorm(valence[IsWinner == 0])
 grid()               
@@ -1151,6 +1159,7 @@ for (k in 1:kmax) {
 
 
 k_min = which.min(test_error)
+k_min
 
 knn = knn(training_norm_data[,-1], test_norm_data[,-1],
           cl = training_norm_data$IsWinner_norm, k = k_min)
@@ -1176,7 +1185,7 @@ for (k in 1:kmax) {
 
 
 k_min_over = which.min(test_over_error)
-
+k_min_over
 
 knn_over = knn(training_norm_data_over[,-1], test_norm_data[,-1],
           cl = training_norm_data$IsWinner_norm, k = k_min_over)

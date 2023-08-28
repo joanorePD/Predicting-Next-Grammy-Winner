@@ -626,15 +626,15 @@ length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$I
 <h2>Exploratory Data Analysis</h2>
 <div id="relationship-between-independent-variables" class="section level3">
 <h3>Relationship Between Independent Variables</h3>
-<p>At first, we took a look at the independent variables by examining
-their correlation, which is the measurement of association between two
+<p>At first, we took a look at the variables by examining their
+correlation, which is the measurement of association between two
 variables. This is essentially a measurement of how similar the
 information we learn from different variables are. The larger the
 correlation between independent variables (negative or positive), the
 higher their collinearity, meaning the information they each carry is
 similar. This means their use together is less beneficial due to
 redundancy and we should avoid the pairing. We would prefer different
-variables to offer different information to our model. (CRISTIAN
+variables which offer different information to our model. (CRISTIAN
 CHECK?)</p>
 <p>EXPLAIN WHY WE AVOID THE PAIRING? WHY IS IT A PROBLEM FOR SOME
 MODELS?</p>
@@ -643,6 +643,8 @@ MODELS?</p>
 <li>collinearity: Highly correlated variables can cause some linear
 models to not fit</li>
 </ul>
+<div id="correlation-between-contiuous-variables" class="section level4">
+<h4>Correlation Between Contiuous Variables</h4>
 <pre class="r"><code>attach(training_set)
 # Correlations between continuous variables
 cor_matrix = cor(training_set[,c(-1, -2, -10, -13, -15)])</code></pre>
@@ -666,6 +668,12 @@ relationship</p>
 utilizing Cramer’s V, which is a normalized version of the chi-square
 statistic.</p>
 <p>(CRISTIAN IS THIS CORRECT? EXPAND?)</p>
+</div>
+<div id="correlation-between-categorical-variables" class="section level4">
+<h4>Correlation Between Categorical Variables</h4>
+<p>In order to determine the strength of similarity between the
+categorical variables, we employed the Cramer’s V measurement. This
+measurement is… (EXPAND ON CRAMER’S V MEASUREMENT)</p>
 <pre class="r"><code># Association measure for categorical variables (Cramer&#39;s V is a normalized 
 # version of the chi-square statistics)
 cramersv(matrix(c(as.numeric(key), as.numeric(mode)), ncol = 2))</code></pre>
@@ -674,10 +682,16 @@ cramersv(matrix(c(as.numeric(key), as.numeric(mode)), ncol = 2))</code></pre>
 <pre><code>## [1] 0.305952</code></pre>
 <pre class="r"><code>cramersv(matrix(c(as.numeric(mode), as.numeric(time_signature)), ncol = 2))</code></pre>
 <pre><code>## [1] 0.1425218</code></pre>
+<p>DISCUSS THE ABOVE RESULTS</p>
+</div>
+<div id="anova" class="section level4">
+<h4>ANOVA</h4>
 <p>Next, we looked for associations between each of the categorical
 variables (Key, Mode, and Time Signature) and all of the continuous
-variables. Some of these were significant, meaning… (ASK CRISTIAN ABOUT
-THIS)</p>
+variables utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way
+to compare continuous and categorical variables by studying their
+variations. If ANOVA points out some feature combinations are
+significant, then that means… (EXPAND HERE BRIEFLY).</p>
 <pre class="r"><code># Association between continuous and categorical variables
 
 # Key
@@ -869,7 +883,11 @@ summary(val_time.aov) # SIGNIFICANT</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The fact that x, y, z, etc. were significant leads us to etc. etc.
 etc. CHAT WITH CRISTIAN ABOUT THIS TOO.</p>
-<p>TALK ABOUT PARTIAL CORRELAtIONS</p>
+</div>
+<div id="partial-correlations" class="section level4">
+<h4>Partial Correlations</h4>
+<p>TALK ABOUT PARTIAL CORRELATIONS; WHAT ARE THEY? WHAT DO THEY
+SHOW?</p>
 <pre class="r"><code># Partial correlations
 correlation(training_set[,c(-1, -2, -10, -13, -15)], partial = TRUE)</code></pre>
 <pre><code>## # Correlation Matrix (pearson-method)
@@ -953,6 +971,7 @@ which.max(data$duration_ms)</code></pre>
 ## #   loudness &lt;dbl&gt;, mode &lt;fct&gt;, tempo &lt;dbl&gt;, time_signature &lt;fct&gt;,
 ## #   valence &lt;dbl&gt;</code></pre>
 <p>TALK ABOUT WHY SOME MAY BE SIGNIFICANT; WHAT THAT MEANS.</p>
+</div>
 </div>
 <div id="distributions" class="section level3">
 <h3>Distributions</h3>
@@ -3058,6 +3077,10 @@ table(test_norm_data$IsWinner_norm, knn_over)</code></pre>
 ##   0 150   0
 ##   1  22   2</code></pre>
 <p>Discuss the results of the oversampled model.</p>
+<p>ARE THERE ANY PLOTS WE COULD DO FOR KNN?</p>
+<p>TALK ABOUT HOW LARGE THE CHOSEN K VALUES ARE; POSSIBLE IMPROVEMENT TO
+ACCURACY BY INTRODUCING SOME KIND OF EARLY STOPPING WHILE HYPER
+TUNING</p>
 </div>
 </div>
 <div id="results-and-conclusions" class="section level1">
