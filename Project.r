@@ -273,7 +273,6 @@ par(mfrow= c(2, 5))
 # Continuous variables
 
 hist(followers)
-hist(acousticness)
 hist(danceability)
 hist(duration_ms)
 hist(energy)
@@ -283,6 +282,66 @@ hist(loudness)
 hist(tempo)
 hist(valence)
 
+# Comparison IsWinner 0 vs 1 - Tempo
+
+par(mfrow = c(1, 2))
+
+x <- data[data$IsWinner == 0,]$tempo
+
+hist(x)
+
+abline(v = mean(x),                       # Add line for mean
+       col = "red",
+       lwd = 3)
+text(x = mean(x) * 1.4,                   # Add text for mean
+     y = 150,
+     paste("Mean =", round(mean(x), digits=2)),
+     col = "red",
+     cex = 1)
+
+x <- data[data$IsWinner == 1,]$tempo
+
+hist(x)
+
+abline(v = mean(x),                       # Add line for mean
+       col = "red",
+       lwd = 3)
+text(x = mean(x) * 1.3,                   # Add text for mean
+     y = 18,
+     paste("Mean =", round(mean(x), digits=2)),
+     col = "red",
+     cex = 1)
+
+# Comparison IsWinner 0 vs 1 - Valence
+
+par(mfrow = c(1, 2))
+
+x <- data[data$IsWinner == 0,]$valence
+
+hist(x)
+
+abline(v = mean(x),                       # Add line for mean
+       col = "red",
+       lwd = 3)
+text(x = mean(x) * 0.5,                   # Add text for mean
+     y = 120,
+     paste("Mean =", round(mean(x), digits=2)),
+     col = "red",
+     cex = 1)
+
+x <- data[data$IsWinner == 1,]$valence
+
+hist(x)
+
+abline(v = mean(x),                       # Add line for mean
+       col = "red",
+       lwd = 3)
+text(x = mean(x) * 0.5,                   # Add text for mean
+     y = 30,
+     paste("Mean =", round(mean(x), digits=2)),
+     col = "red",
+     cex = 1)
+
 # Categorical variables
 
 par(mfrow = c(1, 3))
@@ -290,6 +349,18 @@ par(mfrow = c(1, 3))
 barplot(table(key), main = "Key distribution")
 barplot(table(mode), main = "Mode")
 barplot(table(time_signature), main = "Time signature")
+
+# Comparison IsWinner 0 vs 1 - Key
+
+par(mfrow = c(1, 2))
+
+x <- data[data$IsWinner == 0,]$key
+
+barplot(table(x), main = "Key: Non-Nominated")
+
+x <- data[data$IsWinner == 1,]$key
+
+barplot(table(x), main = "Key: Nominated/Winner")
 
 # Relationships between dependent and independent variables
 
