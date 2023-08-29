@@ -376,6 +376,62 @@ sum(oversampled_train_data$IsWinner == 1)
 logistic = glm(IsWinner ~ ., data = training_set[,c(-1,-2)], family = "binomial")
 summary(logistic)
 
+# Computing predictions
+
+logistic_predictions_full = predict(logistic, newdata = test_set[,c(-1, -2)], type = "response")
+
+# Threshold = 0.2
+
+logistic_predictions_full_02 = ifelse(logistic_predictions_full > 0.2, 1, 0)
+logistic_accuracy_full_02 = sum(logistic_predictions_full_02 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_predictions_full_02)
+
+false_positive_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[3]
+negative_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[1] + table(test_set$IsWinner, logistic_predictions_full_02)[2]
+typeIerror_logistic_full_02 = false_positive_logistic_full_02 / negative_logistic_full_02
+
+true_positive_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[4]
+positive_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[2] + table(test_set$IsWinner, logistic_predictions_full_02)[4]
+sensitivity_logistic_full_02 = true_positive_logistic_full_02 / positive_logistic_full_02
+
+# Threshold = 0.3
+
+logistic_predictions_full_03 = ifelse(logistic_predictions_full > 0.3, 1, 0)
+logistic_accuracy_full_03 = sum(logistic_predictions_full_03 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_predictions_full_03)
+
+false_positive_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[3]
+negative_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[1] + table(test_set$IsWinner, logistic_predictions_full_03)[2]
+typeIerror_logistic_full_03 = false_positive_logistic_full_03 / negative_logistic_full_03
+
+true_positive_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[4]
+positive_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[2] + table(test_set$IsWinner, logistic_predictions_full_03)[4]
+sensitivity_logistic_full_03 = true_positive_logistic_full_03 / positive_logistic_full_03
+
+# Threshold = 0.4
+
+logistic_predictions_full_04 = ifelse(logistic_predictions_full > 0.4, 1, 0)
+logistic_accuracy_full_04 = sum(logistic_predictions_full_04 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_predictions_full_04)
+
+false_positive_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[3]
+negative_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[1] + table(test_set$IsWinner, logistic_predictions_full_04)[2]
+typeIerror_logistic_full_04 = false_positive_logistic_full_04 / negative_logistic_full_04
+
+true_positive_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[4]
+positive_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[2] + table(test_set$IsWinner, logistic_predictions_full_04)[4]
+sensitivity_logistic_full_04 = true_positive_logistic_full_04 / positive_logistic_full_04
+
+
+# ROC curve
+
+roc.out <- roc(test_set$IsWinner, logistic_predictions_full)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
 # Stepwise variable selection
 
 log_both =  stepAIC(logistic, direction = "both")
