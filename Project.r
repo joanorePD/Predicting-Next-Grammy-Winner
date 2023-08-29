@@ -378,15 +378,11 @@ summary(logistic)
 
 # Stepwise variable selection
 
-log_back = stepAIC(logistic, direction = "backward")
-
-log_for = stepAIC(logistic, direction = "forward")
-
 log_both =  stepAIC(logistic, direction = "both")
 
 # Fitting the reduced model
 
-logistic_reduced = glm(IsWinner ~ danceability + loudness + followers + valence + duration_ms + acousticness, data = training_set,  family = "binomial")
+logistic_reduced = glm(IsWinner ~ Year + followers + acousticness + duration_ms + valence, data = training_set,  family = "binomial")
 
 summary(logistic_reduced)
 
