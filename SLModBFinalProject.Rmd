@@ -326,6 +326,12 @@ val_time.aov <- aov(valence ~ time_signature)
 summary(val_time.aov) # SIGNIFICANT
 ```
 
+Categorical    | Continuous
+---------------| ------------------------------------------
+Key            | Followers Danceability  Energy
+Mode           | Followers Acousticness Energy Loudness
+Time signature | Acousticness Danceability Duration Energy Instrumentalness Loudness Tempo Valence
+
 The fact that x, y, z, etc. were significant allows us to confidently say there is a strong enough correlation between those parings and we may use them in our models in a beneficial manner.
 
 #### Partial Correlations
