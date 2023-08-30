@@ -434,7 +434,7 @@ logistic_accuracy_02 = sum(logistic_predictions_02 == test_set[2]) / dim(test_se
 table(test_set$IsWinner, logistic_predictions_02)
 
 false_positive_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[3]
-negative_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[1] + table(test_set$IsWinner, logistic_predictions_02)[2]
+negative_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[1] + table(test_set$IsWinner, logistic_predictions_02)[3]
 typeIerror_logistic_02 = false_positive_logistic_02 / negative_logistic_02
 
 true_positive_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[4]
@@ -449,7 +449,7 @@ logistic_accuracy_03 = sum(logistic_predictions_03 == test_set[2]) / dim(test_se
 table(test_set$IsWinner, logistic_predictions_03)
 
 false_positive_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[3]
-negative_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[1] + table(test_set$IsWinner, logistic_predictions_03)[2]
+negative_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[1] + table(test_set$IsWinner, logistic_predictions_03)[3]
 typeIerror_logistic_03 = false_positive_logistic_03 / negative_logistic_03
 
 true_positive_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[4]
@@ -464,7 +464,7 @@ logistic_accuracy_04 = sum(logistic_predictions_04 == test_set[2]) / dim(test_se
 table(test_set$IsWinner, logistic_predictions_04)
 
 false_positive_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[3]
-negative_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[1] + table(test_set$IsWinner, logistic_predictions_04)[2]
+negative_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[1] + table(test_set$IsWinner, logistic_predictions_04)[3]
 typeIerror_logistic_04 = false_positive_logistic_04 / negative_logistic_04
 
 true_positive_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[4]
@@ -523,7 +523,7 @@ logistic_over_accuracy_02 = sum(logistic_over_predictions_02 == test_set[2]) / d
 table(test_set$IsWinner, logistic_over_predictions_02)
 
 false_positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[3]
-negative_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[1] + table(test_set$IsWinner, logistic_over_predictions_02)[2]
+negative_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[1] + table(test_set$IsWinner, logistic_over_predictions_02)[3]
 typeIerror_logistic_over_02 = false_positive_logistic_over_02 / negative_logistic_over_02
 
 true_positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[4]
@@ -538,7 +538,7 @@ logistic_over_accuracy_03 = sum(logistic_over_predictions_03 == test_set[2]) / d
 table(test_set$IsWinner, logistic_over_predictions_03)
 
 false_positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[3]
-negative_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[1] + table(test_set$IsWinner, logistic_over_predictions_03)[2]
+negative_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[1] + table(test_set$IsWinner, logistic_over_predictions_03)[3]
 typeIerror_logistic_over_03 = false_positive_logistic_over_03 / negative_logistic_over_03
 
 true_positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[4]
@@ -554,7 +554,7 @@ logistic_over_accuracy_04 = sum(logistic_over_predictions_04 == test_set[2]) / d
 table(test_set$IsWinner, logistic_over_predictions_04)
 
 false_positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[3]
-negative_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[1] + table(test_set$IsWinner, logistic_over_predictions_04)[2]
+negative_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[1] + table(test_set$IsWinner, logistic_over_predictions_04)[3]
 typeIerror_logistic_over_04 = false_positive_logistic_over_04 / negative_logistic_over_04
 
 true_positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[4]
@@ -928,7 +928,7 @@ lda_over_accuracy_04 = sum(lda_over_predictions_04 == test_set[2]) / dim(test_se
 table(test_set$IsWinner, lda_over_predictions_04)
 
 false_positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[3]
-negative_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[1] + table(test_set$IsWinner, lda_over_predictions_04)[2]
+negative_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[1] + table(test_set$IsWinner, lda_over_predictions_04)[3]
 typeIerror_lda_over_04 = false_positive_lda_over_04 / negative_lda_over_04
 
 true_positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[4]
@@ -944,7 +944,7 @@ lda_over_accuracy_05 = sum(lda_over_predictions_05 == test_set[2]) / dim(test_se
 table(test_set$IsWinner, lda_over_predictions_05[[1]])
 
 false_positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[3]
-negative_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, lda_over_predictions_05[[1]])[2]
+negative_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, lda_over_predictions_05[[1]])[3]
 typeIerror_lda_over_05 = false_positive_lda_over_05 / negative_lda_over_05
 
 true_positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[4]
@@ -992,7 +992,7 @@ qda_over_accuracy_04 = sum(qda_over_predictions_04 == test_set[2]) / dim(test_se
 table(test_set$IsWinner, qda_over_predictions_04)
 
 false_positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[3]
-negative_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[1] + table(test_set$IsWinner, qda_over_predictions_04)[2]
+negative_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[1] + table(test_set$IsWinner, qda_over_predictions_04)[3]
 typeIerror_qda_over_04 = false_positive_qda_over_04 / negative_qda_over_04
 
 true_positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[4]
@@ -1008,7 +1008,7 @@ qda_over_accuracy_05 = sum(qda_over_predictions_05 == test_set[2]) / dim(test_se
 table(test_set$IsWinner, qda_over_predictions_05[[1]])
 
 false_positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[3]
-negative_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, qda_over_predictions_05[[1]])[2]
+negative_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, qda_over_predictions_05[[1]])[3]
 typeIerror_qda_over_05 = false_positive_qda_over_05 / negative_qda_over_05
 
 true_positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[4]
