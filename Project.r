@@ -255,6 +255,7 @@ par(mfrow= c(2, 4))
  
 # Continuous variables
 
+hist(acousticness, main='Acousticness')
 hist(danceability, main='Danceability')
 hist(duration_ms, main='Duration')
 hist(energy, main='Energy')
@@ -367,7 +368,7 @@ logistic_accuracy_full_02 = sum(logistic_predictions_full_02 == test_set[2]) / d
 table(test_set$IsWinner, logistic_predictions_full_02)
 
 false_positive_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[3]
-negative_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[1] + table(test_set$IsWinner, logistic_predictions_full_02)[2]
+negative_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[1] + table(test_set$IsWinner, logistic_predictions_full_02)[3]
 typeIerror_logistic_full_02 = false_positive_logistic_full_02 / negative_logistic_full_02
 
 true_positive_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[4]
@@ -382,7 +383,7 @@ logistic_accuracy_full_03 = sum(logistic_predictions_full_03 == test_set[2]) / d
 table(test_set$IsWinner, logistic_predictions_full_03)
 
 false_positive_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[3]
-negative_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[1] + table(test_set$IsWinner, logistic_predictions_full_03)[2]
+negative_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[1] + table(test_set$IsWinner, logistic_predictions_full_03)[3]
 typeIerror_logistic_full_03 = false_positive_logistic_full_03 / negative_logistic_full_03
 
 true_positive_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[4]
@@ -397,7 +398,7 @@ logistic_accuracy_full_04 = sum(logistic_predictions_full_04 == test_set[2]) / d
 table(test_set$IsWinner, logistic_predictions_full_04)
 
 false_positive_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[3]
-negative_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[1] + table(test_set$IsWinner, logistic_predictions_full_04)[2]
+negative_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[1] + table(test_set$IsWinner, logistic_predictions_full_04)[3]
 typeIerror_logistic_full_04 = false_positive_logistic_full_04 / negative_logistic_full_04
 
 true_positive_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[4]
@@ -1113,3 +1114,4 @@ knn_over = knn(training_norm_data_over[,-1], test_norm_data[,-1],
 knn_pred_min_over = as.factor(knn_over)
 
 table(test_norm_data$IsWinner_norm, knn_over)
+
