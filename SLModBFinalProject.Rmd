@@ -310,9 +310,9 @@ The table below lists the categorical/continuous variable combinations that may 
 
 Categorical    | Continuous
 ---------------| ------------------------------------------
-Key            | Danceability  Energy
-Mode           | Acousticness Energy Loudness
-Time signature | Acousticness Danceability Duration Energy Instrumentalness Loudness Tempo Valence
+Key            | Danceability;  Energy
+Mode           | Acousticness;  Energy;  Loudness
+Time signature | Acousticness;  Danceability;  Duration;  Energy;  Instrumentalness;  Loudness;  Tempo;  Valence
 
 The fact that x, y, z, etc. were significant allows us to confidently say there is a strong enough correlation between those parings and we may use them in our models in a beneficial manner.
 
@@ -840,6 +840,8 @@ shapiro.test(valence[IsWinner == 1]) # No
 According tot he Shapiro Test, discuss what the values mean or each of the attributes. What useful knowledge is gained from this?
 
 #### Distribution(???) Plots of the Attributes
+
+- The purpose of the quantile-quantile (QQ) plot is to show if two data sets come from the same distribution (WRITEUP)
 
 ##### Danceability
 ```{r}
