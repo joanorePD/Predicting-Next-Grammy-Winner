@@ -117,9 +117,7 @@ Acousticness  | A confidence measure from 0.0 to 1.0 of whether the track is aco
 Danceability  | Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
 Energy        | Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.
 Instrumentalness | Predicts whether a track contains no vocals. "Ooh" and "aah" sounds are treated as instrumental in this context. Rap or spoken word tracks are clearly "vocal". The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content. Values above 0.5 are intended to represent instrumental tracks, but confidence is higher as the value approaches 1.0.
-Liveness      | Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live.
 Loudness      | The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db.
-Speechiness   | Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks.
 Valence       | A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
 
 Although Spotify does not openly share how they determine these metrics, we found them suitable to assist in our analysis.
@@ -193,7 +191,7 @@ DISCUSS THE ABOVE PLOT; TALK ABOUT THE SHAPES (BLobs, slightly linear, etc); TAL
 
 MORE INFORMATION
 
-Evaluating with this plot, we were able to understand the shape of the data and discover outliers as well as general trends. For example, almost the entore trend line of DUration vs Instrumentalness is caused by a single outlier. It also confirmed the high coralation between loudness and energy, showing a nice upward durection of the trend line, as well as for valence and danceability (although those data have higher variability).
+From evaluating this plot, we were able to understand the shape of the data and discover outliers as well as general trends. For example, almost the entire trend line of Duration vs Instrumentalness is caused by a single outlier. It also confirmed the high correlation between loudness and energy, showing a nice upward direction of the trend line, as well as for valence and danceability (although those data have higher variability).
 
 Line is average of the dots? (CONFIRM)
 
@@ -308,13 +306,17 @@ val_time.aov <- aov(valence ~ time_signature)
 summary(val_time.aov) # SIGNIFICANT
 ```
 
+The table below lists the categorical/continuous variable combinations that may be significant, according to ANOVA: 
+
 Categorical    | Continuous
 ---------------| ------------------------------------------
-Key            | Followers Danceability  Energy
-Mode           | Followers Acousticness Energy Loudness
+Key            | Danceability  Energy
+Mode           | Acousticness Energy Loudness
 Time signature | Acousticness Danceability Duration Energy Instrumentalness Loudness Tempo Valence
 
 The fact that x, y, z, etc. were significant allows us to confidently say there is a strong enough correlation between those parings and we may use them in our models in a beneficial manner.
+
+DISCUSS HOW ALL WERE SIGNIFICANT WITH TIME SIGNATURE; Why could that be and how do we approach that information?
 
 #### Partial Correlations
 
@@ -325,19 +327,27 @@ Every possible combination of continuous variables.
 ```{r, warnings = FALSE}
 # Partial correlations
 correlation(training_set[,c(-1, -2, -9, -11, -13)], partial = TRUE)
+```
 
+Plotting the 3 highest t-values below to see... (IS THIS A T-VALUE?)
+
+```{r, warnings = FALSE}
 # Plots of variables with the largest partial correlation
 ggplot(data = training_set, aes(danceability, valence)) + geom_jitter(color = "blue")
 ggplot(data = training_set, aes(loudness, energy)) + geom_jitter(color = "blue")
 ggplot(data = training_set, aes(acousticness, energy)) + geom_jitter(color = "blue")
+```
 
 
-#Weird song veeeeeeeeeeeeeeeeeeeeeeeery long 
+TALK ABOUT WHY SOME MAY BE SIGNIFICANT; WHAT THAT MEANS.
+
+```{r}
+#Weird song, very long; outlier 
 which.max(data$duration_ms)
 data[504, ]
 ```
 
-TALK ABOUT WHY SOME MAY BE SIGNIFICANT; WHAT THAT MEANS.
+WHY ARE WE HIGHLIGHTING THIS OUTLIER? HOW DOES IT AFFECT THE PARTIAL CORRELATION?
 
 ### Distributions
 
@@ -369,7 +379,7 @@ DISCUSS CONTIN VAR'S
 
 Mention normally distributed fatures (Dance, Valence) and the amount of skew found in the others
 
-From these histograms, it is clear that the danceability feature is the most normally distributed. All others have a small skew at best (valence) to larger skews (tempo, loudness, energy) to seemingly exponential skews or individual values (duration, acousticness, followers, instrumentalness, liveness). As we build our models, we will keep these distributions in mind.
+From these histograms, it is clear that the danceability feature is the most normally distributed. All others have a small skew at best (valence) to larger skews (tempo, loudness, energy) to seemingly exponential skews or individual values (duration, acousticness, followers, instrumentalness). As we build our models, we will keep these distributions in mind.
 
 #### Categorical
 

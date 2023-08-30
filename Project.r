@@ -255,6 +255,7 @@ par(mfrow= c(2, 4))
  
 # Continuous variables
 
+hist(acousticness, main='Acousticness')
 hist(danceability, main='Danceability')
 hist(duration_ms, main='Duration')
 hist(energy, main='Energy')
