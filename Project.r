@@ -68,8 +68,8 @@ names = paste0(data$track_name, " - ", data$artist_name)
 
 # Eliminating unusable variables
 
-data = data[,c("IsWinner", "Year", "followers", "acousticness", "danceability", "duration_ms",
-               "energy", "instrumentalness", "key", "liveness", "loudness", "mode",
+data = data[,c("IsWinner", "Year", "acousticness", "danceability", "duration_ms",
+               "energy", "instrumentalness", "key", "loudness", "mode",
                "tempo", "time_signature", "valence")]
 
 data = cbind(names = names, data)
@@ -130,18 +130,19 @@ length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$I
 attach(training_set)
 
 # Correlations between continuous variables
-cor_matrix = cor(training_set[,c(-1, -2, -10, -13, -15)])
+
+cor_matrix = cor(training_set[,c(-1, -2, -9, -11, -13)])
 # corrplot(cor_matrix, method='number')
 # dev.new(width=10, height=5, unit="in")
 png(file="corplot_indep_1.png",
     width=1200, height=1000, pointsize = 26)
 corrplot.mixed(cor_matrix, tl.pos='lt')
 dev.off()
-#pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
+#pairs(training_set[,c(-1, -2, -9, -11, -13)], lower.panel = panel.smooth)
 
 # Send pairs() to png to resize and visualize better
 png(file = "corplot_indep_2.png", width = 1200, height = 1000, pointsize=20)
-pairs(training_set[,c(-1, -2, -10, -13, -15)], lower.panel = panel.smooth)
+pairs(training_set[,c(-1, -2, -9, -11, -13)], lower.panel = panel.smooth)
 dev.off()  # important!
 
 
@@ -154,9 +155,6 @@ cramersv(matrix(c(as.numeric(mode), as.numeric(time_signature)), ncol = 2))
 # Association between continuous and categorical variables
 
 # Key
-
-fol_key.aov <- aov(followers ~ key)
-summary(fol_key.aov) # SIGNIFICANT
 
 aco_key.aov <- aov(acousticness ~ key)
 summary(aco_key.aov)
@@ -173,9 +171,6 @@ summary(ene_key.aov) # SIGNIFICANT
 ins_key.aov <- aov(instrumentalness ~ key)
 summary(ins_key.aov)
 
-liv_key.aov <- aov(liveness ~ key)
-summary(liv_key.aov)
-
 loud_key.aov <- aov(loudness ~ key)
 summary(loud_key.aov)
 
@@ -186,9 +181,6 @@ val_key.aov <- aov(valence ~ key)
 summary(val_key.aov)
 
 # Mode
-
-fol_mode.aov <- aov(followers ~ mode)
-summary(fol_mode.aov) # SIGNIFICANT
 
 aco_mode.aov <- aov(acousticness ~ mode)
 summary(aco_mode.aov) # SIGNIFICANT
@@ -205,9 +197,6 @@ summary(ene_mode.aov) # SIGNIFICANT
 ins_mode.aov <- aov(instrumentalness ~ mode)
 summary(ins_mode.aov)
 
-liv_mode.aov <- aov(liveness ~ mode)
-summary(liv_mode.aov)
-
 loud_mode.aov <- aov(loudness ~ mode)
 summary(loud_mode.aov) # SIGNIFICANT
 
@@ -218,9 +207,6 @@ val_mode.aov <- aov(valence ~ mode)
 summary(val_mode.aov)
 
 # Time signature
-
-fol_time.aov <- aov(followers ~ time_signature)
-summary(fol_time.aov)
 
 aco_time.aov <- aov(acousticness ~ time_signature)
 summary(aco_time.aov) # SIGNIFICANT
@@ -237,9 +223,6 @@ summary(ene_time.aov) # SIGNIFICANT
 ins_time.aov <- aov(instrumentalness ~ time_signature)
 summary(ins_time.aov) # SIGNIFICANT
 
-liv_time.aov <- aov(liveness ~ time_signature)
-summary(liv_time.aov)
-
 loud_time.aov <- aov(loudness ~ time_signature)
 summary(loud_time.aov) # SIGNIFICANT
 
@@ -251,7 +234,7 @@ summary(val_time.aov) # SIGNIFICANT
 
 
 # Partial correlations
-correlation(training_set[,c(-1, -2, -10, -13, -15)], partial = TRUE)
+correlation(training_set[,c(-1, -2, -9, -11, -13)], partial = TRUE)
 
 # Plots of variables with the largest partial correlation
 ggplot(data = training_set, aes(danceability, valence)) + geom_jitter(color = "blue")
@@ -268,16 +251,14 @@ data[504, ]
 
 # Checking distributions
 
-par(mfrow= c(2, 5))
+par(mfrow= c(2, 4))
  
 # Continuous variables
 
-hist(followers, main='Followers')
 hist(danceability, main='Danceability')
 hist(duration_ms, main='Duration')
 hist(energy, main='Energy')
 hist(instrumentalness, main='Instrumentalness')
-hist(liveness, main='Liveness')
 hist(loudness, main='Loudness')
 hist(tempo, main='Tempo')
 hist(valence, main='Valence')
@@ -334,15 +315,13 @@ barplot(table(x), main = "Key: Nominated/Winner")
 
 # Relationships between dependent and independent variables
 
-par(mfrow= c(2, 5))
+par(mfrow= c(2, 4))
 
 boxplot(danceability ~ training_set$IsWinner, xlab='Nominee Boolean')
-boxplot(followers ~ training_set$IsWinner, xlab='Nominee Boolean')
 boxplot(acousticness ~ training_set$IsWinner, xlab='Nominee Boolean')
 boxplot(duration_ms ~ training_set$IsWinner, xlab='Nominee Boolean')
 boxplot(energy ~ training_set$IsWinner, xlab='Nominee Boolean')
 boxplot(instrumentalness ~ training_set$IsWinner, xlab='Nominee Boolean')
-boxplot(liveness ~ training_set$IsWinner, xlab='Nominee Boolean')
 boxplot(loudness ~ training_set$IsWinner, xlab='Nominee Boolean')
 boxplot(tempo ~ training_set$IsWinner, xlab='Nominee Boolean')
 boxplot(valence ~ training_set$IsWinner, xlab='Nominee Boolean')
@@ -438,7 +417,7 @@ log_both =  stepAIC(logistic, direction = "both")
 
 # Fitting the reduced model
 
-logistic_reduced = glm(IsWinner ~ Year + followers + acousticness + duration_ms + valence, data = training_set,  family = "binomial")
+logistic_reduced = glm(IsWinner ~ Year + acousticness + duration_ms + valence, data = training_set,  family = "binomial")
 
 summary(logistic_reduced)
 
@@ -503,16 +482,11 @@ auc(roc.out)
 logistic_over = glm(as.numeric(unlist(oversampled_train_data[1])) ~ ., data = oversampled_train_data[-1], family = "binomial")
 summary(logistic_over)
 
-
-log_over_back = stepAIC(logistic_over, direction = "backward")
-
-log_over_for = stepAIC(logistic_over, direction = "forward")
-
 log_over_both =  stepAIC(logistic_over, direction = "both")
 
 response_variable_over = as.numeric(unlist(oversampled_train_data[1]))
 
-reduced_variables_over = as.matrix(oversampled_train_data[,c(2, 3, 4, 6, 8, 9, 11, 14, 15)], ncol = 9)
+reduced_variables_over = as.matrix(oversampled_train_data[,c(2, 3, 5, 7, 8, 9, 12, 13)], ncol = 8)
 
 reduced_train_data_over = matrix(c(
   response_variable_over,
@@ -520,19 +494,20 @@ reduced_train_data_over = matrix(c(
   as.numeric(reduced_variables_over[,2]),
   as.numeric(reduced_variables_over[,3]),
   as.numeric(reduced_variables_over[,4]),
-  as.numeric(reduced_variables_over[,5]),
-  as.factor(reduced_variables_over[,6]),
-  as.numeric(reduced_variables_over[,7]),
-  as.factor(reduced_variables_over[,8]),
-  as.numeric(reduced_variables_over[,9])
-), ncol = 10)
+  as.factor(reduced_variables_over[,5]),
+  as.numeric(reduced_variables_over[,6]),
+  as.factor(reduced_variables_over[,7]),
+  as.numeric(reduced_variables_over[,8])
+), ncol = 9)
+
+head(reduced_variables_over)
 
 
-colnames(reduced_train_data_over) = c("IsWinner", "Year", "followers", "acousticness", "duration_ms",
+colnames(reduced_train_data_over) = c("IsWinner", "Year", "acousticness", "duration_ms",
                                      "instrumentalness", "key", "loudness", "time_signature", "valence" )
 
 
-logistic_reduced_over = glm(response_variable_over ~ Year + followers + acousticness 
+logistic_reduced_over = glm(response_variable_over ~ Year + acousticness 
                             + duration_ms + instrumentalness + key + loudness + 
                             + time_signature + valence, data = oversampled_train_data,
                             family = "binomial")
@@ -599,9 +574,6 @@ auc(roc.out)
 shapiro.test(danceability[IsWinner == 0]) # Yes
 shapiro.test(danceability[IsWinner == 1]) # Yes
 
-shapiro.test(followers[IsWinner == 0]) # No
-shapiro.test(followers[IsWinner == 1]) # No
-
 shapiro.test(acousticness[IsWinner == 0]) # No
 shapiro.test(acousticness[IsWinner == 1]) # No
 
@@ -613,9 +585,6 @@ shapiro.test(energy[IsWinner == 1]) # No
 
 shapiro.test(instrumentalness[IsWinner == 0]) # No
 shapiro.test(instrumentalness[IsWinner == 1]) # No
-
-shapiro.test(liveness[IsWinner == 0]) # No
-shapiro.test(liveness[IsWinner == 1]) # No
 
 shapiro.test(loudness[IsWinner == 0]) # No
 shapiro.test(loudness[IsWinner == 1]) # No
@@ -636,17 +605,6 @@ qqline(danceability[IsWinner == 0],lwd = 2, col = "red")
 qqnorm(danceability[IsWinner == 1])
 grid()               
 qqline(danceability[IsWinner == 1],lwd = 2, col = "red")
-
-# followers huge right tail
-par(mfrow = c(1, 2))
-
-qqnorm(followers[IsWinner == 0])
-grid()               
-qqline(followers[IsWinner == 0],lwd = 2, col = "red")
-
-qqnorm(followers[IsWinner == 1])
-grid()               
-qqline(followers[IsWinner == 1],lwd = 2, col = "red")
 
 # acousticness S shaped
 par(mfrow = c(1, 2))
@@ -692,17 +650,6 @@ qqnorm(instrumentalness[IsWinner == 1])
 grid()               
 qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 
-# liveness S shaped
-par(mfrow = c(1, 2))
-
-qqnorm(liveness[IsWinner == 0])
-grid()               
-qqline(liveness[IsWinner == 0],lwd = 2, col = "red")
-
-qqnorm(liveness[IsWinner == 1])
-grid()               
-qqline(liveness[IsWinner == 1],lwd = 2, col = "red")
-
 # loudness tails not normal
 par(mfrow = c(1, 2))
 
@@ -738,26 +685,6 @@ qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 
 # Applying transformations to the predictors in the attempt of making them normal
 
-# followers plots improved, one passes the test
-
-par(mfrow = c(1, 1))
-
-b_followers <- boxcox(lm(followers ~ 1))
-lambda <- b_followers$x[which.max(b_followers$y)]
-followers_tran <- (followers ^ lambda - 1) / lambda
-
-par(mfrow = c(1, 2))
-
-qqnorm(followers_tran[IsWinner == 0])
-grid()               
-qqline(followers_tran[IsWinner == 0],lwd = 2, col = "red")
-
-qqnorm(followers_tran[IsWinner == 1])
-grid()               
-qqline(followers_tran[IsWinner == 1],lwd = 2, col = "red")
-
-shapiro.test(followers_tran[IsWinner == 0]) # No 
-shapiro.test(followers_tran[IsWinner == 1]) # Yes
 
 # Acousticness plots improved, test not passed
 
@@ -847,26 +774,6 @@ qqline(instrumentalness_tran[IsWinner == 1],lwd = 2, col = "red")
 shapiro.test(instrumentalness_tran[IsWinner == 0]) # No 
 shapiro.test(instrumentalness_tran[IsWinner == 1]) # No
 
-# liveness plots improved a lot, test not passed because of a few points in the tails
-
-par(mfrow = c(1, 1))
-
-b_liveness <- boxcox(lm(liveness ~ 1))
-lambda <- b_liveness$x[which.max(b_liveness$y)]
-liveness_tran <- (liveness ^ lambda - 1) / lambda
-
-par(mfrow = c(1, 2))
-
-qqnorm(liveness_tran[IsWinner == 0])
-grid()               
-qqline(liveness_tran[IsWinner == 0],lwd = 2, col = "red")
-
-qqnorm(liveness_tran[IsWinner == 1])
-grid()               
-qqline(liveness_tran[IsWinner == 1],lwd = 2, col = "red")
-
-shapiro.test(liveness_tran[IsWinner == 0]) # No 
-shapiro.test(liveness_tran[IsWinner == 1]) # No
 
 # loudness boxcox transformation not directly applicable because the variable
 # is always negative, I multiplied the values by -1 and then applied it, 
@@ -939,10 +846,6 @@ shapiro.test(valence_tran[IsWinner == 1]) # No
 
 par(mfrow = c(1, 1))
 
-b_data_followers <- boxcox(lm(data$followers ~ 1))
-lambda <- b_data_followers$x[which.max(b_data_followers$y)]
-data_followers_tran <- (data$followers ^ lambda - 1) / lambda
-
 b_data_acousticness <- boxcox(lm(data$acousticness ~ 1))
 lambda <- b_data_acousticness$x[which.max(b_data_acousticness$y)]
 data_acousticness_tran <- (data$acousticness ^ lambda - 1) / lambda
@@ -950,10 +853,6 @@ data_acousticness_tran <- (data$acousticness ^ lambda - 1) / lambda
 b_data_duration_ms <- boxcox(lm(data$duration_ms ~ 1))
 lambda <- b_data_duration_ms$x[which.max(b_data_duration_ms$y)]
 data_duration_ms_tran <- (data$duration_ms ^ lambda - 1) / lambda
-
-b_data_liveness <- boxcox(lm(data$liveness ~ 1))
-lambda <- b_data_liveness$x[which.max(b_data_liveness$y)]
-data_liveness_tran <- (data$liveness ^ lambda - 1) / lambda
 
 neg_loudness = data$loudness * (-1)
 b_data_loudness <- boxcox(lm(neg_loudness ~ 1))
@@ -965,16 +864,16 @@ lambda <- b_data_tempo$x[which.max(b_data_tempo$y)]
 data_tempo_tran <- (data$tempo ^ lambda - 1) / lambda
 
 
-tran_data = matrix(c(data$IsWinner, data_followers_tran, data_acousticness_tran, data_duration_ms_tran, 
-            data$energy, data$instrumentalness, data_liveness_tran, data_loudness_tran, 
-            data_tempo_tran, data$valence), ncol = 10)
+tran_data = matrix(c(data$IsWinner, data_acousticness_tran, data_duration_ms_tran, 
+            data$energy, data$instrumentalness, data_loudness_tran, 
+            data_tempo_tran, data$valence), ncol = 8)
 
 training_tran_data = tran_data[train_ind,]
 
 test_tran_data = tran_data[-train_ind,]
 
-colnames_tran_data = c("IsWinner", "followers_tran", "acousticness_tran", "duration_ms_tran", "energy",
-                       "instrumentalness", "liveness_tran", "loudness_tran", "tempo_tran", "valence")
+colnames_tran_data = c("IsWinner", "acousticness_tran", "duration_ms_tran", "energy",
+                       "instrumentalness", "loudness_tran", "tempo_tran", "valence")
 
 colnames(training_tran_data) = colnames_tran_data
 colnames(test_tran_data) = colnames_tran_data
@@ -987,8 +886,8 @@ tran_data = as.data.frame(tran_data)
 
 ## LDA
 
-simple_lda = lda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
-                energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+simple_lda = lda(IsWinner ~ acousticness_tran + duration_ms_tran + 
+                energy + instrumentalness + loudness_tran + tempo_tran +
                 valence, data = training_tran_data, family = "binomial")
 
 
@@ -1005,8 +904,8 @@ auc(roc.out)
 oversampled_train_tran_data = ovun.sample(IsWinner ~., data = training_tran_data, method = "over", p = 0.5, seed = 42)$data
 
 
-simple_over_lda = lda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
-                   energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+simple_over_lda = lda(IsWinner ~ acousticness_tran + duration_ms_tran + 
+                   energy + instrumentalness + loudness_tran + tempo_tran +
                    valence, data = oversampled_train_tran_data, family = "binomial")
 
 
@@ -1054,8 +953,8 @@ sensitivity_lda_over_05 = true_positive_lda_over_05 / positive_lda_over_05
 
 ## QDA
 
-qda = qda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
-            energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+qda = qda(IsWinner ~ acousticness_tran + duration_ms_tran + 
+            energy + instrumentalness + loudness_tran + tempo_tran +
             valence, data = training_tran_data, family = "binomial")
 
 
@@ -1069,8 +968,8 @@ auc(roc.out)
 
 # QDA oversampled
 
-qda_over = qda(IsWinner ~ followers_tran + acousticness_tran + duration_ms_tran + 
-            energy + instrumentalness + liveness_tran + loudness_tran + tempo_tran +
+qda_over = qda(IsWinner ~ acousticness_tran + duration_ms_tran + 
+            energy + instrumentalness + loudness_tran + tempo_tran +
             valence, data = oversampled_train_tran_data, family = "binomial")
 
 
@@ -1153,7 +1052,7 @@ min_max_norm = function(x) {
   (x - min(x)) / (max(x) - min(x))
 }
 
-normalized_data = as.data.frame(lapply(data[,c(-1, -2, -10, -13, -15)], min_max_norm))
+normalized_data = as.data.frame(lapply(data[,c(-1, -2, -9, -11, -13)], min_max_norm))
 
 IsWinner_norm = data$IsWinner
 
@@ -1191,7 +1090,9 @@ table(test_norm_data$IsWinner_norm, knn)
 
 test_over_error = numeric(kmax)
 
-normalized_over_data = as.data.frame(lapply(oversampled_train_data[,c(-9, -12, -14)], min_max_norm))
+oversampled_train_data
+
+normalized_over_data = as.data.frame(lapply(oversampled_train_data[,c(-8, -10, -12)], min_max_norm))
 
 training_norm_data_over = normalized_over_data[train_ind,]
 
