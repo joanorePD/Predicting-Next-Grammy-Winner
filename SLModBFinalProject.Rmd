@@ -153,7 +153,7 @@ length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$I
 
 ### Relationship Between Independent Variables
 
-At first, we took a look at the variables by examining their correlation, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and we should avoid the pairing. We would prefer different variables which offer different information to our model.
+At first, we took a look at the independent variables by examining their correlation, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and we should avoid the pairing. We would prefer to utilize pairings of variables that offer different information to our model.
 
 It was important for us to understand our data better in these regards, so that we may know which attribute pairings could give useful insight.
 
@@ -173,11 +173,7 @@ corrplot.mixed(cor_matrix, tl.pos='lt')
 knitr::include_graphics("corplot_indep_1.png")
 ```
 
-DISCUSS  THE ABOVE PLOT; POINT OUT LARGE CORELATION
-
-The 4 major pairings of:
-- means they are not very beneficial
-- Interesting to see that a song that has high energy often has high loudness (interesting for its own sake, not necessarily for our project)
+The above plot visualizes the correlations between the continuous, independent variables. There are four pairings of variables that produce a large correlation: acousticness/energy, acousticness/loudness, danceability/valence, and loudness/energy. It was interesting to see that loudness and energy had such a high correlation, giving us some insight into how these metrics are defined.
 
 ```{r, eval = FALSE}
 pairs(training_set[,c(-1, -2, -9, -11, -13)], lower.panel = panel.smooth)
@@ -187,43 +183,31 @@ pairs(training_set[,c(-1, -2, -9, -11, -13)], lower.panel = panel.smooth)
 knitr::include_graphics("corplot_indep_2.png")
 ```
 
-DISCUSS THE ABOVE PLOT; TALK ABOUT THE SHAPES (BLobs, slightly linear, etc); TALK ABOUt THE RED LINES AND WHAT THEIR DIRECTION AND LINEARTY MEANS
-
-MORE INFORMATION
-
-From evaluating this plot, we were able to understand the shape of the data and discover outliers as well as general trends. For example, almost the entire trend line of Duration vs Instrumentalness is caused by a single outlier. It also confirmed the high correlation between loudness and energy, showing a nice upward direction of the trend line, as well as for valence and danceability (although those data have higher variability).
-
-Line is average of the dots? (CONFIRM)
-
-pos corr means 2 varibales change int he same direction; both grow or both decrease
-neg corr means one increases and the other decrease
-best correlation is 0 for independent variables
-
-When looking between indep and depend var's we want correlation as high as possible
-Helps to predict
-
-Correlation is only a linear relationship; could be non-linear relationship
+From evaluating this second type of plot showing the correlation between continuous, independent variables, we were able to understand the shape of the data and discover outliers as well as general trends. For example, almost the entire trend line of Duration vs Instrumentalness is caused by a single outlier. It also confirmed the high, positive correlation between loudness and energy, showing a nice upward direction of the trend line with the data points clustered around it. It also showed the strong trend line between valence and danceability, although those data have higher variability and are less centered around the line. The highly negative correlation between acousticness and energy is also visualized, touting a firmly downward trend line.
 
 #### Correlation Between Categorical Variables
 
-In order to determine the strength of similarity between the categorical variables, we employed the Cramer's V measurement. This measurement is a normalized version of the chi-square statistic, returning a value of 0 if there is no association between the categorical variables, and returning 1 if there is a perfect association in which one variable is completely determined by the other. (EXPAND ON CRAMER'S V MEASUREMENT)
+In order to determine the strength of similarity between the categorical variables, we employed the Cramer's V measurement. This measurement is a normalized version of the chi-square statistic, returning a value of 0 if there is no association between the categorical variables, and returning 1 if there is a perfect association in which one variable is completely determined by the other.
 
 ```{r, warning=FALSE}
 # Association measure for categorical variables (Cramer's V is a normalized 
 # version of the chi-square statistics)
+
+# Key / Mode
 cramersv(matrix(c(as.numeric(key), as.numeric(mode)), ncol = 2))
+# Key / Time Signature
 cramersv(matrix(c(as.numeric(key), as.numeric(time_signature)), ncol = 2))
+# Mode / Time Signature
 cramersv(matrix(c(as.numeric(mode), as.numeric(time_signature)), ncol = 2))
 ```
 
-Most valuable iformation from Cramer:
-- Not fully dissacociated from each other!
+Although measurements of association between categorical variables are hard to interpret, the Cramer's V test still informs us if there is full disassociation or full association between said variables. From our data, it can be seen that key/mode and key/time_signature are definitely not fully disassociated or fully associated. The same can be said about mode/time_signature, although the measured value was closer to 0.
 
-#### ANOVA
+#### ANOVA Test
 
-Next, we looked for associations between each of the categorical variables (Key, Mode, and Time Signature) and all of the continuous variables utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables by studying their variations. If ANOVA points out some feature combinations are significant, then that means the attributes are different. (EXPAND HERE BRIEFLY). Chose 5% as the threshold for significance. Following combinations were significant:
+Next, we looked for associations between each of the categorical variables and all of the continuous variables utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables. If ANOVA points out some feature combinations are significant, then that suggests the means of the groups of continuous variables are different. We chose 5% as the threshold for significance.
 
-ANOVA makes some assumptions, which are not fully satisfied by our variables, meaning the results we obtained are not completely correct (REWORD).
+ANOVA makes some assumptions regarding the variances of the attributes which are not fully satisfied by all of our variables, meaning the results we obtained should be considered carefully.
 
 ```{r, warnings = FALSE}
 # Association between continuous and categorical variables
@@ -309,37 +293,39 @@ summary(val_time.aov) # SIGNIFICANT
 The table below lists the categorical/continuous variable combinations that may be significant, according to ANOVA: 
 
 Categorical    | Continuous
----------------| ------------------------------------------
+---------------| :------------------------------------------:
 Key            | Danceability;  Energy
 Mode           | Acousticness;  Energy;  Loudness
 Time signature | Acousticness;  Danceability;  Duration;  Energy;  Instrumentalness;  Loudness;  Tempo;  Valence
 
-The fact that x, y, z, etc. were significant allows us to confidently say there is a strong enough correlation between those parings and we may use them in our models in a beneficial manner.
+The fact that these groups were significant allows us to say there may be a strong enough correlation between these pairings to use them in our models in a beneficial manner. DISCUSS HOW ALL WERE SIGNIFICANT WITH TIME SIGNATURE; WHY COULD THAT BE AND HOW DO WE ADDRESS THAT?
 
-DISCUSS HOW ALL WERE SIGNIFICANT WITH TIME SIGNATURE; Why could that be and how do we approach that information?
+PARAPHRASE:
+"Note that the ANOVA alone does not tell us specifically which means were different from one another. To determine that, we would need to follow up with multiple comparisons (or post-hoc) tests."
 
 #### Partial Correlations
 
-TALK ABOUT PARTIAL CORRELATIONS; WHAT ARE THEY? WHAT DO THEY SHOW?
-
-Every possible combination of continuous variables.
+Because ANOVA does not inform us which means were different from the others, it is necessary to further explore the data pairings. To do this, we utilized partial correlations, an exhaustive search that compares each possible pairing of continuous variables.
 
 ```{r, warnings = FALSE}
 # Partial correlations
 correlation(training_set[,c(-1, -2, -9, -11, -13)], partial = TRUE)
 ```
 
-Plotting the 3 highest t-values below to see... (IS THIS A T-VALUE?)
+There were three variable pairs that stood out as significantly different:
 
 ```{r, warnings = FALSE}
 # Plots of variables with the largest partial correlation
+
+# Danceability / Valence
 ggplot(data = training_set, aes(danceability, valence)) + geom_jitter(color = "blue")
+# Loudness / Energy
 ggplot(data = training_set, aes(loudness, energy)) + geom_jitter(color = "blue")
+# Acousticness / Energy
 ggplot(data = training_set, aes(acousticness, energy)) + geom_jitter(color = "blue")
 ```
 
-
-TALK ABOUT WHY SOME MAY BE SIGNIFICANT; WHAT THAT MEANS.
+These three pairings are the same three largest correlations seen from the first correlation plots, confirming those findings. It is also interesting to see how the correlation value changes, THEY ARE HIGHER  HERE; ASK CRISTIAN MORE ABOUT THIS.
 
 ```{r}
 #Weird song, very long; outlier 
@@ -347,7 +333,9 @@ which.max(data$duration_ms)
 data[504, ]
 ```
 
-WHY ARE WE HIGHLIGHTING THIS OUTLIER? HOW DOES IT AFFECT THE PARTIAL CORRELATION?
+WHY ARE WE HIGHLIGHTING THIS OUTLIER? HOW DOES IT AFFECT THE PARTIAL CORRELATION? TALK ABOUT HOW WE LEFT IT IN THE DATA AS A PART OF OUR EXPLORATION AND THE LEARNING EXPERIENCE OF HAVING DATA WITH OUTLIERS.
+
+By definition, correlation speaks to linear relationships. This information will directly guide how we develop linear models of our data, but non-linear relationships between the highly correlated data points could still exist.
 
 ### Distributions
 
@@ -375,11 +363,41 @@ hist(valence)
 knitr::include_graphics("distrib_contin_hist.png")
 ```
 
-DISCUSS CONTIN VAR'S
-
-Mention normally distributed fatures (Dance, Valence) and the amount of skew found in the others
-
 From these histograms, it is clear that the danceability feature is the most normally distributed. All others have a small skew at best (valence) to larger skews (tempo, loudness, energy) to seemingly exponential skews or individual values (duration, acousticness, instrumentalness). As we build our models, we will keep these distributions in mind.
+
+COMPARISON OF NON-NOMINATED / NOMINATED FOR A CONTINUOUS VARIABLE (VALENCE)
+
+We also compared the distributions and means of each variable for non-nominated and nominated songs. Most were very similar, but below we highlighted the most different attribute: Valence.
+
+```{r}
+# Comparison IsWinner 0 vs 1 - Valence
+
+par(mfrow = c(1, 2))
+
+x <- data[data$IsWinner == 0,]$valence
+hist(x, main = "Valence: Non-Nominated")
+abline(v = mean(x),                       # Add line for mean
+       col = "red",
+       lwd = 3)
+text(x = mean(x) * 1.5,                   # Add text for mean
+     y = 121,
+     paste("Mean =", round(mean(x), digits=2)),
+     col = "red",
+     cex = 1)
+
+x <- data[data$IsWinner == 1,]$valence
+hist(x, main = "Valence: Nominated")
+abline(v = mean(x),                       # Add line for mean
+       col = "red",
+       lwd = 3)
+text(x = mean(x) * 0.5,                   # Add text for mean
+     y = 31,
+     paste("Mean =", round(mean(x), digits=2)),
+     col = "red",
+     cex = 1)
+```
+
+Depending on the dependent variable, the valence variable peaks at different locations and has a different mean. This could point towards valence being an important factor in our predictions.
 
 #### Categorical
 
@@ -393,7 +411,22 @@ barplot(table(mode), main = "Mode")
 barplot(table(time_signature), main = "Time signature")
 ```
 
-Evident mode of the categories in Mode and Time Signature; VERY high frequency
+Evident mode of the categories in Mode and Time Signature; VERY high frequency TALK ABOUT THIS
+
+We were again curious to compare the distribution of non-nominated to nominated songs for the categorical variables, and highlight the one that demonstrated the greatest difference: Key.
+
+```{r}
+# Comparison IsWinner 0 vs 1 - Key
+
+par(mfrow = c(1, 2))
+x <- data[data$IsWinner == 0,]$key
+barplot(table(x), main = "Key: Non-Nominated")
+
+x <- data[data$IsWinner == 1,]$key
+barplot(table(x), main = "Key: Nominated/Winner")
+```
+
+Although the distribution of key for both values of the dependent variable look very similar, there are some important differences. We see a much larger proportion of non-nominated songs written in key 4 (corresponding to the key of E) and key 7 (corresponding to the key of G) when compared to nominated songs. The opposite can be said about key 11 (key of B), with a larger proportion of nominated songs in that key when compared to non-nominated songs.
 
 #### Relationship Between Independent and Dependent Variables
 
