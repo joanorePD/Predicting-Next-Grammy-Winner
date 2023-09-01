@@ -502,11 +502,12 @@ oversampled_train_data = ovun.sample(IsWinner ~.,
 # Checking oversampled training set balance
 
 sum(oversampled_train_data$IsWinner == 0)
-sum(oversampled_train_data$IsWinner == 1) 
+sum(oversampled_train_data$IsWinner == 1)
 ```
 
 ### Logistic Model
-Starting with a logistic model (Explain what it does?)
+
+The first model created in this project was a logistic model, being a straightforward binary classification tool that will classify the songs as non-nominated or nominated works. It considers all the variables.
 
 ```{r}
 ## Simple logistic model
@@ -516,16 +517,19 @@ logistic = glm(IsWinner ~ ., data = training_set[,c(-1,-2)],
 summary(logistic)
 ```
 
-What does this model say?
+From the creation of the model, it determined valence, duration, and acousticness to be significant variables.
 
 #### Predictions
 
 ```{r}
 # Computing predictions
 
-logistic_predictions_full = predict(logistic, newdata = test_set[,c(-1, -2)],
+logistic_predictions_full = predict(logistic,
+                                    newdata = test_set[,c(-1, -2)],
                                     type = "response")
 ```
+
+Below are the predictions as computed by the logistic model created above, using different thresholds of classification. The threshold defines at which confidence level the model will classify a song as "nominated."
 
 ##### Threshold = 0.2
 
@@ -541,14 +545,26 @@ false_positive_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_
 negative_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[1] + table(test_set$IsWinner, logistic_predictions_full_02)[3]
 typeIerror_logistic_full_02 = false_positive_logistic_full_02 / negative_logistic_full_02
 
+typeIerror_logistic_full_02
+```
+
+```{r}
 true_positive_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[4]
 positive_logistic_full_02 = table(test_set$IsWinner, logistic_predictions_full_02)[2] + table(test_set$IsWinner, logistic_predictions_full_02)[4]
 sensitivity_logistic_full_02 = true_positive_logistic_full_02 / positive_logistic_full_02
+
+sensitivity_logistic_full_02
 ```
 
-Discuss what we see from this threshold:
+At a classification threshold of 0.2, the Type 1 Error (False Positive Rate), defined as False Positive classifications / Total Negative songs, was 0.32. That means around a third of the non-nominated songs were misclassified as nominated 
+
+The Sensitivity (True Positive Rate), defined as True Positive classifications / Total positive songs was 0.5. Contextually, this means that half of the nominated songs were classified correctly.
+
+Ideally, the Type 1 error should be lower than this and the Sensitivity should be much higher.
 
 ##### Threshold = 0.3
+
+In an attempt to improve the classification of songs from our model, the threshold was increased to 0.3.
 
 ```{r}
 # Threshold = 0.3
@@ -562,14 +578,26 @@ false_positive_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_
 negative_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[1] + table(test_set$IsWinner, logistic_predictions_full_03)[3]
 typeIerror_logistic_full_03 = false_positive_logistic_full_03 / negative_logistic_full_03
 
+typeIerror_logistic_full_03
+```
+
+```{r}
 true_positive_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[4]
 positive_logistic_full_03 = table(test_set$IsWinner, logistic_predictions_full_03)[2] + table(test_set$IsWinner, logistic_predictions_full_03)[4]
 sensitivity_logistic_full_03 = true_positive_logistic_full_03 / positive_logistic_full_03
+
+sensitivity_logistic_full_03
 ```
 
-Discuss what we see from this threshold compared to 0.2:
+With an increase in threshold to 0.3, the Type 1 Error decreased to 0.113. This was an improvement, as it means there were fewer non-nominated songs classified as nominated, but to get a full picture Sensitivity still needed to be examined.
+
+The Sensitivity also decreased to 0.083, which is not optimal behavior. This means that at a classification threshold of 0.3, the model correctly predicts only 8% of the nominated songs.
+
+The combined information from these two tests suggests the model is classifying more songs as non-nominated, avoiding false positives while also missing correct classifications of nominated songs.
 
 ##### Threshold = 0.4
+
+For a final comparison, the threshold was set to 0.4.
 
 ```{r}
 # Threshold = 0.4
@@ -583,14 +611,26 @@ false_positive_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_
 negative_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[1] + table(test_set$IsWinner, logistic_predictions_full_04)[3]
 typeIerror_logistic_full_04 = false_positive_logistic_full_04 / negative_logistic_full_04
 
+typeIerror_logistic_full_04
+```
+
+```{r}
 true_positive_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[4]
 positive_logistic_full_04 = table(test_set$IsWinner, logistic_predictions_full_04)[2] + table(test_set$IsWinner, logistic_predictions_full_04)[4]
 sensitivity_logistic_full_04 = true_positive_logistic_full_04 / positive_logistic_full_04
+
+sensitivity_logistic_full_04
 ```
 
-Discuss what we see from this threshold compared to 0.2 and 0.3
+With an increase in threshold to 0.4, the Type 1 Error decreased further to 0.013. This again was an improvement, but it may be detrimental to the overall model accuracy.
 
-####ROC Curve
+The Sensitivity reached 0. This means the model managed to properly classify 0 nominated songs
+
+Overall, increasing the threshold was detrimental.
+
+#### ROC Curve
+
+An ROC Curve is meant to display the performance of a classification model. It plots the True Positive Rate (Sensitivity) against the False positive Rate (Type 1 Error) across different confidence thresholds. This takes into account both sides of the classification accuracy we discussed above and paints a comprehensive picture of how well the model can classify the song data.
 
 ```{r}
 # ROC curve
@@ -600,11 +640,11 @@ plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab
 auc(roc.out)
 ```
 
-Discuss these predictions:
+The ROC curve produced by the logistic model touts an Area Under the ROC Curve (AUR/AUC) of 0.598, meaning it achieves almost 60% diagnostic accuracy. A model producing an AUC greater than 50% is needed to make a model more efficient than a coin flip, so the basic logistic model does attain some predictive capabilities.
 
-### Stepwise Variable Selection
+### Stepwise Variable Selection and Reduced Model
 
-Utilizing stepwise variable selection:
+Stepwise variable selection was performed in an attempt to further improve the logistic model. This process removes the least beneficial variable from the model's consideration. As it removes more and more variables, it also goes back and checks if re-adding a previously removed variable would benefit the current state of the model at that time.
 
 ```{r}
 # Stepwise variable selection
@@ -612,25 +652,19 @@ Utilizing stepwise variable selection:
 log_both =  stepAIC(logistic, direction = "both")
 ```
 
-Possibly think about separating the 3 models and discussing them independently (Because the output it very large, would be difficult for the reader to scroll up and reference)
-
-### Reduced Model
-
-Fitting the reduced model (Is this according to the stepwise??) Discuss why we chose the features that we did for the reduced model:
+According to the stepwise selection, the most valuable variables for the logistic model are: year, valence, duration, and acousticness.
 
 ```{r}
 # Fitting the reduced model
 
-logistic_reduced = glm(IsWinner ~ danceability + loudness +  valence + duration_ms + acousticness, data = training_set,  family = "binomial")
+logistic_reduced = glm(IsWinner ~  Year + valence + duration_ms + acousticness, data = training_set,  family = "binomial")
 
 summary(logistic_reduced)
 ```
 
-Summarize what this model shows:
+Utilizing the information gained from the stepwise variable selection, a reduced version of the logistic model was created.
 
 #### Predicting
-
-Making the predictions:
 
 ```{r}
 # Computing predictions
@@ -638,7 +672,7 @@ Making the predictions:
 logistic_predictions = predict(logistic_reduced, newdata = test_set[,c(-1, -2)], type = "response")
 ```
 
-Inspect the predictions using different thresholds: .2, .3, and .4. Talk about what a threshold is and what changing it does.
+As done with the full logistic model, predictions using different thresholds were examined to ascertain the performance of the reduced model.
 
 ##### Threshold = 0.2
 ```{r}
@@ -653,14 +687,20 @@ false_positive_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[3
 negative_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[1] + table(test_set$IsWinner, logistic_predictions_02)[3]
 typeIerror_logistic_02 = false_positive_logistic_02 / negative_logistic_02
 
+typeIerror_logistic_02
+```
+
+```{r}
 true_positive_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[4]
 positive_logistic_02 = table(test_set$IsWinner, logistic_predictions_02)[2] + table(test_set$IsWinner, logistic_predictions_02)[4]
 sensitivity_logistic_02 = true_positive_logistic_02 / positive_logistic_02
+
+sensitivity_logistic_02
 ```
 
-Discuss what we see from this threshold:
+At a confidence threshold of 0.2, the model produces a Type 1 Error of 0.37, incorrectly classifying 37% of the non-nominated songs as nominated. This is slightly worse than the 0.32 seen from the full model.
 
-ASK CRISTIAN: Should we just display the TypeIError here, or is it used somewhere else? Maybe we can make a table after looking at all the thresholds? Does that make sense in this context?
+It also produces a sensitivity of 0.54, meaning it correctly classifies 54% of the nominated songs, a slight improvement to the 0.5 produced from the full model at this threshold.
 
 ##### Threshold = 0.3
 ```{r}
@@ -675,12 +715,18 @@ false_positive_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[3
 negative_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[1] + table(test_set$IsWinner, logistic_predictions_03)[3]
 typeIerror_logistic_03 = false_positive_logistic_03 / negative_logistic_03
 
+typeIerror_logistic_03
+```
+
+```{r}
 true_positive_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[4]
 positive_logistic_03 = table(test_set$IsWinner, logistic_predictions_03)[2] + table(test_set$IsWinner, logistic_predictions_03)[4]
 sensitivity_logistic_03 = true_positive_logistic_03 / positive_logistic_03
+
+sensitivity_logistic_03
 ```
 
-Discuss what we see from this threshold, incomparison to 0.2.
+As seen before with the full model, increasing the threshold to 0.3 decreased the Type 1 Error, but to a more significant degree. It now produces a value of 0.04, which is a significant drop in misclassifications of non-nominated songs. Coupled with that, however, was a significant drop in Sensitivity, reaching 0.042.
 
 ##### Threshold = 0.4
 ```{r}
@@ -695,16 +741,20 @@ false_positive_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[3
 negative_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[1] + table(test_set$IsWinner, logistic_predictions_04)[3]
 typeIerror_logistic_04 = false_positive_logistic_04 / negative_logistic_04
 
+typeIerror_logistic_04
+```
+
+```{r}
 true_positive_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[4]
 positive_logistic_04 = table(test_set$IsWinner, logistic_predictions_04)[2] + table(test_set$IsWinner, logistic_predictions_04)[4]
 sensitivity_logistic_04 = true_positive_logistic_04 / positive_logistic_04
+
+sensitivity_logistic_04
 ```
 
-Talk about what this threshold shows and how it compares to 0.2 and 0.3. Talk about why we don't raise the threshold any more:
+As was done with the full logistic model, the threshold was increased to 0.4. With this change, the model classified no songs as nominated, producing values of N/A from the calculations.
 
 #### ROC Curve
-
-Take a look at the ROC curve of the best threshold?
 
 ```{r}
 # ROC curve
@@ -714,7 +764,7 @@ plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab
 auc(roc.out)
 ```
 
-Discuss what the ROC curve shows.
+The ROC curve shows that the reduced logistic model produces a diagnostic accuracy of 0.576, slightly worse than the full logistic model.
 
 ### Logistic Oversampled Model
 
@@ -1595,3 +1645,5 @@ In the end...
 SHOW TABLES, GRAPHS, CHARTS, HIGHLIGHT THE MOST IMPORTANT INFORMATION ONLY. DO NOT INUNDATE THIS SECTION.
 
 Future work could expand upon our research by...
+
+- Change the time_signature to be binary; 4 or not_4
