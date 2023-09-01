@@ -483,14 +483,19 @@ Conclusion about what we have seen; what we plan to do with it? (Model fitting n
 
 Explain our approach to modeling:
 
+- Start with linear, move on to... etc.
+
 Talk about oversampling and why we chose to do it:
-- Did we see an improvement in prediction compared to the original, unbalanced data set?
+
+- Attempting to address the imbalance of the data
 
 ```{r}
 ## Oversampling
 
-oversampled_train_data = ovun.sample(IsWinner ~., data = training_set[,-1],
-                                     method = "over", p = 0.5, seed = 42)$data
+oversampled_train_data = ovun.sample(IsWinner ~.,
+                                     data = training_set[,-1],
+                                     method = "over",
+                                     p = 0.5, seed = 42)$data
 
 # Checking oversampled training set balance
 
