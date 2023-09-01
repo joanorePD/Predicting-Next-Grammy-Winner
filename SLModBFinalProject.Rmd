@@ -300,19 +300,16 @@ Time signature | Acousticness;  Danceability;  Duration;  Energy;  Instrumentaln
 
 The fact that these groups were significant allows us to say there may be a strong enough correlation between these pairings to use them in our models in a beneficial manner. DISCUSS HOW ALL WERE SIGNIFICANT WITH TIME SIGNATURE; WHY COULD THAT BE AND HOW DO WE ADDRESS THAT?
 
-PARAPHRASE:
-"Note that the ANOVA alone does not tell us specifically which means were different from one another. To determine that, we would need to follow up with multiple comparisons (or post-hoc) tests."
-
 #### Partial Correlations
 
-Because ANOVA does not inform us which means were different from the others, it is necessary to further explore the data pairings. To do this, we utilized partial correlations, an exhaustive search that compares each possible pairing of continuous variables.
+Because ANOVA does not inform us which means were different from the others, it is necessary to perform a Multiple Comparison Procedure. To do this, we utilized partial correlations, an exhaustive search that compares each possible pairing of continuous variables.
 
 ```{r, warnings = FALSE}
 # Partial correlations
 correlation(training_set[,c(-1, -2, -9, -11, -13)], partial = TRUE)
 ```
 
-There were three variable pairs that stood out as significantly different:
+There were three variable pairs that stood out as highly significantly different:
 
 ```{r, warnings = FALSE}
 # Plots of variables with the largest partial correlation
@@ -365,9 +362,7 @@ knitr::include_graphics("distrib_contin_hist.png")
 
 From these histograms, it is clear that the danceability feature is the most normally distributed. All others have a small skew at best (valence) to larger skews (tempo, loudness, energy) to seemingly exponential skews or individual values (duration, acousticness, instrumentalness). As we build our models, we will keep these distributions in mind.
 
-COMPARISON OF NON-NOMINATED / NOMINATED FOR A CONTINUOUS VARIABLE (VALENCE)
-
-We also compared the distributions and means of each variable for non-nominated and nominated songs. Most were very similar, but below we highlighted the most different attribute: Valence.
+We also compared the distributions and means of each variable for non-nominated and nominated songs. Most were very similar, but below we highlighted the attribute with the greatest difference: Valence.
 
 ```{r}
 # Comparison IsWinner 0 vs 1 - Valence
@@ -375,7 +370,7 @@ We also compared the distributions and means of each variable for non-nominated 
 par(mfrow = c(1, 2))
 
 x <- data[data$IsWinner == 0,]$valence
-hist(x, main = "Valence: Non-Nominated")
+hist(x, main = "Valence: Non-Nominated", xlab="Value")
 abline(v = mean(x),                       # Add line for mean
        col = "red",
        lwd = 3)
@@ -386,7 +381,7 @@ text(x = mean(x) * 1.5,                   # Add text for mean
      cex = 1)
 
 x <- data[data$IsWinner == 1,]$valence
-hist(x, main = "Valence: Nominated")
+hist(x, main = "Valence: Nominated", xlab="Value")
 abline(v = mean(x),                       # Add line for mean
        col = "red",
        lwd = 3)
@@ -397,7 +392,7 @@ text(x = mean(x) * 0.5,                   # Add text for mean
      cex = 1)
 ```
 
-Depending on the dependent variable, the valence variable peaks at different locations and has a different mean. This could point towards valence being an important factor in our predictions.
+The valence variable peaks at different locations for the two values of the dependent variable and has a different mean. This could point towards valence being an important factor in our predictions.
 
 #### Categorical
 
@@ -407,11 +402,11 @@ Depending on the dependent variable, the valence variable peaks at different loc
 par(mfrow = c(1, 3))
 
 barplot(table(key), main = "Key distribution")
-barplot(table(mode), main = "Mode")
+barplot(table(mode), main = "Modality")
 barplot(table(time_signature), main = "Time signature")
 ```
 
-Evident mode of the categories in Mode and Time Signature; VERY high frequency TALK ABOUT THIS
+None of the categorical variables exhibit a normal distribution. Both mode and time_signature have an obvious statistical mode. The value of 1 for the variable mode represents songs in major keys, making up a super majority of the songs, and almost every song uses the time_signature of 4 with only a handful using 3. With such high frequencies of values within these categories... WHAT DOES IT SAY
 
 We were again curious to compare the distribution of non-nominated to nominated songs for the categorical variables, and highlight the one that demonstrated the greatest difference: Key.
 
@@ -428,9 +423,15 @@ barplot(table(x), main = "Key: Nominated/Winner")
 
 Although the distribution of key for both values of the dependent variable look very similar, there are some important differences. We see a much larger proportion of non-nominated songs written in key 4 (corresponding to the key of E) and key 7 (corresponding to the key of G) when compared to nominated songs. The opposite can be said about key 11 (key of B), with a larger proportion of nominated songs in that key when compared to non-nominated songs.
 
+HOW DO WE CHECK TO SEE IF THIS KIND OF DIFFERENCE IS STATISTICALLY SIGNIFICANT? DO SONGS IN THE KEY OF B HAVE A GREATER CHANCE OF BEING NOMINATED?
+
 #### Relationship Between Independent and Dependent Variables
 
+Examining the association between independent and dependent variables can give insight into the data of independent variables which exhibit notable differences between the two possible values of the dependent variable.
+
 ##### Continuous
+
+To visualize these relationships, we utilize box plots:
 
 ```{r}
 # Relationships between dependent and independent variables
@@ -447,15 +448,13 @@ boxplot(tempo ~ training_set$IsWinner, xlab='Nominee Boolean')
 boxplot(valence ~ training_set$IsWinner, xlab='Nominee Boolean')
 ```
 
-More examination:
-- Shows difference between classes within the context of individual, continuous features
-- Energy and Valence are of use; seeing the difference in Median
+The difference in median seen for the energy and valence variables points towards them being possibly valuable to our models. The difference in interquartile range for acousticness, energy, and valence is also interesting to see.
 
 ##### Categorical
 
 CHI SQUARED TEST
 
-Measure of association; using it between Categorical variables and the 2 classes
+To measure the independent/dependent variables association for the categorical variables, we utilize the Chi Squared Test. It will pass judgement on the level of independence between the variables.
 
 ```{r, warning=FALSE, message=FALSE}
 par(mfrow = c(1, 1))
@@ -463,7 +462,13 @@ par(mfrow = c(1, 1))
 chisq.test(key, training_set$IsWinner)
 chisq.test(mode, training_set$IsWinner)
 chisq.test(time_signature, training_set$IsWinner)
+```
 
+The Chi Squared Test revealed fairly high p-values for all of the categorical variables, and even produced a 1 for mode suggesting complete independence of mode from the dependent variable. IS THIS CORRECT??
+
+We also utilize the Cramer's V again, and it showed.... EXPAND
+
+```{r}
 cramersv(matrix(c(as.numeric(key), as.numeric(training_set$IsWinner)), ncol = 2))
 cramersv(matrix(c(as.numeric(mode), as.numeric(training_set$IsWinner)), ncol = 2))
 cramersv(matrix(c(as.numeric(time_signature), as.numeric(training_set$IsWinner)), ncol = 2))
@@ -473,8 +478,6 @@ cramersv(matrix(c(as.numeric(time_signature), as.numeric(training_set$IsWinner))
 
 Conclusion about what we have seen; what we plan to do with it? (Model fitting next)
 - Found they are independent; these categorical variables alone do not offer much information regarding the classification
-
-
 
 ## Model Development
 
