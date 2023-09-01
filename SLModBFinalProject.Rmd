@@ -298,7 +298,9 @@ Key            | Danceability;  Energy
 Mode           | Acousticness;  Energy;  Loudness
 Time signature | Acousticness;  Danceability;  Duration;  Energy;  Instrumentalness;  Loudness;  Tempo;  Valence
 
-The fact that these groups were significant allows us to say there may be a strong enough correlation between these pairings to use them in our models in a beneficial manner. DISCUSS HOW ALL WERE SIGNIFICANT WITH TIME SIGNATURE; WHY COULD THAT BE AND HOW DO WE ADDRESS THAT?
+The fact that these groups were significant allows us to say there may be a strong enough correlation between these pairings to use them in our models in a beneficial manner. 
+
+We notice how the time signature variable shows significance in combination with all other variables. This may be due to the fact that this variable is highly imbalanced, since 93.4% of the songs have a time signature of 4/4. 
 
 #### Partial Correlations
 
@@ -423,7 +425,7 @@ barplot(table(x), main = "Key: Nominated/Winner")
 
 Although the distribution of key for both values of the dependent variable look very similar, there are some important differences. We see a much larger proportion of non-nominated songs written in key 4 (corresponding to the key of E) and key 7 (corresponding to the key of G) when compared to nominated songs. The opposite can be said about key 11 (key of B), with a larger proportion of nominated songs in that key when compared to non-nominated songs.
 
-HOW DO WE CHECK TO SEE IF THIS KIND OF DIFFERENCE IS STATISTICALLY SIGNIFICANT? DO SONGS IN THE KEY OF B HAVE A GREATER CHANCE OF BEING NOMINATED?
+While these patterns are observable, the effect size may not be substantial enough to reach statistical significance, as we will see in the Chi-Squared tests performed. In other words, while key '11' may appear more often in nominated songs, the difference may not be large enough to confidently conclude that it has a significant impact on nominations.
 
 #### Relationship Between Independent and Dependent Variables
 
@@ -882,7 +884,9 @@ According tot he Shapiro Test, discuss what the values mean or each of the attri
 
 #### Distribution(???) Plots of the Attributes
 
-- The purpose of the quantile-quantile (QQ) plot is to show if two data sets come from the same distribution (WRITEUP)
+- The purpose of the quantile-quantile (QQ) plot is to show if two datasets come from the same distribution or if there are deviations from a common distribution. It compares the quantiles (percentiles) of one dataset to the quantiles of another, typically to check for similarities or differences in their underlying distributions. 
+
+In this case, we will be using  this type of plot for a normality analysis of the variables, comparing each of their distributions to a normal one with the same mean and standard deviation.
 
 ##### Danceability
 ```{r}
