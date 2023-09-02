@@ -994,11 +994,12 @@ table(test_set$IsWinner, qda_over_predictions_04)
 false_positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[3]
 negative_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[1] + table(test_set$IsWinner, qda_over_predictions_04)[3]
 typeIerror_qda_over_04 = false_positive_qda_over_04 / negative_qda_over_04
+typeIerror_qda_over_04
 
 true_positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[4]
 positive_qda_over_04 = table(test_set$IsWinner, qda_over_predictions_04)[2] + table(test_set$IsWinner, qda_over_predictions_04)[4]
 sensitivity_qda_over_04 = true_positive_qda_over_04 / positive_qda_over_04
-
+sensitivity_qda_over_04
 
 # Threshold 0.5
 
@@ -1010,10 +1011,13 @@ table(test_set$IsWinner, qda_over_predictions_05[[1]])
 false_positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[3]
 negative_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, qda_over_predictions_05[[1]])[3]
 typeIerror_qda_over_05 = false_positive_qda_over_05 / negative_qda_over_05
+typeIerror_qda_over_05
 
 true_positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[4]
 positive_qda_over_05 = table(test_set$IsWinner, qda_over_predictions_05[[1]])[2] + table(test_set$IsWinner, qda_over_predictions_05[[1]])[4]
 sensitivity_qda_over_05 = true_positive_qda_over_05 / positive_qda_over_05
+sensitivity_qda_over_05
+
 
 #########################################C 
 
