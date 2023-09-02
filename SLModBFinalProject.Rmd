@@ -771,15 +771,116 @@ In this section, a logistic model is created (same as seen above) using the prev
 ```{r}
 # Fitting logistic oversampled 
 
-logistic_over = glm(as.numeric(unlist(oversampled_train_data[1])) ~ ., data = oversampled_train_data[-1], family = "binomial")
+logistic_over = glm(as.numeric(unlist(oversampled_train_data[1])) ~ .,
+                    data = oversampled_train_data[-1],
+                    family = "binomial")
 summary(logistic_over)
 ```
 
 Using the oversampled dataset, the full logistic model now determines the following variables to be significant: year, acousticness, duration, key5, key11, loudness, and valence. This is quite a difference compared to the previous logistic model based on the original dataset, which only listed 3 variables (year, duration, and valence) as significant.
 
-#### Stepwise?
+#### Predictions
 
-What are we looking at in this next part with the stepwise again?
+```{r}
+# Computing predictions
+
+logistic_over_predictions_full = predict(logistic_over, newdata = test_set[,c(-1, -2)], type = "response")
+```
+
+Below are the predictions as computed by the oversampled, full logistic model created above, using different thresholds of classification. The same thresholds that were explored in the original-dataset full logistic model will he highlighted again: 0.2, 0.3, and 0.4
+
+##### Threshold = 0.2
+
+```{r}
+# Threshold = 0.2
+
+logistic_over_predictions_full_02 = ifelse(logistic_over_predictions_full > 0.2, 1, 0)
+logistic_over_accuracy_full_02 = sum(logistic_over_predictions_full_02 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_over_predictions_full_02)
+
+false_positive_logistic_over_full_02 = table(test_set$IsWinner, logistic_over_predictions_full_02)[3]
+negative_logistic_over_full_02 = table(test_set$IsWinner, logistic_over_predictions_full_02)[1] + table(test_set$IsWinner, logistic_over_predictions_full_02)[3]
+typeIerror_logistic_over_full_02 = false_positive_logistic_over_full_02 / negative_logistic_over_full_02
+
+typeIerror_logistic_over_full_02
+
+true_positive_logistic_over_full_02 = table(test_set$IsWinner, logistic_over_predictions_full_02)[4]
+positive_logistic_over_full_02 = table(test_set$IsWinner, logistic_over_predictions_full_02)[2] + table(test_set$IsWinner, logistic_over_predictions_full_02)[4]
+sensitivity_logistic_over_full_02 = true_positive_logistic_over_full_02 / positive_logistic_over_full_02
+
+sensitivity_logistic_over_full_02
+```
+
+At threshold 0.2, the Type 1 Error (False Positive Rate) was 0.853, meaning 85.3% of the non-nominated songs were misclassified as nominated. This is a fairly large error.
+
+The Sensitivity (True Positive Rate) was .958, a fantastic value, showing the the oversampled full logistic model correctly classified 95.8% of the nominated songs. However, knowing the value of the Type 1 Error, it is clear that this value is so high because the model is classifying a vast majority of the data points as nominated. While it misses very few of the truly nominated songs, it misclassifies a large number of the non-nominated songs.
+
+##### Threshold = 0.3
+
+```{r}
+# Threshold = 0.3
+
+logistic_over_predictions_full_03 = ifelse(logistic_over_predictions_full > 0.3, 1, 0)
+logistic_over_accuracy_full_03 = sum(logistic_over_predictions_full_03 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_over_predictions_full_03)
+
+false_positive_logistic_over_full_03 = table(test_set$IsWinner, logistic_over_predictions_full_03)[3]
+negative_logistic_over_full_03 = table(test_set$IsWinner, logistic_over_predictions_full_03)[1] + table(test_set$IsWinner, logistic_over_predictions_full_03)[3]
+typeIerror_logistic_over_full_03 = false_positive_logistic_over_full_03 / negative_logistic_over_full_03
+
+typeIerror_logistic_over_full_03
+
+true_positive_logistic_over_full_03 = table(test_set$IsWinner, logistic_over_predictions_full_03)[4]
+positive_logistic_over_full_03 = table(test_set$IsWinner, logistic_over_predictions_full_03)[2] + table(test_set$IsWinner, logistic_over_predictions_full_03)[4]
+sensitivity_logistic_over_full_03 = true_positive_logistic_over_full_03 / positive_logistic_over_full_03
+
+sensitivity_logistic_over_full_03
+```
+
+At a threshold of 0.3, the Type 1 Error improves to 0.693, misclassifying fewer non-nominated songs than at threshold 0.2, but the Sensitivity also decreases to 0.792 meaning the model is missing more of the nominated songs.
+
+##### Threshold = 0.4
+
+```{r}
+# Threshold = 0.4
+
+logistic_over_predictions_full_04 = ifelse(logistic_over_predictions_full > 0.4, 1, 0)
+logistic_over_accuracy_full_04 = sum(logistic_over_predictions_full_04 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_over_predictions_full_04)
+
+false_positive_logistic_over_full_04 = table(test_set$IsWinner, logistic_over_predictions_full_04)[3]
+negative_logistic_over_full_04 = table(test_set$IsWinner, logistic_over_predictions_full_04)[1] + table(test_set$IsWinner, logistic_over_predictions_full_04)[3]
+typeIerror_logistic_over_full_04 = false_positive_logistic_over_full_04 / negative_logistic_over_full_04
+
+typeIerror_logistic_over_full_04
+
+true_positive_logistic_over_full_04 = table(test_set$IsWinner, logistic_over_predictions_full_04)[4]
+positive_logistic_over_full_04 = table(test_set$IsWinner, logistic_over_predictions_full_04)[2] + table(test_set$IsWinner, logistic_over_predictions_full_04)[4]
+sensitivity_logistic_over_full_04 = true_positive_logistic_over_full_04 / positive_logistic_over_full_04
+
+sensitivity_logistic_over_full_04
+```
+
+At a classification threshold of 0.4, the model's Type 1 Error decreases a fair amount to 0.5, but the sensitivity also decreases slightly to 0.75. In comparison to the full logistic model using the original dataset, which at this threshold obtained the worst Sensitivity value of 0, the oversampled full logistic model performs much better (again, at this threshold). The ROC curve will exhibit how well the model performs overall.
+
+#### ROC Curve
+
+```{r}
+# ROC curve
+
+roc.out <- roc(test_set$IsWinner, logistic_over_predictions_full)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+```
+
+Overall, the ROC curve shows that the full oversampled logistic model produces a diagnostic accuracy of 0.579, which is slightly lower than the ROC curve produced by the full logistic model using the original data.
+
+### Stepwise Variable Selection and Reduced Model of the Oversampled Dataset
+
+Stepwise variable selection is again performed on the oversampled logistic model in an attempt to improve the model's classification accuracy by only utilizing the most insightful variables.
 
 ```{r}
 log_over_both =  stepAIC(logistic_over, direction = "both")
@@ -803,98 +904,117 @@ reduced_train_data_over = matrix(c(
 head(reduced_variables_over)
 ```
 
-
+The stepwise function determined the following variables to be the useful and cohesive: instrumentalness, year, loudness, time_signature, key, valence, acousticness, and duration.
 
 ```{r}
 colnames(reduced_train_data_over) = c("IsWinner", "Year", "acousticness",
-                                      "duration_ms", "instrumentalness", "key",
-                                      "loudness", "time_signature", "valence" )
-
-
+                                      "duration_ms", "instrumentalness",
+                                      "key", "loudness",
+                                      "time_signature", "valence" )
 logistic_reduced_over = glm(response_variable_over ~ Year + acousticness 
-                            + duration_ms + instrumentalness + key + loudness +
-                            time_signature + valence, data = oversampled_train_data,
+                            + duration_ms + instrumentalness + key 
+                            + loudness 
+                            + time_signature + valence,
+                            data = oversampled_train_data,
                             family = "binomial")
-
-logistic_over_predictions = predict(logistic_reduced_over, newdata = test_set[,c(-1, -2)], type = "response")
 ```
 
-Discuss the above code.
+#### Predictions
 
-Testing more thresholds: 0.2, 0.3, 0.4.
+```{r}
+logistic_reduced_over_predictions = predict(logistic_reduced_over,
+                                            newdata = test_set[,c(-1, -2)],
+                                            type = "response")
+```
+
+In order to compare to the previously created models with ease, the reduced oversampled logistic model was tested on the same three thresholds that the other models were tested on.
 
 ##### Threshold = 0.2
 
 ```{r}
 # Threshold = 0.2
 
-logistic_over_predictions_02 = ifelse(logistic_over_predictions > 0.2, 1, 0)
-logistic_over_accuracy_02 = sum(logistic_over_predictions_02 == test_set[2]) / dim(test_set[2])[1]
+logistic_reduced_over_predictions_02 = ifelse(logistic_reduced_over_predictions > 0.2, 1, 0)
+logistic_reduced_over_accuracy_02 = sum(logistic_reduced_over_predictions_02 == test_set[2]) / dim(test_set[2])[1]
 
-table(test_set$IsWinner, logistic_over_predictions_02)
+table(test_set$IsWinner, logistic_reduced_over_predictions_02)
 
-false_positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[3]
-negative_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[1] + table(test_set$IsWinner, logistic_over_predictions_02)[3]
-typeIerror_logistic_over_02 = false_positive_logistic_over_02 / negative_logistic_over_02
+false_positive_logistic_reduced_over_02 = table(test_set$IsWinner, logistic_reduced_over_predictions_02)[3]
+negative_logistic_reduced_over_02 = table(test_set$IsWinner, logistic_reduced_over_predictions_02)[1] + table(test_set$IsWinner, logistic_reduced_over_predictions_02)[3]
+typeIerror_logistic_reduced_over_02 = false_positive_logistic_reduced_over_02 / negative_logistic_reduced_over_02
 
-true_positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[4]
-positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[2] + table(test_set$IsWinner, logistic_over_predictions_02)[4]
-sensitivity_logistic_over_02 = true_positive_logistic_over_02 / positive_logistic_over_02
+typeIerror_logistic_reduced_over_02
+
+true_positive_logistic_reduced_over_02 = table(test_set$IsWinner, logistic_reduced_over_predictions_02)[4]
+positive_logistic_reduced_over_02 = table(test_set$IsWinner, logistic_reduced_over_predictions_02)[2] + table(test_set$IsWinner, logistic_reduced_over_predictions_02)[4]
+sensitivity_logistic_reduced_over_02 = true_positive_logistic_reduced_over_02 / positive_logistic_reduced_over_02
+
+sensitivity_logistic_reduced_over_02
 ```
 
-Discuss this threshold.
+At this threshold, the Type 1 Error was 0.853 and the Sensitivity was 0.958, which are the same exact values for the full oversampled logistic model at this threshold.
 
 ##### Threshold = 0.3
 
 ```{r}
-logistic_over_predictions_03 = ifelse(logistic_over_predictions > 0.3, 1, 0)
-logistic_over_accuracy_03 = sum(logistic_over_predictions_03 == test_set[2]) / dim(test_set[2])[1]
+# Threshold = 0.3
 
-table(test_set$IsWinner, logistic_over_predictions_03)
+logistic_reduced_over_predictions_03 = ifelse(logistic_reduced_over_predictions > 0.3, 1, 0)
+logistic_reduced_over_accuracy_03 = sum(logistic_reduced_over_predictions_03 == test_set[2]) / dim(test_set[2])[1]
 
-false_positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[3]
-negative_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[1] + table(test_set$IsWinner, logistic_over_predictions_03)[3]
-typeIerror_logistic_over_03 = false_positive_logistic_over_03 / negative_logistic_over_03
+table(test_set$IsWinner, logistic_reduced_over_predictions_03)
 
-true_positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[4]
-positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[2] + table(test_set$IsWinner, logistic_over_predictions_03)[4]
-sensitivity_logistic_over_03 = true_positive_logistic_over_03 / positive_logistic_over_03
+false_positive_logistic_reduced_over_03 = table(test_set$IsWinner, logistic_reduced_over_predictions_03)[3]
+negative_logistic_reduced_over_03 = table(test_set$IsWinner, logistic_reduced_over_predictions_03)[1] + table(test_set$IsWinner, logistic_reduced_over_predictions_03)[3]
+typeIerror_logistic_reduced_over_03 = false_positive_logistic_reduced_over_03 / negative_logistic_reduced_over_03
+
+typeIerror_logistic_reduced_over_03
+
+true_positive_logistic_reduced_over_03 = table(test_set$IsWinner, logistic_reduced_over_predictions_03)[4]
+positive_logistic_reduced_over_03 = table(test_set$IsWinner, logistic_reduced_over_predictions_03)[2] + table(test_set$IsWinner, logistic_reduced_over_predictions_03)[4]
+sensitivity_logistic_reduced_over_03 = true_positive_logistic_reduced_over_03 / positive_logistic_reduced_over_03
+
+sensitivity_logistic_reduced_over_03
 ```
 
-Discuss what this threshold shows, compared to 0.2
+With a threshold of 0.3, when compared to threshold 0.2, the model again produced a lower Type 1 Error of 0.68 and a lower Sensitivity of 0.792. These values are very similar to the full oversampled logistic model at this threshold as well.
 
 ##### Threshold = 0.4
 
 ```{r}
-logistic_over_predictions_04 = ifelse(logistic_over_predictions > 0.4, 1, 0)
-logistic_over_accuracy_04 = sum(logistic_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
+# Threshold = 0.4
 
-table(test_set$IsWinner, logistic_over_predictions_04)
+logistic_reduced_over_predictions_04 = ifelse(logistic_reduced_over_predictions > 0.4, 1, 0)
+logistic_reduced_over_accuracy_04 = sum(logistic_reduced_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
 
-false_positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[3]
-negative_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[1] + table(test_set$IsWinner, logistic_over_predictions_04)[3]
-typeIerror_logistic_over_04 = false_positive_logistic_over_04 / negative_logistic_over_04
+table(test_set$IsWinner, logistic_reduced_over_predictions_04)
 
-true_positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[4]
-positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[2] + table(test_set$IsWinner, logistic_over_predictions_04)[4]
-sensitivity_logistic_over_04 = true_positive_logistic_over_04 / positive_logistic_over_04
+false_positive_logistic_reduced_over_04 = table(test_set$IsWinner, logistic_reduced_over_predictions_04)[3]
+negative_logistic_reduced_over_04 = table(test_set$IsWinner, logistic_reduced_over_predictions_04)[1] + table(test_set$IsWinner, logistic_reduced_over_predictions_04)[3]
+typeIerror_logistic_reduced_over_04 = false_positive_logistic_reduced_over_04 / negative_logistic_reduced_over_04
+
+typeIerror_logistic_reduced_over_04
+
+true_positive_logistic_reduced_over_04 = table(test_set$IsWinner, logistic_reduced_over_predictions_04)[4]
+positive_logistic_reduced_over_04 = table(test_set$IsWinner, logistic_reduced_over_predictions_04)[2] + table(test_set$IsWinner, logistic_reduced_over_predictions_04)[4]
+sensitivity_logistic_reduced_over_04 = true_positive_logistic_reduced_over_04 / positive_logistic_reduced_over_04
+
+sensitivity_logistic_reduced_over_04
 ```
 
-Final discussion of the thresholds and how they compare:
+Using the threshold of 0.4 again produced the same results to the full oversampled logistic model, with a Type 1 Error of 0.5 and a Sensitivity of 0.75. This suggests the models are extremely similar.
 
 #### ROC Curve
-
-ROC Curve of this model:
 
 ```{r}
 # ROC curve
 
-roc.out <- roc(test_set$IsWinner, logistic_over_predictions)
+roc.out <- roc(test_set$IsWinner, logistic_reduced_over_predictions)
 plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
 auc(roc.out)
 ```
 
-Discuss this ROC curve:
+The ROC curve adds to the evidence that the models are very similar, producing the exact same AUC value of the full oversampled logistic model: 0.579.
 
 ### Discriminant Analysis
 
@@ -935,11 +1055,13 @@ We also used a visual tool to check if the variables follow a Normal distributio
 
 ##### Danceability
 ```{r}
-qqnorm(danceability[IsWinner == 0])
+par(mfrow = c(1, 2))
+
+qqnorm(danceability[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(danceability[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(danceability[IsWinner == 1])
+qqnorm(danceability[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(danceability[IsWinner == 1],lwd = 2, col = "red")
 ```
@@ -948,11 +1070,13 @@ Danceability looks normal confirming the result of the test.
 
 ##### Acousticness
 ```{r}
-qqnorm(acousticness[IsWinner == 0])
+par(mfrow = c(1, 2))
+
+qqnorm(acousticness[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(acousticness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(acousticness[IsWinner == 1])
+qqnorm(acousticness[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 ```
@@ -961,11 +1085,13 @@ Acousticness is heavily not Normal, following a S-shape.
 
 ##### Duration
 ```{r}
-qqnorm(duration_ms[IsWinner == 0])
+par(mfrow = c(1, 2))
+
+qqnorm(duration_ms[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(duration_ms[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(duration_ms[IsWinner == 1])
+qqnorm(duration_ms[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
 ```
@@ -974,11 +1100,13 @@ Duration shows a heavy right tail.
 
 ##### Energy
 ```{r}
-qqnorm(energy[IsWinner == 0])
+par(mfrow = c(1, 2))
+
+qqnorm(energy[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(energy[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(energy[IsWinner == 1])
+qqnorm(energy[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(energy[IsWinner == 1],lwd = 2, col = "red")
 ```
@@ -987,11 +1115,13 @@ The energy feature shows not normal tails.
 
 ##### Instrumentalness
 ```{r}
-qqnorm(instrumentalness[IsWinner == 0])
+par(mfrow = c(1, 2))
+
+qqnorm(instrumentalness[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(instrumentalness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(instrumentalness[IsWinner == 1])
+qqnorm(instrumentalness[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 ```
@@ -1000,11 +1130,13 @@ Instrumentalness shows a very heavy  right tail.
 
 ##### Loudness
 ```{r}
-qqnorm(loudness[IsWinner == 0])
+par(mfrow = c(1, 2))
+
+qqnorm(loudness[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(loudness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(loudness[IsWinner == 1])
+qqnorm(loudness[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
 ```
@@ -1013,11 +1145,13 @@ Loudness shows not normal tails.
 
 ##### Tempo
 ```{r}
-qqnorm(tempo[IsWinner == 0])
+par(mfrow = c(1, 2))
+
+qqnorm(tempo[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(tempo[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(tempo[IsWinner == 1])
+qqnorm(tempo[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
 ```
@@ -1029,11 +1163,11 @@ The tempo variable seems close to a normal distribution.
 # valence tails slightly not normal
 par(mfrow = c(1, 2))
 
-qqnorm(valence[IsWinner == 0])
+qqnorm(valence[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(valence[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(valence[IsWinner == 1])
+qqnorm(valence[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 ```
@@ -1058,11 +1192,11 @@ acousticness_tran <- (acousticness ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(acousticness_tran[IsWinner == 0])
+qqnorm(acousticness_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(acousticness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(acousticness_tran[IsWinner == 1])
+qqnorm(acousticness_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(acousticness_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1085,11 +1219,11 @@ duration_ms_tran <- (duration_ms ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(duration_ms_tran[IsWinner == 0])
+qqnorm(duration_ms_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(duration_ms_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(duration_ms_tran[IsWinner == 1])
+qqnorm(duration_ms_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(duration_ms_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1110,11 +1244,11 @@ energy_tran <- (energy ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(energy_tran[IsWinner == 0])
+qqnorm(energy_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(energy_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(energy_tran[IsWinner == 1])
+qqnorm(energy_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(energy_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1140,11 +1274,11 @@ instrumentalness_tran <- (new_instrumentalness ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(instrumentalness_tran[IsWinner == 0])
+qqnorm(instrumentalness_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(instrumentalness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(instrumentalness_tran[IsWinner == 1])
+qqnorm(instrumentalness_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(instrumentalness_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1167,11 +1301,11 @@ loudness_tran <- (new_loudness ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(loudness_tran[IsWinner == 0])
+qqnorm(loudness_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(loudness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(loudness_tran[IsWinner == 1])
+qqnorm(loudness_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(loudness_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1194,11 +1328,11 @@ tempo_tran <- (tempo ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(tempo_tran[IsWinner == 0])
+qqnorm(tempo_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(tempo_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(tempo_tran[IsWinner == 1])
+qqnorm(tempo_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(tempo_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1221,11 +1355,11 @@ valence_tran <- (valence ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(valence_tran[IsWinner == 0])
+qqnorm(valence_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(valence_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(valence_tran[IsWinner == 1])
+qqnorm(valence_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(valence_tran[IsWinner == 1],lwd = 2, col = "red")
 

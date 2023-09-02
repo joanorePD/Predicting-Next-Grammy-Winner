@@ -681,88 +681,88 @@ shapiro.test(valence[IsWinner == 1]) # No
 # danceability looking normal
 par(mfrow = c(1, 2))
 
-qqnorm(danceability[IsWinner == 0])
+qqnorm(danceability[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(danceability[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(danceability[IsWinner == 1])
+qqnorm(danceability[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(danceability[IsWinner == 1],lwd = 2, col = "red")
 
 # acousticness S shaped
 par(mfrow = c(1, 2))
 
-qqnorm(acousticness[IsWinner == 0])
+qqnorm(acousticness[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(acousticness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(acousticness[IsWinner == 1])
+qqnorm(acousticness[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 
 # duration_ms  big right tail
 par(mfrow = c(1, 2))
 
-qqnorm(duration_ms[IsWinner == 0])
+qqnorm(duration_ms[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(duration_ms[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(duration_ms[IsWinner == 1])
+qqnorm(duration_ms[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
 
 # energy tails not normal
 par(mfrow = c(1, 2))
 
-qqnorm(energy[IsWinner == 0])
+qqnorm(energy[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(energy[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(energy[IsWinner == 1])
+qqnorm(energy[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(energy[IsWinner == 1],lwd = 2, col = "red")
 
 # instrumentalness huge right tail
 par(mfrow = c(1, 2))
 
-qqnorm(instrumentalness[IsWinner == 0])
+qqnorm(instrumentalness[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(instrumentalness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(instrumentalness[IsWinner == 1])
+qqnorm(instrumentalness[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 
 # loudness tails not normal
 par(mfrow = c(1, 2))
 
-qqnorm(loudness[IsWinner == 0])
+qqnorm(loudness[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(loudness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(loudness[IsWinner == 1])
+qqnorm(loudness[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
 
 # tempo tails slightly not normal
 par(mfrow = c(1, 2))
 
-qqnorm(tempo[IsWinner == 0])
+qqnorm(tempo[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(tempo[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(tempo[IsWinner == 1])
+qqnorm(tempo[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
 
 # valence tails slightly not normal
 par(mfrow = c(1, 2))
 
-qqnorm(valence[IsWinner == 0])
+qqnorm(valence[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(valence[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(valence[IsWinner == 1])
+qqnorm(valence[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 
@@ -779,11 +779,11 @@ acousticness_tran <- (acousticness ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(acousticness_tran[IsWinner == 0])
+qqnorm(acousticness_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(acousticness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(acousticness_tran[IsWinner == 1])
+qqnorm(acousticness_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(acousticness_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -800,11 +800,11 @@ duration_ms_tran <- (duration_ms ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(duration_ms_tran[IsWinner == 0])
+qqnorm(duration_ms_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(duration_ms_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(duration_ms_tran[IsWinner == 1])
+qqnorm(duration_ms_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(duration_ms_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -821,11 +821,11 @@ energy_tran <- (energy ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(energy_tran[IsWinner == 0])
+qqnorm(energy_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(energy_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(energy_tran[IsWinner == 1])
+qqnorm(energy_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(energy_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -846,11 +846,11 @@ instrumentalness_tran <- (new_instrumentalness ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(instrumentalness_tran[IsWinner == 0])
+qqnorm(instrumentalness_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(instrumentalness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(instrumentalness_tran[IsWinner == 1])
+qqnorm(instrumentalness_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(instrumentalness_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -872,11 +872,11 @@ loudness_tran <- (new_loudness ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(loudness_tran[IsWinner == 0])
+qqnorm(loudness_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(loudness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(loudness_tran[IsWinner == 1])
+qqnorm(loudness_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(loudness_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -893,11 +893,11 @@ tempo_tran <- (tempo ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(tempo_tran[IsWinner == 0])
+qqnorm(tempo_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(tempo_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(tempo_tran[IsWinner == 1])
+qqnorm(tempo_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(tempo_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -914,11 +914,11 @@ valence_tran <- (valence ^ lambda - 1) / lambda
 
 par(mfrow = c(1, 2))
 
-qqnorm(valence_tran[IsWinner == 0])
+qqnorm(valence_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
 grid()               
 qqline(valence_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(valence_tran[IsWinner == 1])
+qqnorm(valence_tran[IsWinner == 1], main="Normal Q-Q Nominated")
 grid()               
 qqline(valence_tran[IsWinner == 1],lwd = 2, col = "red")
 
