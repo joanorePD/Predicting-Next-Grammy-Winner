@@ -478,12 +478,83 @@ roc.out <- roc(test_set$IsWinner, logistic_predictions)
 plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
 auc(roc.out)
 
-# Fitting logistic oversampled 
+# Fitting logistic oversampled
 
 logistic_over = glm(as.numeric(unlist(oversampled_train_data[1])) ~ ., data = oversampled_train_data[-1], family = "binomial")
 summary(logistic_over)
 
+# Computing predictions
+
+logistic_over_predictions_full = predict(logistic_over, newdata = test_set[,c(-1, -2)], type = "response")
+
+# Threshold = 0.2
+
+logistic_over_predictions_full_02 = ifelse(logistic_over_predictions_full > 0.2, 1, 0)
+logistic_over_accuracy_full_02 = sum(logistic_over_predictions_full_02 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_over_predictions_full_02)
+
+false_positive_logistic_over_full_02 = table(test_set$IsWinner, logistic_over_predictions_full_02)[3]
+negative_logistic_over_full_02 = table(test_set$IsWinner, logistic_over_predictions_full_02)[1] + table(test_set$IsWinner, logistic_over_predictions_full_02)[3]
+typeIerror_logistic_over_full_02 = false_positive_logistic_over_full_02 / negative_logistic_over_full_02
+
+typeIerror_logistic_over_full_02
+
+true_positive_logistic_over_full_02 = table(test_set$IsWinner, logistic_over_predictions_full_02)[4]
+positive_logistic_over_full_02 = table(test_set$IsWinner, logistic_over_predictions_full_02)[2] + table(test_set$IsWinner, logistic_over_predictions_full_02)[4]
+sensitivity_logistic_over_full_02 = true_positive_logistic_over_full_02 / positive_logistic_over_full_02
+
+sensitivity_logistic_over_full_02
+
+# Threshold = 0.3
+
+logistic_over_predictions_full_03 = ifelse(logistic_over_predictions_full > 0.3, 1, 0)
+logistic_over_accuracy_full_03 = sum(logistic_over_predictions_full_03 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_over_predictions_full_03)
+
+false_positive_logistic_over_full_03 = table(test_set$IsWinner, logistic_over_predictions_full_03)[3]
+negative_logistic_over_full_03 = table(test_set$IsWinner, logistic_over_predictions_full_03)[1] + table(test_set$IsWinner, logistic_over_predictions_full_03)[3]
+typeIerror_logistic_over_full_03 = false_positive_logistic_over_full_03 / negative_logistic_over_full_03
+
+typeIerror_logistic_over_full_03
+
+true_positive_logistic_over_full_03 = table(test_set$IsWinner, logistic_over_predictions_full_03)[4]
+positive_logistic_over_full_03 = table(test_set$IsWinner, logistic_over_predictions_full_03)[2] + table(test_set$IsWinner, logistic_over_predictions_full_03)[4]
+sensitivity_logistic_over_full_03 = true_positive_logistic_over_full_03 / positive_logistic_over_full_03
+
+sensitivity_logistic_over_full_03
+
+# Threshold = 0.4
+
+logistic_over_predictions_full_04 = ifelse(logistic_over_predictions_full > 0.4, 1, 0)
+logistic_over_accuracy_full_04 = sum(logistic_over_predictions_full_04 == test_set[2]) / dim(test_set[2])[1]
+
+table(test_set$IsWinner, logistic_over_predictions_full_04)
+
+false_positive_logistic_over_full_04 = table(test_set$IsWinner, logistic_over_predictions_full_04)[3]
+negative_logistic_over_full_04 = table(test_set$IsWinner, logistic_over_predictions_full_04)[1] + table(test_set$IsWinner, logistic_over_predictions_full_04)[3]
+typeIerror_logistic_over_full_04 = false_positive_logistic_over_full_04 / negative_logistic_over_full_04
+
+typeIerror_logistic_over_full_04
+
+true_positive_logistic_over_full_04 = table(test_set$IsWinner, logistic_over_predictions_full_04)[4]
+positive_logistic_over_full_04 = table(test_set$IsWinner, logistic_over_predictions_full_04)[2] + table(test_set$IsWinner, logistic_over_predictions_full_04)[4]
+sensitivity_logistic_over_full_04 = true_positive_logistic_over_full_04 / positive_logistic_over_full_04
+
+sensitivity_logistic_over_full_04
+
+# ROC curve
+
+roc.out <- roc(test_set$IsWinner, logistic_over_predictions_full)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
+# Stepwise variable selection of oversampled data
+
 log_over_both =  stepAIC(logistic_over, direction = "both")
+
+# fitting the reduced logistic model on oversampled data
 
 response_variable_over = as.numeric(unlist(oversampled_train_data[1]))
 
@@ -513,57 +584,68 @@ logistic_reduced_over = glm(response_variable_over ~ Year + acousticness
                             + time_signature + valence, data = oversampled_train_data,
                             family = "binomial")
 
-logistic_over_predictions = predict(logistic_reduced_over, newdata = test_set[,c(-1, -2)], type = "response")
+logistic_reduced_over_predictions = predict(logistic_reduced_over, newdata = test_set[,c(-1, -2)], type = "response")
 
 # Threshold = 0.2
 
-logistic_over_predictions_02 = ifelse(logistic_over_predictions > 0.2, 1, 0)
-logistic_over_accuracy_02 = sum(logistic_over_predictions_02 == test_set[2]) / dim(test_set[2])[1]
+logistic_reduced_over_predictions_02 = ifelse(logistic_reduced_over_predictions > 0.2, 1, 0)
+logistic_reduced_over_accuracy_02 = sum(logistic_reduced_over_predictions_02 == test_set[2]) / dim(test_set[2])[1]
 
-table(test_set$IsWinner, logistic_over_predictions_02)
+table(test_set$IsWinner, logistic_reduced_over_predictions_02)
 
-false_positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[3]
-negative_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[1] + table(test_set$IsWinner, logistic_over_predictions_02)[3]
-typeIerror_logistic_over_02 = false_positive_logistic_over_02 / negative_logistic_over_02
+false_positive_logistic_reduced_over_02 = table(test_set$IsWinner, logistic_reduced_over_predictions_02)[3]
+negative_logistic_reduced_over_02 = table(test_set$IsWinner, logistic_reduced_over_predictions_02)[1] + table(test_set$IsWinner, logistic_reduced_over_predictions_02)[3]
+typeIerror_logistic_reduced_over_02 = false_positive_logistic_reduced_over_02 / negative_logistic_reduced_over_02
 
-true_positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[4]
-positive_logistic_over_02 = table(test_set$IsWinner, logistic_over_predictions_02)[2] + table(test_set$IsWinner, logistic_over_predictions_02)[4]
-sensitivity_logistic_over_02 = true_positive_logistic_over_02 / positive_logistic_over_02
+typeIerror_logistic_reduced_over_02
+
+true_positive_logistic_reduced_over_02 = table(test_set$IsWinner, logistic_reduced_over_predictions_02)[4]
+positive_logistic_reduced_over_02 = table(test_set$IsWinner, logistic_reduced_over_predictions_02)[2] + table(test_set$IsWinner, logistic_reduced_over_predictions_02)[4]
+sensitivity_logistic_reduced_over_02 = true_positive_logistic_reduced_over_02 / positive_logistic_reduced_over_02
+
+sensitivity_logistic_reduced_over_02
 
 # Threshold = 0.3
 
-logistic_over_predictions_03 = ifelse(logistic_over_predictions > 0.3, 1, 0)
-logistic_over_accuracy_03 = sum(logistic_over_predictions_03 == test_set[2]) / dim(test_set[2])[1]
+logistic_reduced_over_predictions_03 = ifelse(logistic_reduced_over_predictions > 0.3, 1, 0)
+logistic_reduced_over_accuracy_03 = sum(logistic_reduced_over_predictions_03 == test_set[2]) / dim(test_set[2])[1]
 
-table(test_set$IsWinner, logistic_over_predictions_03)
+table(test_set$IsWinner, logistic_reduced_over_predictions_03)
 
-false_positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[3]
-negative_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[1] + table(test_set$IsWinner, logistic_over_predictions_03)[3]
-typeIerror_logistic_over_03 = false_positive_logistic_over_03 / negative_logistic_over_03
+false_positive_logistic_reduced_over_03 = table(test_set$IsWinner, logistic_reduced_over_predictions_03)[3]
+negative_logistic_reduced_over_03 = table(test_set$IsWinner, logistic_reduced_over_predictions_03)[1] + table(test_set$IsWinner, logistic_reduced_over_predictions_03)[3]
+typeIerror_logistic_reduced_over_03 = false_positive_logistic_reduced_over_03 / negative_logistic_reduced_over_03
 
-true_positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[4]
-positive_logistic_over_03 = table(test_set$IsWinner, logistic_over_predictions_03)[2] + table(test_set$IsWinner, logistic_over_predictions_03)[4]
-sensitivity_logistic_over_03 = true_positive_logistic_over_03 / positive_logistic_over_03
+typeIerror_logistic_reduced_over_03
 
+true_positive_logistic_reduced_over_03 = table(test_set$IsWinner, logistic_reduced_over_predictions_03)[4]
+positive_logistic_reduced_over_03 = table(test_set$IsWinner, logistic_reduced_over_predictions_03)[2] + table(test_set$IsWinner, logistic_reduced_over_predictions_03)[4]
+sensitivity_logistic_reduced_over_03 = true_positive_logistic_reduced_over_03 / positive_logistic_reduced_over_03
+
+sensitivity_logistic_reduced_over_03
 
 # Threshold = 0.4
 
-logistic_over_predictions_04 = ifelse(logistic_over_predictions > 0.4, 1, 0)
-logistic_over_accuracy_04 = sum(logistic_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
+logistic_reduced_over_predictions_04 = ifelse(logistic_reduced_over_predictions > 0.4, 1, 0)
+logistic_reduced_over_accuracy_04 = sum(logistic_reduced_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
 
-table(test_set$IsWinner, logistic_over_predictions_04)
+table(test_set$IsWinner, logistic_reduced_over_predictions_04)
 
-false_positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[3]
-negative_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[1] + table(test_set$IsWinner, logistic_over_predictions_04)[3]
-typeIerror_logistic_over_04 = false_positive_logistic_over_04 / negative_logistic_over_04
+false_positive_logistic_reduced_over_04 = table(test_set$IsWinner, logistic_reduced_over_predictions_04)[3]
+negative_logistic_reduced_over_04 = table(test_set$IsWinner, logistic_reduced_over_predictions_04)[1] + table(test_set$IsWinner, logistic_reduced_over_predictions_04)[3]
+typeIerror_logistic_reduced_over_04 = false_positive_logistic_reduced_over_04 / negative_logistic_reduced_over_04
 
-true_positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[4]
-positive_logistic_over_04 = table(test_set$IsWinner, logistic_over_predictions_04)[2] + table(test_set$IsWinner, logistic_over_predictions_04)[4]
-sensitivity_logistic_over_04 = true_positive_logistic_over_04 / positive_logistic_over_04
+typeIerror_logistic_reduced_over_04
+
+true_positive_logistic_reduced_over_04 = table(test_set$IsWinner, logistic_reduced_over_predictions_04)[4]
+positive_logistic_reduced_over_04 = table(test_set$IsWinner, logistic_reduced_over_predictions_04)[2] + table(test_set$IsWinner, logistic_reduced_over_predictions_04)[4]
+sensitivity_logistic_reduced_over_04 = true_positive_logistic_reduced_over_04 / positive_logistic_reduced_over_04
+
+sensitivity_logistic_reduced_over_04
 
 # ROC curve
 
-roc.out <- roc(test_set$IsWinner, logistic_over_predictions)
+roc.out <- roc(test_set$IsWinner, logistic_reduced_over_predictions)
 plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
 auc(roc.out)
 

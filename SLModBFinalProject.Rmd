@@ -487,9 +487,7 @@ Explain our approach to modeling:
 
 - Start with linear, move on to... etc.
 
-Talk about oversampling and why we chose to do it:
-
-- Attempting to address the imbalance of the data
+Because of the imbalanced nature of the dataset that was shown previously, an oversampled version of the dataset will be used in an attempt to further improve our models. This oversampling creates synthetic data of the minority class (nominated) with data values for all variables similar to and determined by the real data points of the minority class. This creates a dataset of balanced non-nominated and nominated songs.
 
 ```{r}
 ## Oversampling
@@ -768,7 +766,7 @@ The ROC curve shows that the reduced logistic model produces a diagnostic accura
 
 ### Logistic Oversampled Model
 
-Explain the Logistic Oversampled Model and discuss its benefits (and weaknesses?)
+In this section, a logistic model is created (same as seen above) using the previously created oversampled data set that was discussed at the beginning of the Model Development section as an attempt to improve the logistic model's accuracy.
 
 ```{r}
 # Fitting logistic oversampled 
@@ -777,7 +775,7 @@ logistic_over = glm(as.numeric(unlist(oversampled_train_data[1])) ~ ., data = ov
 summary(logistic_over)
 ```
 
-What does this model summary say? What do we explore next?
+Using the oversampled dataset, the full logistic model now determines the following variables to be significant: year, acousticness, duration, key5, key11, loudness, and valence. This is quite a difference compared to the previous logistic model based on the original dataset, which only listed 3 variables (year, duration, and valence) as significant.
 
 #### Stepwise?
 
