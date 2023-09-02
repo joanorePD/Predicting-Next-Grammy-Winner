@@ -2981,7 +2981,10 @@ sensitivity, therefore the same comments apply.</p>
 </div>
 <div id="knn" class="section level2">
 <h2>KNN</h2>
-<p>What is KNN? How does it work?</p>
+<p>KNN (K-Nearest Neighbors) models are non-parametric and offer a
+flexible decision boundary for classification problems. The model will
+classify a song based on the “k” nearest neighbors of said song in the
+parameter space.</p>
 <pre class="r"><code># K-NN
 
 min_max_norm = function(x) {
@@ -2997,8 +3000,9 @@ normalized_data = cbind(IsWinner_norm, normalized_data)
 training_norm_data = normalized_data[train_ind,]
 
 test_norm_data = normalized_data[-train_ind,]</code></pre>
-<p>Discuss the overview of the model, introduce hyperparameter
-tuning:</p>
+<p>After normalizing the data, the selection of the previously mentioned
+“k” value is performed to determine the most efficient number of
+“neighbors” the model will consider when classifying a song.</p>
 <pre class="r"><code># Selecting k
 
 kmax = 100
@@ -3008,14 +3012,16 @@ test_error = numeric(kmax)
 for (k in 1:kmax) {
   knn_pred = as.factor(knn(training_norm_data[,-1], test_norm_data[,-1],
                             cl = training_norm_data$IsWinner_norm, k = k))
-  cm = confusionMatrix(data = knn_pred, reference = as.factor(test_norm_data$IsWinner_norm))
+  cm = confusionMatrix(data = knn_pred,
+                       reference = as.factor(test_norm_data$IsWinner_norm))
   test_error[k] = 1 - cm$overall[1]
 }
-
-
-k_min = which.min(test_error)</code></pre>
-<p>Discuss the selection of the k; print the value for the
-markdown??</p>
+k_min = which.min(test_error)
+k_min</code></pre>
+<pre><code>## [1] 25</code></pre>
+<p>After analyzing the original training data set, the KNN model
+determined 25 to be the most optimal number of neighbors to
+consider.</p>
 <pre class="r"><code>knn = knn(training_norm_data[,-1], test_norm_data[,-1],
           cl = training_norm_data$IsWinner_norm, k = k_min)
 
@@ -3026,12 +3032,14 @@ table(test_norm_data$IsWinner_norm, knn)</code></pre>
 ##       0   1
 ##   0 150   0
 ##   1  23   1</code></pre>
-<p>Discuss the findings of the KNN model; how we will adapt it or the
-data to improve it.</p>
+<p>Utilizing the chosen K value, the model yields an accuracy of 86.8%
+and predicts all of the non-nominated songs correctly, but only one of
+the nominated songs correctly. This points towards a heavy bias
+classifying songs as non-nominated.</p>
 <div id="oversampling" class="section level3">
 <h3>Oversampling</h3>
-<p>Repeat the above process (Find k, fit model) using oversampled
-data:</p>
+<p>Now the same process as above is repeated, but by building a model
+using the oversampled data.</p>
 <pre class="r"><code># oversampled
 
 test_over_error = numeric(kmax)
@@ -3051,9 +3059,10 @@ for (k in 1:kmax) {
 
 
 k_min_over = which.min(test_over_error)
-
-
-knn_over = knn(training_norm_data_over[,-1], test_norm_data[,-1],
+k_min_over</code></pre>
+<pre><code>## [1] 14</code></pre>
+<p>The chosen value of “k” for the oversampled dataset is 14.</p>
+<pre class="r"><code>knn_over = knn(training_norm_data_over[,-1], test_norm_data[,-1],
           cl = training_norm_data$IsWinner_norm, k = k_min_over)
 
 knn_pred_min_over = as.factor(knn_over)
@@ -3063,11 +3072,9 @@ table(test_norm_data$IsWinner_norm, knn_over)</code></pre>
 ##       0   1
 ##   0 146   4
 ##   1  23   1</code></pre>
-<p>Discuss the results of the oversampled model.</p>
-<p>ARE THERE ANY PLOTS WE COULD DO FOR KNN?</p>
-<p>TALK ABOUT HOW LARGE THE CHOSEN K VALUES ARE; POSSIBLE IMPROVEMENT TO
-ACCURACY BY INTRODUCING SOME KIND OF EARLY STOPPING WHILE HYPER
-TUNING</p>
+<p>Utilizing the chosen “k” value, the KNN model yields a classification
+accuracy of 84.5%, but again only one of the nominated songs were
+correctly classified.</p>
 </div>
 </div>
 <div id="results-and-conclusions" class="section level1">
