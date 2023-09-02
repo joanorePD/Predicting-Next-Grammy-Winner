@@ -1465,34 +1465,43 @@ sensitivity_qda_over_05
 
 Setting the threshold to 0.5 gave better results both in terms of type I error and sensitivity, in particular the model classifies as not nominated 50% of the songs that weren't nominated and classifies 70% of the song that were nominated as nominated.
 
-## Regression
+## Regularized Regression
 
-Discuss what regression is, how it differs from what we have looked at so far, and what it may unvail
+Regularized regression models are a type of regression with an additional constraint on the parameter designed to prevent overfitting and deal with multicollinearity.
 
 ### Ridge Regression
 
-Discuss what specifically this ridge regression is; benefits and drawbacks?
+Ridge regression exploits L2 regularization to shrink the estimated parameters towards zero.
 
 ```{r}
 ## Ridge regression
 
- 
 ridge_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train_data$IsWinner, alpha = 0, family = "binomial",
                      type.measure = "class")
 plot(ridge_cv)
 
-lambda_opt_ridge <- ridge_cv$lambda.min
+lambda_opt_ridge = ridge_cv$lambda.min
 
 pred_ridge = predict(ridge_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
 
 table(test_set$IsWinner, pred_ridge)
+
+false_positive_ridge = table(test_set$IsWinner, pred_ridge)[3]
+negative_ridge = table(test_set$IsWinner, pred_ridge)[1] + table(test_set$IsWinner, pred_ridge)[3]
+typeIerror_ridge = false_positive_ridge / negative_ridge
+typeIerror_ridge
+
+true_positive_ridge = table(test_set$IsWinner, pred_ridge)[4]
+positive_ridge = table(test_set$IsWinner, pred_ridge)[2] + table(test_set$IsWinner, pred_ridge)[4]
+sensitivity_ridge = true_positive_ridge / positive_ridge
+sensitivity_ridge
 ```
 
-Discuss the results: What does it show?
+Ridge regression predictions showed a low type I error and sensitivity, meaning that the model is able to identify not nominated songs, but struggles to correctly classify nominated songs.
 
 ### Lasso Regression
 
-What is Lasso Regression? How does it differe from regression and ridge regression? What are its benefits and drawbacks?
+Lasso regression uses L1 regularization to force some of the estimated parameter to be exactly zero.
 
 ```{r}
 ## Lasso regression
@@ -1502,14 +1511,24 @@ lasso_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train
 
 plot(lasso_cv)
 
-lambda_opt_lasso <- lasso_cv$lambda.min
+lambda_opt_lasso = lasso_cv$lambda.min
 
 pred_lasso = predict(lasso_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
 
 table(test_set$IsWinner, pred_lasso)
+
+false_positive_lasso = table(test_set$IsWinner, pred_lasso)[3]
+negative_lasso = table(test_set$IsWinner, pred_lasso)[1] + table(test_set$IsWinner, pred_lasso)[3]
+typeIerror_lasso = false_positive_lasso / negative_lasso
+typeIerror_lasso
+
+true_positive_lasso = table(test_set$IsWinner, pred_lasso)[4]
+positive_lasso = table(test_set$IsWinner, pred_lasso)[2] + table(test_set$IsWinner, pred_lasso)[4]
+sensitivity_lasso = true_positive_lasso / positive_lasso
+sensitivity_lasso
 ```
 
-What does this show? What insight does it give? Interpret the results.
+Lasso regression gave similar results compared to ridge regression in terms of type I error and slightly worse results in terms of sensitivity, therefore the same comments apply.
 
 ## KNN
 

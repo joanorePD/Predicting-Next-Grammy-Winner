@@ -1107,17 +1107,26 @@ sensitivity_qda_over_05
 
 ## Ridge regression
 
- 
 ridge_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train_data$IsWinner,
-                      alpha = 0, family = "binomial", type.measure = "class")
+                     alpha = 0, family = "binomial", type.measure = "class")
 
 plot(ridge_cv)
 
-lambda_opt_ridge <- ridge_cv$lambda.min
+lambda_opt_ridge = ridge_cv$lambda.min
 
 pred_ridge = predict(ridge_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
 
 table(test_set$IsWinner, pred_ridge)
+
+false_positive_ridge = table(test_set$IsWinner, pred_ridge)[3]
+negative_ridge = table(test_set$IsWinner, pred_ridge)[1] + table(test_set$IsWinner, pred_ridge)[3]
+typeIerror_ridge = false_positive_ridge / negative_ridge
+typeIerror_ridge
+
+true_positive_ridge = table(test_set$IsWinner, pred_ridge)[4]
+positive_ridge = table(test_set$IsWinner, pred_ridge)[2] + table(test_set$IsWinner, pred_ridge)[4]
+sensitivity_ridge = true_positive_ridge / positive_ridge
+sensitivity_ridge
 
 ## Lasso regression
 
@@ -1126,11 +1135,21 @@ lasso_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train
 
 plot(lasso_cv)
 
-lambda_opt_lasso <- lasso_cv$lambda.min
+lambda_opt_lasso = lasso_cv$lambda.min
 
-pred_lasso = predict(lasso_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_ridge)
+pred_lasso = predict(lasso_cv, data.matrix(test_set[, c(-1, -2)]), type = "class", s = lambda_opt_lasso)
 
 table(test_set$IsWinner, pred_lasso)
+
+false_positive_lasso = table(test_set$IsWinner, pred_lasso)[3]
+negative_lasso = table(test_set$IsWinner, pred_lasso)[1] + table(test_set$IsWinner, pred_lasso)[3]
+typeIerror_lasso = false_positive_lasso / negative_lasso
+typeIerror_lasso
+
+true_positive_lasso = table(test_set$IsWinner, pred_lasso)[4]
+positive_lasso = table(test_set$IsWinner, pred_lasso)[2] + table(test_set$IsWinner, pred_lasso)[4]
+sensitivity_lasso = true_positive_lasso / positive_lasso
+sensitivity_lasso
 
 
 # K-NN
