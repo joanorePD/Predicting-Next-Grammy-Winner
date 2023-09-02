@@ -476,8 +476,13 @@ cramersv(matrix(c(as.numeric(time_signature), as.numeric(training_set$IsWinner))
 
 #### Summary
 
-Conclusion about what we have seen; what we plan to do with it? (Model fitting next)
-- Found they are independent; these categorical variables alone do not offer much information regarding the classification
+Correlations between continuous variables were found, specially high correlations between audio features such as acousticness/energy and loudness/energy. However no categorical variables were shown to have any significant association with the dependent variable.
+
+We examined the distribution for both continuous and categorical variables. Most continuous variables showed non-normal distributions, which should be considered when building models. Categorical variables like mode and time signature had high frequencies of specific values.
+
+For continuous variables, we used box plots to visualize differences between nominated and non-nominated songs. Notably, energy and valence showed differences in medians. For categorical variables, Chi-Squared tests and Cramer's V indicated that these variables might not be strongly associated with the Grammy nomination status.
+
+From this analysis we can extract that features like energy and valence may play a role in distinguishing nominated from non-nominated songs. On the other hand, categorical variables didn't showed significant impact on nominations. This information is surely valuable for the next step, model development.
 
 ## Model Development
 
