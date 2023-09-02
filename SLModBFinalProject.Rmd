@@ -329,10 +329,10 @@ These three pairings are the same three largest correlations seen from the first
 ```{r}
 #Weird song, very long; outlier 
 which.max(data$duration_ms)
-data[504, ]
+data[448, ]
 ```
 
-WHY ARE WE HIGHLIGHTING THIS OUTLIER? HOW DOES IT AFFECT THE PARTIAL CORRELATION? TALK ABOUT HOW WE LEFT IT IN THE DATA AS A PART OF OUR EXPLORATION AND THE LEARNING EXPERIENCE OF HAVING DATA WITH OUTLIERS.
+The song Play by Dave Grohl is nearly 23 minutes long. We decided not to delete this song, even though it could be considered an outlier, since it can give meaningful insight on one of the reasons why a song may not gain popularity. Indeed, a song that is really long is less likely to be played on the radio or used in movies, so it may not be heard by many people. This can later influence its likelihood of being considered for a grammy nomination. 
 
 By definition, correlation speaks to linear relationships. This information will directly guide how we develop linear models of our data, but non-linear relationships between the highly correlated data points could still exist.
 
@@ -464,7 +464,7 @@ chisq.test(mode, training_set$IsWinner)
 chisq.test(time_signature, training_set$IsWinner)
 ```
 
-The Chi Squared Test revealed fairly high p-values for all of the categorical variables, and even produced a 1 for mode suggesting complete independence of mode from the dependent variable. IS THIS CORRECT??
+The Chi Squared Test revealed fairly high p-values for all of the categorical variables, and even produced a 1 for mode suggesting complete independence of mode from the dependent variable.
 
 We also utilize the Cramer's V again, and it showed.... EXPAND
 
