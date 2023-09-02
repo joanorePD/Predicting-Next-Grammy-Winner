@@ -898,11 +898,12 @@ auc(roc.out)
 
 Discuss this ROC curve:
 
-### Linear Discriminant Analysis
+### Discriminant Analysis
 
-Discuss this approach and why we are doing it:
+Discriminant analysis is a statistical technique based on the Bayes theorem used to solve classification problems.
 
-We examine the normality of the predictors conditioned to the classes of the variable IsWinner through the use of the Shapiro Test. The Shapiro Test is... and shows...
+This technique assumes that the distributions of the independent variables conditioned to the dependent variable are normal. 
+In order to verify if our variables satisfy this condition we computed the Shapiro-Wilk test. The null hypothesis of this test is that a sample comes from a Normal distribution. We reject the null hypothesis if the p-value is less then 0.05, which means that the probability of that sample to have been generated from a Normal distribution is less that 5%.
 
 ```{r}
 shapiro.test(danceability[IsWinner == 0]) # Yes
@@ -930,20 +931,12 @@ shapiro.test(valence[IsWinner == 0]) # No
 shapiro.test(valence[IsWinner == 1]) # No
 ```
 
-According tot he Shapiro Test, discuss what the values mean or each of the attributes. What useful knowledge is gained from this?
+#### QQ-plots of the conditioned independent variables
 
-#### Distribution(???) Plots of the Attributes
-
-- The purpose of the quantile-quantile (QQ) plot is to show if two datasets come from the same distribution or if there are deviations from a common distribution. It compares the quantiles (percentiles) of one dataset to the quantiles of another, typically to check for similarities or differences in their underlying distributions. 
-
-In this case, we will be using  this type of plot for a normality analysis of the variables, comparing each of their distributions to a normal one with the same mean and standard deviation.
+We also used a visual tool to check if the variables follow a Normal distribution.
 
 ##### Danceability
 ```{r}
-par(mfrow = c(1, 2))
-
-# danceability looking normal
-
 qqnorm(danceability[IsWinner == 0])
 grid()               
 qqline(danceability[IsWinner == 0],lwd = 2, col = "red")
@@ -953,13 +946,10 @@ grid()
 qqline(danceability[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-What does this tell us about the danceability feature?
+Danceability looks normal confirming the result of the test.
 
 ##### Acousticness
 ```{r}
-# acousticness S shaped
-par(mfrow = c(1, 2))
-
 qqnorm(acousticness[IsWinner == 0])
 grid()               
 qqline(acousticness[IsWinner == 0],lwd = 2, col = "red")
@@ -969,13 +959,10 @@ grid()
 qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-What does this tell us about the acousticness feature?
+Acousticness is heavily not Normal, following a S-shape.
 
 ##### Duration
 ```{r}
-# duration_ms  big right tail
-par(mfrow = c(1, 2))
-
 qqnorm(duration_ms[IsWinner == 0])
 grid()               
 qqline(duration_ms[IsWinner == 0],lwd = 2, col = "red")
@@ -985,13 +972,10 @@ grid()
 qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-What does this tell us about the duration feature?
+Duration shows a heavy right tail.
 
 ##### Energy
 ```{r}
-# energy tails not normal
-par(mfrow = c(1, 2))
-
 qqnorm(energy[IsWinner == 0])
 grid()               
 qqline(energy[IsWinner == 0],lwd = 2, col = "red")
@@ -1001,13 +985,10 @@ grid()
 qqline(energy[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-What does this tell us about the energy feature?
+The energy feature shows not normal tails.
 
 ##### Instrumentalness
 ```{r}
-# instrumentalness huge right tail
-par(mfrow = c(1, 2))
-
 qqnorm(instrumentalness[IsWinner == 0])
 grid()               
 qqline(instrumentalness[IsWinner == 0],lwd = 2, col = "red")
@@ -1017,13 +998,10 @@ grid()
 qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-What does this tell us about the instrumentalness feature?
+Instrumentalness shows a very heavy  right tail.
 
 ##### Loudness
 ```{r}
-# loudness tails not normal
-par(mfrow = c(1, 2))
-
 qqnorm(loudness[IsWinner == 0])
 grid()               
 qqline(loudness[IsWinner == 0],lwd = 2, col = "red")
@@ -1033,13 +1011,10 @@ grid()
 qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-What does this tell us about the loudness feature?
+Loudness shows not normal tails.
 
 ##### Tempo
 ```{r}
-# tempo tails slightly not normal
-par(mfrow = c(1, 2))
-
 qqnorm(tempo[IsWinner == 0])
 grid()               
 qqline(tempo[IsWinner == 0],lwd = 2, col = "red")
@@ -1049,7 +1024,7 @@ grid()
 qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-What does this tell us about the tempo feature?
+The tempo variable seems close to a normal distribution.
 
 ##### Valence
 ```{r}
@@ -1065,19 +1040,18 @@ grid()
 qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-What does this tell us about the valence feature?
-
-Overall discussion about the above plots. Highlight strange shapes, important findings, etc. How do we use what we learned?
+The valence variable seems close to a normal distribution exept for the tails.
 
 #### Transformations
 
-We apply transformations to the predictors in an attempt to make them more normal. We then test them looking again at the Shapiro test... EXPLAIN MORE
+The only variable to have passed the test is Danceability, so we decided to apply a transformation to the other variables to make them more Normal-like.
+We decided to use the Box-Cox transform estimating the parameter.
+
+We then test them looking again at the Shapiro test and at the plots to check if the transformation succeeded in making the distributions more Normal-like.
 
 ##### Acousticness
 
 ```{r}
-# Acousticness plots improved, test not passed
-
 par(mfrow = c(1, 1))
 
 b_acousticness <- boxcox(lm(acousticness ~ 1))
@@ -1098,7 +1072,7 @@ shapiro.test(acousticness_tran[IsWinner == 0]) # No
 shapiro.test(acousticness_tran[IsWinner == 1]) # No
 ```
 
-Discuss what these tests say about the newly transformed feature
+The transformed variable didn't pass the test but the plots show a good improvement, so we will use the transformed variable.
 
 ##### Duration
 
@@ -1125,13 +1099,11 @@ shapiro.test(duration_ms_tran[IsWinner == 0]) # No
 shapiro.test(duration_ms_tran[IsWinner == 1]) # No
 ```
 
-Discuss what these tests say about the newly transformed feature
+The transformed variable didn't pass the test but the plots show an improvement in the tails, so we will use the transformed variable.
 
 ##### Energy
 
 ```{r}
-# energy plots are pretty much the same test not passed
-
 par(mfrow = c(1, 1))
 
 b_energy <- boxcox(lm(energy ~ 1))
@@ -1152,17 +1124,16 @@ shapiro.test(energy_tran[IsWinner == 0]) # No
 shapiro.test(energy_tran[IsWinner == 1]) # No
 ```
 
-Discuss what these tests say about the newly transformed feature
+The transformed variable didn't pass the test and the plots don't show improvements so we decided to keep the original values.
 
 ##### Instrumentalness
 
 ```{r}
 # instrumentalness can't apply the boxcox transformation because there are some 0's
-# Tried to apply a linear transformation before but the plot is weird
 
 par(mfrow = c(1, 1))
 
-# Added a tiny value to overcome the issue of 0's
+# Added a small value to overcome the issue of 0's
 new_instrumentalness = instrumentalness + 1e-05
 
 b_instrumentalness <- boxcox(lm(new_instrumentalness ~ 1))
@@ -1183,15 +1154,11 @@ shapiro.test(instrumentalness_tran[IsWinner == 0]) # No
 shapiro.test(instrumentalness_tran[IsWinner == 1]) # No
 ```
 
-Discuss what these tests say about the newly transformed feature
+We could not directly apply the boxcox transformation to the instrumentalness variable because of the presence of zeros, so we added a small value and then applied it. The new variable did not pass the test and the plots did not improve, so we decided to keep the original data.
 
 ##### Loudness
 
 ```{r}
-# loudness boxcox transformation not directly applicable because the variable
-# is always negative, I multiplied the values by -1 and then applied it, 
-# it gave very good results, but we need to pay attention to the interpretation
-
 par(mfrow = c(1, 1))
 
 new_loudness = loudness * (-1)
@@ -1214,7 +1181,7 @@ shapiro.test(loudness_tran[IsWinner == 0]) # Yes
 shapiro.test(loudness_tran[IsWinner == 1]) # Yes
 ```
 
-Discuss what these tests say about the newly transformed feature (NOTE: Loudness was multiplied by -1, so the results are mirrored (RIGHT??))
+We could not directly apply the boxcox transformation to the variable loudness because the variable takes negative values. We multiplied the values by -1 and then applied the transformation. The new variable passed the test and the plots confirm the result of the test. Since we have multiplied the variable by -1 the interpretation of the variable will be mirrored.
 
 ##### Tempo
 
@@ -1241,7 +1208,7 @@ shapiro.test(tempo_tran[IsWinner == 0]) # No
 shapiro.test(tempo_tran[IsWinner == 1]) # No
 ```
 
-Discuss what these tests say about the newly transformed feature
+The transformed tempo variable showed slight improvement in the plots but still didn't pass the test, we used the transformed variable.
 
 ##### Valence
 
@@ -1268,11 +1235,11 @@ shapiro.test(valence_tran[IsWinner == 0]) # No
 shapiro.test(valence_tran[IsWinner == 1]) # No
 ```
 
-Discuss what these tests say about the newly transformed feature
+The transformed variable didn't change much so we kept the original data.
 
-(SHOULD WE COMPARE A FEW OF THE QQ PLOTS BEFORE AND AFTER THE TRANSFORMATION SIDE-BY-SIDE AS A GOOD VISUAL? fOR THE FEATURES THAT CHANGED AND FOR ONE THAT DID NOT?)
+(SHOULD WE COMPARE A FEW OF THE QQ PLOTS BEFORE AND AFTER THE TRANSFORMATION SIDE-BY-SIDE AS A GOOD VISUAL? FOR THE FEATURES THAT CHANGED AND FOR ONE THAT DID NOT?)
 
-### Examination of best BoxCox plots??? IS this Model Evaluation?
+### Data transformation
 
 ```{r}
 par(mfrow = c(1, 1))
@@ -1317,9 +1284,8 @@ test_tran_data = as.data.frame(test_tran_data)
 tran_data = as.data.frame(tran_data)
 ```
 
-Discuss what these boxcox plots show us, what what we take from them for the examination?
 
-### Examining MORE LDA???
+### Linear Discriminant Analysis
 
 ```{r}
 ## LDA
@@ -1339,9 +1305,9 @@ plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate",
 auc(roc.out)
 ```
 
-Discuss the findings of the LDA and ROC curve
+The ROC curve tells us that the predictions computed with this method are worse than a coin toss.
 
-### Oversampled LDA Examination
+### Oversampled LDA 
 
 ```{r}
 # Oversampled LDA
@@ -1365,15 +1331,14 @@ plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate",
 auc(roc.out)
 ```
 
-Discuss the oversampled LDA findings
+The ROC curve shows a slight improvement, but the value is just above 0.5. 
 
 #### Predictions
 
-Making predictions ont he oversampled LDA
+Making predictions on the oversampled LDA
 
 ##### Threshold = 0.4
 ```{r}
-# Threshold 0.4
 
 lda_over_predictions_04 = ifelse(pred_simple_over_lda$posterior[,1] > 0.4, 1, 0)
 lda_over_accuracy_04 = sum(lda_over_predictions_04 == test_set[2]) / dim(test_set[2])[1]
@@ -1383,19 +1348,17 @@ table(test_set$IsWinner, lda_over_predictions_04)
 false_positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[3]
 negative_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[1] + table(test_set$IsWinner, lda_over_predictions_04)[3]
 typeIerror_lda_over_04 = false_positive_lda_over_04 / negative_lda_over_04
+typeIerror_lda_over_04
 
 true_positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[4]
 positive_lda_over_04 = table(test_set$IsWinner, lda_over_predictions_04)[2] + table(test_set$IsWinner, lda_over_predictions_04)[4]
 sensitivity_lda_over_04 = true_positive_lda_over_04 / positive_lda_over_04
+sensitivity_lda_over_04
 ```
-
-Discuss what the 0.4 threshold finds
 
 ##### Threshold = 0.5
 
 ```{r}
-# Threshold 0.5
-
 lda_over_predictions_05 = list(pred_simple_over_lda$class)
 lda_over_accuracy_05 = sum(lda_over_predictions_05 == test_set[2]) / dim(test_set[2])[1]
 
@@ -1404,16 +1367,19 @@ table(test_set$IsWinner, lda_over_predictions_05[[1]])
 false_positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[3]
 negative_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[1] + table(test_set$IsWinner, lda_over_predictions_05[[1]])[3]
 typeIerror_lda_over_05 = false_positive_lda_over_05 / negative_lda_over_05
+typeIerror_lda_over_05
 
 true_positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[4]
 positive_lda_over_05 = table(test_set$IsWinner, lda_over_predictions_05[[1]])[2] + table(test_set$IsWinner, lda_over_predictions_05[[1]])[4]
 sensitivity_lda_over_05 = true_positive_lda_over_05 / positive_lda_over_05
+sensitivity_lda_over_05
 
 ```
 
-Discuss what the 0.5 prediction threshold finds compared to the 0.4
+Setting the threshold to 0.4 leads to high type I error and sensitivity,
+this means that the model is able to detect the nominated song but classifies many not nominated songs as nominated. While setting the threshold to 0.5 leads to low type I error and sensitivity, which means that many nominated songs are classified as not nominated, but most not nominated songs are correctly classified. 
 
-#### QDA and ROC of the LDA and Oversampled LDA
+#### QDA
 
 ```{r}
 ## QDA
@@ -1447,11 +1413,9 @@ plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate",
 auc(roc.out)
 ```
 
-Discuss what these show:
+
 
 #### Predictions
-
-Making more predictions (Using what? Clarify and explain)
 
 ##### Threshold = 0.4
 
