@@ -486,9 +486,9 @@ From this analysis we can extract that features like energy and valence may play
 
 ## Model Development
 
-Explain our approach to modeling:
+In our model development strategy, we adopt a progressive approach, beginning with a logistic model and refining it through oversampling and variable selection techniques. We also explore models such as ridge and lasso regression, and K-nearest neighbors (KNN) to enhance predictive accuracy. Model performance is assessed through Type 1 Error, Sensitivity, and ROC curve analysis, while also considering discriminant analysis assuming normal distribution of key variables.
 
-- Start with linear, move on to... etc.
+### Oversampling
 
 Because of the imbalanced nature of the dataset that was shown previously, an oversampled version of the dataset will be used in an attempt to further improve our models. This oversampling creates synthetic data of the minority class (nominated) with data values for all variables similar to and determined by the real data points of the minority class. This creates a dataset of balanced non-nominated and nominated songs.
 
