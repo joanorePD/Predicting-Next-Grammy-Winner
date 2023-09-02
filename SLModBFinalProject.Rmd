@@ -11,15 +11,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Can we use attributes and metrics of rock songs to predict their likelihood of winning the Grammy for "Best Rock Song?"
 
-What common traits, if any, do award winning rock songs contain? Can we look at intrinsic traits of songs, combined with metrics defined by Spotify, to determine award winning musical features? In this paper, we break down our data collection, data processing, and data analysis of a dataset of roughly 1,000 popular songs, both award-winning and not.
+What common traits, if any, do award winning rock songs contain? Can we look at intrinsic traits of songs, combined with metrics defined by Spotify, to determine award winning musical features? In this paper, we break down our data collection, data processing, and data analysis of a dataset containing roughly 1,000 popular songs, both award-winning and not.
 
 ## The Data
 
 ### Data Collection and Preparation
 
-In order to investigate this, we first collected a list of every song nominated for the "Best Rock Song" Grammy. The reason that we kept it within one award, rather than include other rock related Grammy's ("Best Rock Performance," "Best Rock Album," etc.), is because they are disparate by nature and nominations are awarded for completely different reasons. The Best Rock Song Grammy competition is between individual songs, allowing us to compare them to each other and determine what attributes mold a work worthy of a nomination.
+In order to investigate this, we first collected a list of every song nominated for the "Best Rock Song" Grammy. The reason that we kept it within one award, rather than include other rock-related Grammy's ("Best Rock Performance," "Best Rock Album," etc.), is because they are disparate by nature, and nominations are awarded for completely different reasons. The Best Rock Song Grammy competition is between individual songs, allowing us to compare them to each other and determine what attributes mold a work worthy of a nomination.
 
-In order to examine what sets these nominations apart from other rock songs, we collected the top 10 most streamed songs of each of these previously nominated artists on spotify so that we could compare the features and attributes of their popular non-nominated songs to songs that earned a nomination. This created a dataset of 1,016 popular rock songs. As a final step of processing the data, we had to remove any songs that were released prior to the creation of this Grammy in 1992. Removing all songs older than 1992 yielded a final dataset of 867 songs.
+In order to examine what sets these nominations apart from other rock songs, we collected the top 10 most streamed songs of each of these previously nominated artists on Spotify so that we could compare the features and attributes of their popular non-nominated songs to songs that earned a nomination. This created a dataset of 1,016 popular rock songs. As a final step of processing the data, we had to remove any songs that were released prior to the creation of this Grammy in 1992. Removing all songs older than 1992 yielded a final dataset of 867 songs.
 
 ```{r warning = FALSE, echo = TRUE, message = FALSE}
 # Set the working directory to this file's folder
@@ -105,7 +105,7 @@ length(data$IsWinner[data$IsWinner == 0]) / (length(data$IsWinner[data$IsWinner 
 length(data$IsWinner[data$IsWinner == 1]) / (length(data$IsWinner[data$IsWinner == 0]) + length(data$IsWinner[data$IsWinner == 1]))
 ```
 
-From the balance check, it is seen that the classes are highly imbalanced: 82% non-nominated songs, 18% nominated songs. We make note of this during the data processing stage so that we may take measures to address this during our analysis.
+From the balance check between the number of nominated and non-nominated songs, it is seen that the classes are highly imbalanced: 82% non-nominated songs, 18% nominated songs. We make note of this during the data processing stage so that we may take measures to address this during our analysis.
 
 ### Explanation of Variables
 
@@ -120,7 +120,7 @@ Instrumentalness | Predicts whether a track contains no vocals. "Ooh" and "aah" 
 Loudness      | The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db.
 Valence       | A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
 
-Although Spotify does not openly share how they determine these metrics, we found them suitable to assist in our analysis.
+Although Spotify does not openly share the formulas behind how they determine these metrics, we found them suitable to assist in our analysis.
 
 As a final processing step, we split the data into training and test datasets. The training dataset contains 80% of the original dataset, and the remaining 20% of the data in the test dataset will be used to test our model against after we have trained it. It is very important to test the model on never-before-seen data to determine not only how well the model performs, but also how well the model can generalize.
 
@@ -153,9 +153,9 @@ length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$I
 
 ### Relationship Between Independent Variables
 
-At first, we took a look at the independent variables by examining their correlation, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and we should avoid the pairing. We would prefer to utilize pairings of variables that offer different information to our model.
+At first, correlations between the independent variables were examined, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and should avoid the pairing. It is preferable to utilize pairings of variables that offer different information to assist the model.
 
-It was important for us to understand our data better in these regards, so that we may know which attribute pairings could give useful insight.
+It was important to understand the data better in these regards, so that it can be known which attribute pairings could give useful insight.
 
 #### Correlation Between Contiuous Variables
 
@@ -183,7 +183,7 @@ pairs(training_set[,c(-1, -2, -9, -11, -13)], lower.panel = panel.smooth)
 knitr::include_graphics("corplot_indep_2.png")
 ```
 
-From evaluating this second type of plot showing the correlation between continuous, independent variables, we were able to understand the shape of the data and discover outliers as well as general trends. For example, almost the entire trend line of Duration vs Instrumentalness is caused by a single outlier. It also confirmed the high, positive correlation between loudness and energy, showing a nice upward direction of the trend line with the data points clustered around it. It also showed the strong trend line between valence and danceability, although those data have higher variability and are less centered around the line. The highly negative correlation between acousticness and energy is also visualized, touting a firmly downward trend line.
+From evaluating this second type of plot showing the correlation between continuous, independent variables, one can understand the shape of the data and discover outliers as well as general trends. For example, almost the entire trend line of duration vs instrumentalness is caused by a single outlier. It also confirmed the high, positive correlation between loudness and energy, showing a nice upward direction of the trend line with the data points clustered around it. Furthermore, it showed the strong trend line between valence and danceability, although those data have higher variability and are less centered around the line. The highly negative correlation between acousticness and energy is also visualized, touting a firmly downward trend line.
 
 #### Correlation Between Categorical Variables
 
@@ -201,13 +201,13 @@ cramersv(matrix(c(as.numeric(key), as.numeric(time_signature)), ncol = 2))
 cramersv(matrix(c(as.numeric(mode), as.numeric(time_signature)), ncol = 2))
 ```
 
-Although measurements of association between categorical variables are hard to interpret, the Cramer's V test still informs us if there is full disassociation or full association between said variables. From our data, it can be seen that key/mode and key/time_signature are definitely not fully disassociated or fully associated. The same can be said about mode/time_signature, although the measured value was closer to 0.
+Although measurements of association between categorical variables are hard to interpret, the Cramer's V test still illuminates if there is full disassociation or full association between said variables. From the data, it can be seen that key/mode and key/time_signature are definitely not fully disassociated or fully associated. The same can be said about mode/time_signature, although the measured value was closer to 0.
 
 #### ANOVA Test
 
-Next, we looked for associations between each of the categorical variables and all of the continuous variables utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables. If ANOVA points out some feature combinations are significant, then that suggests the means of the groups of continuous variables are different. We chose 5% as the threshold for significance.
+Next, associations between each of the categorical variables and all of the continuous variables were examined utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables. If ANOVA points out some feature combinations are significant, then that suggests the statistical means of the groups of continuous variables are different. The chosen threshold for significance was 5%.
 
-ANOVA makes some assumptions regarding the variances of the attributes which are not fully satisfied by all of our variables, meaning the results we obtained should be considered carefully.
+ANOVA makes some assumptions regarding the variances of the attributes which are not fully satisfied by all of our variables, meaning the obtained results should be considered carefully.
 
 ```{r, warnings = FALSE}
 # Association between continuous and categorical variables
@@ -300,11 +300,11 @@ Time signature | Acousticness;  Danceability;  Duration;  Energy;  Instrumentaln
 
 The fact that these groups were significant allows us to say there may be a strong enough correlation between these pairings to use them in our models in a beneficial manner. 
 
-We notice how the time signature variable shows significance in combination with all other variables. This may be due to the fact that this variable is highly imbalanced, since 93.4% of the songs have a time signature of 4/4. 
+Interestingly, the time signature variable shows significance in combination with all other variables. This may be due to the fact that this variable is highly imbalanced, since 93.4% of the songs have a time signature of 4/4.
 
 #### Partial Correlations
 
-Because ANOVA does not inform us which means were different from the others, it is necessary to perform a Multiple Comparison Procedure. To do this, we utilized partial correlations, an exhaustive search that compares each possible pairing of continuous variables.
+Because ANOVA does not convey which means were different from the others, it is necessary to perform a Multiple Comparison Procedure. To do this, we utilized partial correlations, an exhaustive search that compares each possible pairing of continuous variables.
 
 ```{r, warnings = FALSE}
 # Partial correlations
@@ -433,7 +433,7 @@ Examining the association between independent and dependent variables can give i
 
 ##### Continuous
 
-To visualize these relationships, we utilize box plots:
+Box plots were utilized to visualize these relationships:
 
 ```{r}
 # Relationships between dependent and independent variables
@@ -454,9 +454,7 @@ The difference in median seen for the energy and valence variables points toward
 
 ##### Categorical
 
-CHI SQUARED TEST
-
-To measure the independent/dependent variables association for the categorical variables, we utilize the Chi Squared Test. It will pass judgement on the level of independence between the variables.
+To measure the independent/dependent variables association for the categorical variables, we utilized the Chi Squared Test. It will pass judgement on the level of independence between the variables.
 
 ```{r, warning=FALSE, message=FALSE}
 par(mfrow = c(1, 1))
