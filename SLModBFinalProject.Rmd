@@ -1774,3 +1774,8 @@ Future work could expand upon our research by...
 - the addition of new variables for the songs
 - Investigating different types of models
 - different accuracy metrics during the hyperparameter tuning of KNN and/or early stopping
+- larger dataset size -> with more recent data if available, or with songs from other artists
+- Using more advance techniques for handling class imbalance
+- Perform analysis over time -> trends might also influence which songs get nominated, which could also be detected with a larger dataset
+- More insights on the music industry (by maybe contacting musicologists/experts) could maybe give us valuable information on which other features could be included
+
