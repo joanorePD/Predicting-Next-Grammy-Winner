@@ -324,7 +324,7 @@ ggplot(data = training_set, aes(loudness, energy)) + geom_jitter(color = "blue")
 ggplot(data = training_set, aes(acousticness, energy)) + geom_jitter(color = "blue")
 ```
 
-These three pairings are the same three largest correlations seen from the first correlation plots, confirming those findings. It is also interesting to see how the correlation value changes, THEY ARE HIGHER  HERE; ASK CRISTIAN MORE ABOUT THIS.
+These three pairings are the same three largest correlations seen from the first correlation plots, confirming those findings. It is also interesting to see how the correlation value is lower once cleaned from the confounding effects.
 
 ```{r}
 #Weird song, very long; outlier 
@@ -408,7 +408,7 @@ barplot(table(mode), main = "Modality")
 barplot(table(time_signature), main = "Time signature")
 ```
 
-None of the categorical variables exhibit a normal distribution. Both mode and time_signature have an obvious statistical mode. The value of 1 for the variable mode represents songs in major keys, making up a super majority of the songs, and almost every song uses the time_signature of 4 with only a handful using 3. With such high frequencies of values within these categories... WHAT DOES IT SAY
+Both mode and time_signature have an obvious statistical mode. The value of 1 for the variable mode represents songs in major keys, making up a super majority of the songs, and almost every song uses the time_signature of 4 with only a handful using 3.
 
 We were again curious to compare the distribution of non-nominated to nominated songs for the categorical variables, and highlight the one that demonstrated the greatest difference: Key.
 
@@ -464,9 +464,9 @@ chisq.test(mode, training_set$IsWinner)
 chisq.test(time_signature, training_set$IsWinner)
 ```
 
-The Chi Squared Test revealed fairly high p-values for all of the categorical variables, and even produced a 1 for mode suggesting complete independence of mode from the dependent variable.
+The Chi-Squared Test revealed fairly high p-values for all of the categorical variables, and even produced a 1 for mode suggesting complete independence between mode and the dependent variable.
 
-We also utilize the Cramer's V again, and it showed.... EXPAND
+We also utilized the Cramer's V and obtained values that suggest some kind of dependence between the independent and dependent variables.
 
 ```{r}
 cramersv(matrix(c(as.numeric(key), as.numeric(training_set$IsWinner)), ncol = 2))
@@ -508,7 +508,7 @@ sum(oversampled_train_data$IsWinner == 1)
 
 ### Logistic Model
 
-The first model created in this project was a logistic model, being a straightforward binary classification tool that will classify the songs as non-nominated or nominated works. It considers all the variables.
+We started by considering the logistic regression, a model that belongs to the category of the generalized linear model. The logistic regression models the probability of an event to occur (in our case of a song to be nominated) by having the log-odds of the event to be a linear combination of the independent variables.
 
 ```{r}
 ## Simple logistic model
@@ -1422,6 +1422,8 @@ tran_data = as.data.frame(tran_data)
 
 ### Linear Discriminant Analysis
 
+Linear discriminant analysis is a technique based on the Bayes theorem and finds a linear combination of variables that best separates the classes of the dependent variable.
+
 ```{r}
 ## LDA
 
@@ -1514,7 +1516,9 @@ sensitivity_lda_over_05
 Setting the threshold to 0.4 leads to high type I error and sensitivity,
 this means that the model is able to detect the nominated song but classifies many not nominated songs as nominated. While setting the threshold to 0.5 leads to low type I error and sensitivity, which means that many nominated songs are classified as not nominated, but most not nominated songs are correctly classified. 
 
-#### QDA
+#### Quadratic discriminant analysis
+
+Quadratic discriminant analysis is a generalization of LDA and does not assume that dependent variable have the same variance.
 
 ```{r}
 ## QDA

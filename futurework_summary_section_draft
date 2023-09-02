@@ -1,0 +1,35 @@
+SUMMARY
+Overall, the model that produced the highest diagnostic accuracy was... with ___%, although the x, y, and z models were very similar with a, b, and c respectively.
+
+Logistic Full: ROC 0.598
+Logistic Reduced: ROC 0.576
+Log Oversampled Full: ROC 0.579
+Log Oversampled Reduced: ROC 0.579
+
+Lin Discr Analy: ROC 0.497 (no better than a coin toss)
+Over LDA: ROC 0.508
+QDA: ROC 0.518
+#################### ADD HEADER SECTION FOR QDA OVERSAMPLED IN MARKDOWN
+QDA Over: ROC 0.591
+
+Ridge Regression: Type 1 Error 0.353
+Ridge Regress: Sensitivity 0.417
+Lasso Regress: Type1Error 0.353
+Lasso Regress: Sensitivity 0.417
+
+KNN: Type1Error FP / N = 0
+KNN: Sensitivity TP / P = 1/24 = 0.0417
+KNN Over: Type1Error = 0.027
+KNN Over: Sensitivity = .0417
+########### ADD IN TYPE1ERROR AND SENSITIVITY PRINTOUTS TO THE CODE SECTION
+
+The models with the worst performance were...
+
+Future work could expand upon our research by...
+
+- Change the time_signature to be binary; 4 or not_4
+- the addition of new variables for the songs
+- Investigating different types of models
+- different accuracy metrics during the hyperparameter tuning of KNN and/or early stopping
+
+Future work could expand on our research in an attempt to improve the answer to our proposed topic. Through the addition of new variables, more insight and connections may be discovered by the models. The interactions between variables act as the guide to this analysis, so by introducing new variables the models may "see" patterns in the data it was previously unaware of. Different types of models could also be utilized in hopes of discovering connections that others did not. Different metrics could also be employed during the parameterization process or hyperparameter tuning to alter the models created here and possibly improve them.
