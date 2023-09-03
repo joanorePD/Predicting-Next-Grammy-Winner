@@ -1,10 +1,15 @@
 ---
 title: "What Makes a Rock Song Award-Winning?"
 author: "Cristian Granchelli, Joan Orellana Rios, Cameron Kelahan"
-date: "2023-08-25"
 output:
-  pdf_document: default
-  html_document: default
+  pdf_document:
+    fig_caption: yes
+  html_document: 
+    fig_caption: yes
+urlcolor: blue
+header-includes:
+ \usepackage{float}
+ \floatplacement{figure}{H}
 ---
 
 ```{r setup, include=FALSE}
@@ -169,7 +174,7 @@ At first, correlations between the independent variables were examined, which is
 
 It was important to understand the data better in these regards, so that it can be known which attribute pairings could give useful insight.
 
-#### Correlation Between Contiuous Variables\
+### Correlation Between Continuous Variables
 
 ```{r, message = FALSE}
 attach(training_set)
@@ -182,7 +187,7 @@ cor_matrix = cor(training_set[,c(-1, -2, -9, -11, -13)])
 corrplot.mixed(cor_matrix, tl.pos='lt')
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="Correlation Matrix"}
 knitr::include_graphics("corplot_indep_1.png")
 ```
 
@@ -192,14 +197,13 @@ The above plot visualizes the correlations between the continuous, independent v
 pairs(training_set[,c(-1, -2, -9, -11, -13)], lower.panel = panel.smooth)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="Pairs Correlation Plot with Line Fit"}
 knitr::include_graphics("corplot_indep_2.png")
 ```
 
 From evaluating this second type of plot showing the correlation between continuous, independent variables, one can understand the shape of the data and discover outliers as well as general trends. For example, almost the entire trend line of duration vs instrumentalness is caused by a single outlier. It also confirmed the high, positive correlation between loudness and energy, showing a nice upward direction of the trend line with the data points clustered around it. Furthermore, it showed the strong trend line between valence and danceability, although those data have higher variability and are less centered around the line. The highly negative correlation between acousticness and energy is also visualized, touting a firmly downward trend line.
 
-#### Correlation Between Categorical Variables\
-
+### Correlation Between Categorical Variables
 The Cramer's V measurement was employed in order to determine the strength of similarity between the categorical variables. This measurement is a normalized version of the chi-square statistic, returning a value of 0 if there is no association between the categorical variables, and returning 1 if there is a perfect association in which one variable is completely determined by the other.
 
 ```{r, warning=FALSE}
@@ -216,7 +220,7 @@ cramersv(matrix(c(as.numeric(mode), as.numeric(time_signature)), ncol = 2))
 
 Although measurements of association between categorical variables are hard to interpret, the Cramer's V test still illuminates if there is full disassociation or full association between said variables. From the data, it can be seen that key/mode and key/time_signature are definitely not fully disassociated or fully associated. The same can be said about mode/time_signature, although the measured value was closer to 0.
 
-#### ANOVA Test\
+### ANOVA Test
 
 Next, associations between each of the categorical variables and all of the continuous variables were examined utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables. If ANOVA points out some feature combinations are significant, then that suggests the statistical means of the groups of continuous variables are different. The chosen threshold for significance was 5%.
 
@@ -303,6 +307,7 @@ val_time.aov <- aov(valence ~ time_signature)
 summary(val_time.aov) # SIGNIFICANT
 ```
 
+\newpage
 The table below lists the categorical/continuous variable combinations that may be significant, according to ANOVA: 
 
 Categorical    | Continuous
@@ -315,7 +320,7 @@ The fact that these groups were significant suggests there may be a strong enoug
 
 Interestingly, the time signature variable shows significance in combination with all other variables. This may be due to the fact that this variable is highly imbalanced, since 93.4% of the songs have a time signature of 4/4.
 
-#### Partial Correlations\
+### Partial Correlations
 
 Because ANOVA does not convey which of the means were different from the others, it is necessary to perform a Multiple Comparison Procedure. Partial correlations was utilized in this case, which is an exhaustive search that compares each possible pairing of continuous variables.
 
@@ -326,16 +331,22 @@ correlation(training_set[,c(-1, -2, -9, -11, -13)], partial = TRUE)
 
 There were three variable pairs that stood out as highly significantly different:
 
-```{r, warnings = FALSE}
+```{r, warnings = FALSE, fig.cap="Partial Correlation between Danceability and Valence"}
 # Plots of variables with the largest partial correlation
 
 # Danceability / Valence
 ggplot(data = training_set, aes(danceability, valence)) + geom_jitter(color = "blue")
+```
+```{r, warnings=FALSE, fig.cap="Partial Correlation between Loudness and Energy"}
 # Loudness / Energy
 ggplot(data = training_set, aes(loudness, energy)) + geom_jitter(color = "blue")
+```
+```{r, warnings=FALSE, fig.cap="Partial Correlation between Acousticness and Energy"}
 # Acousticness / Energy
 ggplot(data = training_set, aes(acousticness, energy)) + geom_jitter(color = "blue")
 ```
+
+\newpage
 
 These three pairings are the same three largest correlations seen from the first correlation plots, confirming those findings. It is also interesting to see how the correlation value is lower once cleaned from the confounding effects.
 
@@ -353,7 +364,7 @@ As a quick note, the song "Play" by Dave Grohl stood out during the analysis, be
 
 An examination of the variables' distributions can give insight to better understand the data and how it can be interacted with. Some models that will be used in this project are based on assumptions that are related to distributions, often times assuming a normal distribution of data. From gauging how different variables are distributed, better models can be created by taking their distribution assumptions into account.
 
-#### Continuous\
+### Continuous
 
 ```{r, warnings = FALSE, eval=FALSE}
 # Checking distributions
@@ -371,7 +382,7 @@ hist(tempo)
 hist(valence)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="Histograms of all the continuous variables"}
 knitr::include_graphics("distrib_contin_hist.png")
 ```
 
@@ -379,7 +390,7 @@ From these histograms, it is clear that the danceability feature is the most nor
 
 The distributions and means of each variable for non-nominated and nominated songs were also compared. Most were very similar, but highlighted below is the attribute with the greatest difference: Valence.
 
-```{r}
+```{r, fig.cap="Distribution of the Valence variable conditioned to the dependent variable"}
 # Comparison IsWinner 0 vs 1 - Valence
 
 par(mfrow = c(1, 2))
@@ -389,7 +400,7 @@ hist(x, main = "Valence: Non-Nominated", xlab="Value")
 abline(v = mean(x),                       # Add line for mean
        col = "red",
        lwd = 3)
-text(x = mean(x) * 1.5,                   # Add text for mean
+text(x = mean(x) * 1.6,                   # Add text for mean
      y = 121,
      paste("Mean =", round(mean(x), digits=2)),
      col = "red",
@@ -400,7 +411,7 @@ hist(x, main = "Valence: Nominated", xlab="Value")
 abline(v = mean(x),                       # Add line for mean
        col = "red",
        lwd = 3)
-text(x = mean(x) * 0.5,                   # Add text for mean
+text(x = mean(x) * 0.45,                   # Add text for mean
      y = 31,
      paste("Mean =", round(mean(x), digits=2)),
      col = "red",
@@ -409,9 +420,9 @@ text(x = mean(x) * 0.5,                   # Add text for mean
 
 The valence variable peaks at different locations for the two values of the dependent variable and has a different mean. This could point towards valence being an important factor for the models to consider.
 
-#### Categorical\
+### Categorical
 
-```{r}
+```{r, fig.cap="Distribution of the categorical variables"}
 # Categorical variables
 
 par(mfrow = c(1, 3))
@@ -425,7 +436,7 @@ Both mode and time_signature have an obvious statistical mode. The value of 1 fo
 
 The distributions of non-nominated to nominated songs for the categorical variables was again compared, and highlighted below is the variable that demonstrated the greatest difference: Key.
 
-```{r}
+```{r, fig.cap="Distribution of the Key variable conditioned to the dependent variable"}
 # Comparison IsWinner 0 vs 1 - Key
 
 par(mfrow = c(1, 2))
@@ -440,15 +451,15 @@ Although the distribution of key for both values of the dependent variable look 
 
 While these patterns are observable, the effect size may not be substantial enough to reach statistical significance, will be seen in the Chi-Squared tests performed. In other words, while key '11' may appear more often in nominated songs, the difference may not be large enough to confidently conclude that it has a significant impact on nominations.
 
-#### Relationship Between Independent and Dependent Variables\
+### Relationship Between Independent and Dependent Variables
 
 Examining the association between independent and dependent variables can give insight into the data of independent variables which exhibit notable differences between the two possible values of the dependent variable.
 
-##### Continuous\
+### Continuous
 
 Box plots were utilized to visualize these relationships:
 
-```{r}
+```{r, fig.cap="Boxplots of continuous independent variables conditioned to the dependent variable"}
 # Relationships between dependent and independent variables
 
 par(mfrow= c(2, 4))
@@ -465,7 +476,7 @@ boxplot(valence ~ training_set$IsWinner, xlab='Nominee Boolean')
 
 The difference in median seen for the energy and valence variables points towards them being possibly valuable to the models. The difference in interquartile range for acousticness, energy, and valence is also interesting to see.
 
-##### Categorical\
+### Categorical
 
 The Chi Squared Test was utilized to measure the independent/dependent variables association for the categorical variables. It will pass judgement on the level of independence between the variables.
 
@@ -487,7 +498,7 @@ cramersv(matrix(c(as.numeric(mode), as.numeric(training_set$IsWinner)), ncol = 2
 cramersv(matrix(c(as.numeric(time_signature), as.numeric(training_set$IsWinner)), ncol = 2))
 ```
 
-#### Summary\
+### Summary
 
 From this exploratory data analysis, correlations between continuous variables were certainly found. Especially high correlations exist between the audio features acousticness/energy and loudness/energy. No categorical variables were shown to have any significant association with the dependent variable.
 
@@ -496,6 +507,8 @@ After examining the distribution for both continuous and categorical variables, 
 For continuous variables, box plots visualized differences between nominated and non-nominated songs. Notably, energy and valence showed differences in medians. For categorical variables, Chi-Squared tests and Cramer's V indicated that these variables might not be strongly associated with the Grammy nomination status.
 
 From this analysis, one can extract that features like energy and valence may play a role in distinguishing nominated from non-nominated songs. On the other hand, categorical variables did not show significant impact on nominations. This information is surely valuable for the next step, model development.
+
+\newpage
 
 ## Model Development
 
@@ -533,7 +546,7 @@ summary(logistic)
 
 From the creation of the model, it determined valence, duration, and acousticness to be significant variables.
 
-#### Predictions\
+### Predictions for the full Logistic Model
 
 ```{r}
 # Computing predictions
@@ -545,7 +558,7 @@ logistic_predictions_full = predict(logistic,
 
 Below are the predictions as computed by the logistic model created above, using different thresholds of classification. The threshold defines at which confidence level the model will classify a song as "nominated."
 
-##### Threshold = 0.2\
+### Threshold = 0.2
 
 ```{r}
 # Threshold = 0.2
@@ -576,7 +589,7 @@ The Sensitivity (True Positive Rate), defined as True Positive classifications /
 
 Ideally, the Type I error should be lower than this and the Sensitivity should be much higher.
 
-##### Threshold = 0.3\
+### Threshold = 0.3
 
 In an attempt to improve the classification of songs from the model, the threshold was increased to 0.3.
 
@@ -609,7 +622,7 @@ The Sensitivity also decreased to 0.083, which is not optimal behavior. This mea
 
 The combined information from these two tests suggests the model is classifying more songs as non-nominated, avoiding false positives while also missing correct classifications of nominated songs.
 
-##### Threshold = 0.4\
+### Threshold = 0.4
 
 For a final comparison, the threshold was set to 0.4.
 
@@ -642,11 +655,11 @@ The Sensitivity reached 0. This means the model managed to properly classify 0 n
 
 Overall, increasing the threshold was detrimental.
 
-#### ROC Curve\
+### ROC Curve
 
 An ROC Curve is meant to display the performance of a classification model. It plots the True Positive Rate (Sensitivity) against the False Positive Rate (Type I Error) across different confidence thresholds. This takes into account both sides of the classification accuracy discussed above and paints a comprehensive picture of how well the model can classify the song data.
 
-```{r}
+```{r, fig.cap="ROC Curve of the Full Logistic Model"}
 # ROC curve
 
 roc.out <- roc(test_set$IsWinner, logistic_predictions_full)
@@ -678,7 +691,7 @@ summary(logistic_reduced)
 
 Utilizing the information gained from the stepwise variable selection, a reduced version of the logistic model was created.
 
-#### Predicting\
+### Predictions for the Reduced Logistic Model
 
 ```{r}
 # Computing predictions
@@ -688,7 +701,7 @@ logistic_predictions = predict(logistic_reduced, newdata = test_set[,c(-1, -2)],
 
 As done with the full logistic model, predictions using different thresholds were examined to ascertain the performance of the reduced model.
 
-##### Threshold = 0.2\
+### Threshold = 0.2
 ```{r}
 # Threshold = 0.2
 
@@ -716,7 +729,7 @@ At a confidence threshold of 0.2, the model produces a Type I Error of 0.37, inc
 
 It also produces a Sensitivity of 0.54, meaning it correctly classifies 54% of the nominated songs, a slight improvement to the 0.5 produced from the full model at this threshold.
 
-##### Threshold = 0.3\
+### Threshold = 0.3
 ```{r}
 # Threshold = 0.3
 
@@ -742,7 +755,7 @@ sensitivity_logistic_03
 
 As seen before with the full model, increasing the threshold to 0.3 decreased the Type I Error, but to a more significant degree. It now produces a value of 0.04, which is a significant drop in misclassifications of non-nominated songs. Coupled with that, however, was a significant drop in Sensitivity, reaching 0.042.
 
-##### Threshold = 0.4\
+### Threshold = 0.4
 ```{r}
 # Threshold = 0.4
 
@@ -768,9 +781,9 @@ sensitivity_logistic_04
 
 As was done with the full logistic model, the threshold was increased to 0.4. With this change, the model classified no songs as nominated, producing values of N/A from the Type I Error and Sensitivity calculations.
 
-#### ROC Curve\
+### ROC Curve
 
-```{r}
+```{r, fig.cap="ROC Curve of the Reduced Logistic Model"}
 # ROC curve
 
 roc.out <- roc(test_set$IsWinner, logistic_predictions)
@@ -795,7 +808,7 @@ summary(logistic_over)
 
 Using the oversampled dataset, the full logistic model now determines the following variables to be significant: year, acousticness, duration, key5, key11, loudness, and valence. This is quite a difference compared to the previous logistic model based on the original dataset, which only listed 3 variables (acousticness, duration, and valence) as significant.
 
-#### Predictions\
+### Predictions for the Oversampled Logistic Model
 
 ```{r}
 # Computing predictions
@@ -805,7 +818,7 @@ logistic_over_predictions_full = predict(logistic_over, newdata = test_set[,c(-1
 
 Below are the predictions as computed by the oversampled, full logistic model created above, using different thresholds of classification. The same thresholds that were explored in the original-dataset full logistic model will he highlighted again: 0.2, 0.3, and 0.4
 
-##### Threshold = 0.2\
+### Threshold = 0.2
 
 ```{r}
 # Threshold = 0.2
@@ -832,7 +845,7 @@ At threshold 0.2, the Type I Error (False Positive Rate) was 0.853, meaning 85.3
 
 The Sensitivity (True Positive Rate) was .958, a fantastic value, showing the the oversampled full logistic model correctly classified 95.8% of the nominated songs. However, knowing the value of the Type I Error, it is clear that this value is so high because the model is classifying a vast majority of the data points as nominated. While it misses very few of the truly nominated songs, it misclassifies a large number of the non-nominated songs.
 
-##### Threshold = 0.3\
+### Threshold = 0.3
 
 ```{r}
 # Threshold = 0.3
@@ -857,7 +870,7 @@ sensitivity_logistic_over_full_03
 
 At a threshold of 0.3, the Type I Error improves to 0.693, misclassifying fewer non-nominated songs than at threshold 0.2, but the Sensitivity also decreases to 0.792 meaning the model is missing more of the nominated songs.
 
-##### Threshold = 0.4\
+### Threshold = 0.4
 
 ```{r}
 # Threshold = 0.4
@@ -882,9 +895,9 @@ sensitivity_logistic_over_full_04
 
 At a classification threshold of 0.4, the model's Type I Error decreases a fair amount to 0.5, but the Sensitivity also decreases slightly to 0.75. In comparison to the full logistic model using the original dataset, which at this threshold obtained the worst Sensitivity value of 0, the oversampled full logistic model performs much better (again, at this threshold). The ROC curve will exhibit how well the model performs overall.
 
-#### ROC Curve\
+### ROC Curve
 
-```{r}
+```{r, fig.cap="ROC Curve of the Full Oversampled Logistic Model"}
 # ROC curve
 
 roc.out <- roc(test_set$IsWinner, logistic_over_predictions_full)
@@ -935,7 +948,7 @@ logistic_reduced_over = glm(response_variable_over ~ Year + acousticness
                             family = "binomial")
 ```
 
-#### Predictions\
+### Predictions for the Oversampled Reduced Logistic Model
 
 ```{r}
 logistic_reduced_over_predictions = predict(logistic_reduced_over,
@@ -945,7 +958,7 @@ logistic_reduced_over_predictions = predict(logistic_reduced_over,
 
 In order to compare to the previously created models with ease, the reduced oversampled logistic model was tested on the same three thresholds that the other models were tested on.
 
-##### Threshold = 0.2\
+### Threshold = 0.2
 
 ```{r}
 # Threshold = 0.2
@@ -970,7 +983,7 @@ sensitivity_logistic_reduced_over_02
 
 At this threshold, the Type I Error was 0.853 and the Sensitivity was 0.958, which are the same exact values for the full oversampled logistic model at this threshold.
 
-##### Threshold = 0.3\
+### Threshold = 0.3
 
 ```{r}
 # Threshold = 0.3
@@ -995,7 +1008,7 @@ sensitivity_logistic_reduced_over_03
 
 With a threshold of 0.3, when compared to threshold 0.2, the model again produced a lower Type I Error of 0.68 and a lower Sensitivity of 0.792. These values are very similar to the full oversampled logistic model at this threshold as well.
 
-##### Threshold = 0.4\
+### Threshold = 0.4
 
 ```{r}
 # Threshold = 0.4
@@ -1020,9 +1033,9 @@ sensitivity_logistic_reduced_over_04
 
 Using the threshold of 0.4 again produced the same results to the full oversampled logistic model, with a Type I Error of 0.5 and a Sensitivity of 0.75. This suggests the models are extremely similar.
 
-#### ROC Curve\
+### ROC Curve
 
-```{r}
+```{r, fig.cap="ROC Curve of the Reduced Oversampled Logistic Model"}
 # ROC curve
 
 roc.out <- roc(test_set$IsWinner, logistic_reduced_over_predictions)
@@ -1062,153 +1075,173 @@ shapiro.test(valence[IsWinner == 0]) # No
 shapiro.test(valence[IsWinner == 1]) # No
 ```
 
-#### QQ-plots of the conditioned independent variables\
+\newpage
+
+### QQ plots of the conditioned independent variables
 
 A visual tool was also used to check if the variables followed a normal distribution.
 
-##### Danceability\
-```{r}
+### Danceability
+```{r, fig.cap="QQ Plots of Danceability conditioned to the dependent variable"}
 par(mfrow = c(1, 2))
 
-qqnorm(danceability[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+qqnorm(danceability[IsWinner == 0], main="Normal QQ Non-Nominated")
 grid()               
 qqline(danceability[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(danceability[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(danceability[IsWinner == 1], main="Normal QQ Nominated")
 grid()               
 qqline(danceability[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 Danceability looks normal confirming the result of the test.
 
-##### Acousticness\
-```{r}
+\newpage
+
+### Acousticness
+```{r, fig.cap="QQ Plots of Acousticness conditioned to the dependent variable"}
 par(mfrow = c(1, 2))
 
-qqnorm(acousticness[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+qqnorm(acousticness[IsWinner == 0], main="Normal QQ Non-Nominated")
 grid()               
 qqline(acousticness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(acousticness[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(acousticness[IsWinner == 1], main="Normal QQ Nominated")
 grid()               
 qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 Acousticness is heavily not normal, following an S-shape.
 
-##### Duration\
-```{r}
+\newpage
+
+### Duration
+```{r, fig.cap="QQ Plots of Duration conditioned to the dependent variable"}
 par(mfrow = c(1, 2))
 
-qqnorm(duration_ms[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+qqnorm(duration_ms[IsWinner == 0], main="Normal QQ Non-Nominated")
 grid()               
 qqline(duration_ms[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(duration_ms[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(duration_ms[IsWinner == 1], main="Normal QQ Nominated")
 grid()               
 qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 Duration shows a heavy right tail.
 
-##### Energy\
-```{r}
+\newpage
+
+### Energy
+```{r, fig.cap="QQ Plots of Energy conditioned to the dependent variable"}
 par(mfrow = c(1, 2))
 
-qqnorm(energy[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+qqnorm(energy[IsWinner == 0], main="Normal QQ Non-Nominated")
 grid()               
 qqline(energy[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(energy[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(energy[IsWinner == 1], main="Normal QQ Nominated")
 grid()               
 qqline(energy[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The energy feature shows not normal tails.
 
-##### Instrumentalness\
-```{r}
+\newpage
+
+### Instrumentalness
+```{r, fig.cap="QQ Plots of Instrumentalness conditioned to the dependent variable"}
 par(mfrow = c(1, 2))
 
-qqnorm(instrumentalness[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+qqnorm(instrumentalness[IsWinner == 0], main="Normal QQ Non-Nominated")
 grid()               
 qqline(instrumentalness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(instrumentalness[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(instrumentalness[IsWinner == 1], main="Normal QQ Nominated")
 grid()               
 qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 Instrumentalness shows a very heavy  right tail.
 
-##### Loudness\
-```{r}
+\newpage
+
+### Loudness
+```{r, fig.cap="QQ Plots of Loudness conditioned to the dependent variable"}
 par(mfrow = c(1, 2))
 
-qqnorm(loudness[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+qqnorm(loudness[IsWinner == 0], main="Normal QQ Non-Nominated")
 grid()               
 qqline(loudness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(loudness[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(loudness[IsWinner == 1], main="Normal QQ Nominated")
 grid()               
 qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 Loudness shows not normal tails.
 
-##### Tempo\
-```{r}
+\newpage
+
+### Tempo
+```{r, fig.cap="QQ Plots of Tempo conditioned to the dependent variable"}
 par(mfrow = c(1, 2))
 
-qqnorm(tempo[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+qqnorm(tempo[IsWinner == 0], main="Normal QQ Non-Nominated")
 grid()               
 qqline(tempo[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(tempo[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(tempo[IsWinner == 1], main="Normal QQ Nominated")
 grid()               
 qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The tempo variable seems close to a normal distribution.
 
-##### Valence\
-```{r}
+\newpage
+
+### Valence
+```{r, fig.cap="QQ Plots of Valence conditioned to the dependent variable"}
 # valence tails slightly not normal
 par(mfrow = c(1, 2))
 
-qqnorm(valence[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+qqnorm(valence[IsWinner == 0], main="Normal QQ Non-Nominated")
 grid()               
 qqline(valence[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(valence[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(valence[IsWinner == 1], main="Normal QQ Nominated")
 grid()               
 qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The valence variable seems close to a normal distribution, except for the tails.
 
-#### Transformations\
+\newpage
+
+### Transformations
 
 The only variable to have passed the test is danceability, so transformations were applied to the other variables to make them more normal-like. Specifically, the Box-Cox transformation was used to estimate the parameter.
 
 The variables were then tested again. Examining the new output from the Shapiro test and the Q-Q plots, the variables were checked to see if the transformations succeeded in making the distributions more normal-like.
 
-##### Acousticness\
+### Acousticness
 
-```{r}
+```{r, fig.cap="Distribution of the Acousticness Box-Cox Parameter"}
 par(mfrow = c(1, 1))
 
 b_acousticness <- boxcox(lm(acousticness ~ 1))
 lambda <- b_acousticness$x[which.max(b_acousticness$y)]
 acousticness_tran <- (acousticness ^ lambda - 1) / lambda
+```
 
+```{r, fig.cap="QQ Plots of Acousticness conditioned to the dependent variable (Original and Transformed)"}
 par(mfrow = c(2, 2))
 
-qqnorm(acousticness_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
+qqnorm(acousticness_tran[IsWinner == 0], main="Transformed QQ Non-Nominated")
 grid()               
 qqline(acousticness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(acousticness_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
+qqnorm(acousticness_tran[IsWinner == 1], main="Transformed QQ Nominated")
 grid()               
 qqline(acousticness_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1216,20 +1249,22 @@ shapiro.test(acousticness_tran[IsWinner == 0]) # No
 shapiro.test(acousticness_tran[IsWinner == 1]) # No
 
 # Original Q-Q Plots
-qqnorm(acousticness[IsWinner == 0], main="Original Q-Q Non-Nominated")
+qqnorm(acousticness[IsWinner == 0], main="Original QQ Non-Nominated")
 grid()               
 qqline(acousticness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(acousticness[IsWinner == 1], main="Original Q-Q Nominated")
+qqnorm(acousticness[IsWinner == 1], main="Original QQ Nominated")
 grid()               
 qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed variable did not pass the test, but the plots showed a good improvement, so the transformed variable will be used.
 
-##### Duration\
+\newpage
 
-```{r}
+### Duration
+
+```{r, fig.cap="Distribution of the Duration Box-Cox Parameter"}
 # duration_ms plots improved, test not passed
 
 par(mfrow = c(1, 1))
@@ -1237,16 +1272,18 @@ par(mfrow = c(1, 1))
 b_duration_ms <- boxcox(lm(duration_ms ~ 1))
 lambda <- b_duration_ms$x[which.max(b_duration_ms$y)]
 duration_ms_tran <- (duration_ms ^ lambda - 1) / lambda
+```
 
+```{r, fig.cap="QQ Plots of Duration conditioned to the dependent variable (Original and Transformed)"}
 par(mfrow = c(2, 2))
 
 # Transformed data
 
-qqnorm(duration_ms_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
+qqnorm(duration_ms_tran[IsWinner == 0], main="Transformed QQ Non-Nominated")
 grid()               
 qqline(duration_ms_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(duration_ms_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
+qqnorm(duration_ms_tran[IsWinner == 1], main="Transformed QQ Nominated")
 grid()               
 qqline(duration_ms_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1255,35 +1292,39 @@ shapiro.test(duration_ms_tran[IsWinner == 1]) # No
 
 # Original data
 
-qqnorm(duration_ms[IsWinner == 0], main="Original Q-Q Non-Nominated")
+qqnorm(duration_ms[IsWinner == 0], main="Original QQ Non-Nominated")
 grid()               
 qqline(duration_ms[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(duration_ms[IsWinner == 1], main="Original Q-Q Nominated")
+qqnorm(duration_ms[IsWinner == 1], main="Original QQ Nominated")
 grid()               
 qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed variable did not pass the test but the plots show an improvement in the tails, so the transformed variable will be used.
 
-##### Energy\
+\newpage
 
-```{r}
+### Energy
+
+```{r, fig.cap="Distribution of the Energy Box-Cox Parameter"}
 par(mfrow = c(1, 1))
 
 b_energy <- boxcox(lm(energy ~ 1))
 lambda <- b_energy$x[which.max(b_energy$y)]
 energy_tran <- (energy ^ lambda - 1) / lambda
+```
 
+```{r, fig.cap="QQ Plots of Energy conditioned to the dependent variable (Original and Transformed)"}
 par(mfrow = c(2, 2))
 
 # Transformed data
 
-qqnorm(energy_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
+qqnorm(energy_tran[IsWinner == 0], main="Transformed QQ Non-Nominated")
 grid()               
 qqline(energy_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(energy_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
+qqnorm(energy_tran[IsWinner == 1], main="Transformed QQ Nominated")
 grid()               
 qqline(energy_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1292,20 +1333,22 @@ shapiro.test(energy_tran[IsWinner == 1]) # No
 
 # Original data
 
-qqnorm(energy[IsWinner == 0], main="Original Q-Q Non-Nominated")
+qqnorm(energy[IsWinner == 0], main="Original QQ Non-Nominated")
 grid()               
 qqline(energy[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(energy[IsWinner == 1], main="Original Q-Q Nominated")
+qqnorm(energy[IsWinner == 1], main="Original QQ Nominated")
 grid()               
 qqline(energy[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed variable did not pass the test and the plots don't show improvements, so the original values will be kept.
 
-##### Instrumentalness\
+\newpage
 
-```{r}
+### Instrumentalness
+
+```{r, fig.cap="Distribution of the Instrumentalness Box-Cox Parameter"}
 # instrumentalness can't apply the boxcox transformation because there are some 0's
 
 par(mfrow = c(1, 1))
@@ -1316,16 +1359,18 @@ new_instrumentalness = instrumentalness + 1e-05
 b_instrumentalness <- boxcox(lm(new_instrumentalness ~ 1))
 lambda <- b_instrumentalness$x[which.max(b_instrumentalness$y)]
 instrumentalness_tran <- (new_instrumentalness ^ lambda - 1) / lambda
+```
 
+```{r, fig.cap="QQ Plots of Instrumentalness conditioned to the dependent variable (Original and Transformed)"}
 par(mfrow = c(2, 2))
 
 # Transformed data
 
-qqnorm(instrumentalness_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
+qqnorm(instrumentalness_tran[IsWinner == 0], main="Transformed QQ Non-Nominated")
 grid()               
 qqline(instrumentalness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(instrumentalness_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
+qqnorm(instrumentalness_tran[IsWinner == 1], main="Transformed QQ Nominated")
 grid()               
 qqline(instrumentalness_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1334,20 +1379,22 @@ shapiro.test(instrumentalness_tran[IsWinner == 1]) # No
 
 # Original data
 
-qqnorm(instrumentalness[IsWinner == 0], main="Original Q-Q Non-Nominated")
+qqnorm(instrumentalness[IsWinner == 0], main="Original QQ Non-Nominated")
 grid()               
 qqline(instrumentalness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(instrumentalness[IsWinner == 1], main="Original Q-Q Nominated")
+qqnorm(instrumentalness[IsWinner == 1], main="Original QQ Nominated")
 grid()               
 qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The Box-Cox transformation could not be directly applied to the instrumentalness variable because of the presence of zeros, so a small value was added and then applied to it. The new variable did not pass the test and the plots did not improve, so the original data was kept.
 
-##### Loudness\
+\newpage
 
-```{r}
+### Loudness
+
+```{r, fig.cap="Distribution of the Loudness Box-Cox Parameter"}
 par(mfrow = c(1, 1))
 
 new_loudness = loudness * (-1)
@@ -1355,16 +1402,18 @@ new_loudness = loudness * (-1)
 b_loudness <- boxcox(lm(new_loudness ~ 1))
 lambda <- b_loudness$x[which.max(b_loudness$y)]
 loudness_tran <- (new_loudness ^ lambda - 1) / lambda
+```
 
+```{r, fig.cap="QQ Plots of Loudness conditioned to the dependent variable (Original and Transformed)"}
 par(mfrow = c(2, 2))
 
 # Transformed data
 
-qqnorm(loudness_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
+qqnorm(loudness_tran[IsWinner == 0], main="Transformed QQ Non-Nominated")
 grid()               
 qqline(loudness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(loudness_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
+qqnorm(loudness_tran[IsWinner == 1], main="Transformed QQ Nominated")
 grid()               
 qqline(loudness_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1373,20 +1422,22 @@ shapiro.test(loudness_tran[IsWinner == 1]) # Yes
 
 # Original data
 
-qqnorm(loudness[IsWinner == 0], main="Original Q-Q Non-Nominated")
+qqnorm(loudness[IsWinner == 0], main="Original QQ Non-Nominated")
 grid()               
 qqline(loudness[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(loudness[IsWinner == 1], main="Original Q-Q Nominated")
+qqnorm(loudness[IsWinner == 1], main="Original QQ Nominated")
 grid()               
 qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The Box-Cox transformation could also not be directly applied to the variable loudness because the variable takes negative values. As a workaround, the values were multiplied by -1 and then the transformation was applied. The new variable passed the test and the plots confirmed the result of the test. Since the variable was multiplied by -1, the interpretation of the variable will be mirrored.
 
-##### Tempo\
+\newpage
 
-```{r}
+### Tempo
+
+```{r, fig.cap="Distribution of the Tempo Box-Cox Parameter"}
 # tempo, slight improvement in the plots
 
 par(mfrow = c(1, 1))
@@ -1394,16 +1445,18 @@ par(mfrow = c(1, 1))
 b_tempo <- boxcox(lm(tempo ~ 1))
 lambda <- b_tempo$x[which.max(b_tempo$y)]
 tempo_tran <- (tempo ^ lambda - 1) / lambda
+```
 
+```{r, fig.cap="QQ Plots of Tempo conditioned to the dependent variable (Original and Transformed)"}
 par(mfrow = c(2, 2))
 
 # Transformed Data
 
-qqnorm(tempo_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
+qqnorm(tempo_tran[IsWinner == 0], main="Transformed QQ Non-Nominated")
 grid()               
 qqline(tempo_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(tempo_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
+qqnorm(tempo_tran[IsWinner == 1], main="Transformed QQ Nominated")
 grid()               
 qqline(tempo_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1412,20 +1465,22 @@ shapiro.test(tempo_tran[IsWinner == 1]) # No
 
 # Original data
 
-qqnorm(tempo[IsWinner == 0], main="Original Q-Q Non-Nominated")
+qqnorm(tempo[IsWinner == 0], main="Original QQ Non-Nominated")
 grid()               
 qqline(tempo[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(tempo[IsWinner == 1], main="Original Q-Q Nominated")
+qqnorm(tempo[IsWinner == 1], main="Original QQ Nominated")
 grid()               
 qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed tempo variable showed slight improvement in the plots, but still did not pass the test, so we used the transformed variable.
 
-##### Valence\
+\newpage
 
-```{r}
+### Valence
+
+```{r, fig.cap="Distribution of the Valence Box-Cox Parameter"}
 # valence, pretty much the same
 
 par(mfrow = c(1, 1))
@@ -1433,16 +1488,18 @@ par(mfrow = c(1, 1))
 b_valence <- boxcox(lm(valence ~ 1))
 lambda <- b_valence$x[which.max(b_valence$y)]
 valence_tran <- (valence ^ lambda - 1) / lambda
+```
 
+```{r, fig.cap="QQ Plots of Valence conditioned to the dependent variable (Original and Transformed)"}
 par(mfrow = c(2, 2))
 
 # Transformed data
 
-qqnorm(valence_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
+qqnorm(valence_tran[IsWinner == 0], main="Transformed QQ Non-Nominated")
 grid()               
 qqline(valence_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(valence_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
+qqnorm(valence_tran[IsWinner == 1], main="Transformed QQ Nominated")
 grid()               
 qqline(valence_tran[IsWinner == 1],lwd = 2, col = "red")
 
@@ -1451,32 +1508,40 @@ shapiro.test(valence_tran[IsWinner == 1]) # No
 
 # Original data
 
-qqnorm(valence[IsWinner == 0], main="Original Q-Q Non-Nominated")
+qqnorm(valence[IsWinner == 0], main="Original QQ Non-Nominated")
 grid()               
 qqline(valence[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(valence[IsWinner == 1], main="Original Q-Q Nominated")
+qqnorm(valence[IsWinner == 1], main="Original QQ Nominated")
 grid()               
 qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed variable did not change much, so the original data was kept.
 
+\newpage
+
 ### Data transformation
 
-```{r}
+```{r, fig.cap="Distribution of the Acousticness Box-Cox Parameter"}
 par(mfrow = c(1, 1))
 
 b_data_acousticness <- boxcox(lm(data$acousticness ~ 1))
+```
+```{r, fig.cap="Distribution of the Duration Box-Cox Parameter"}
 lambda <- b_data_acousticness$x[which.max(b_data_acousticness$y)]
 data_acousticness_tran <- (data$acousticness ^ lambda - 1) / lambda
 
 b_data_duration_ms <- boxcox(lm(data$duration_ms ~ 1))
+```
+```{r, fig.cap="Distribution of the Loudness Box-Cox Parameter"}
 lambda <- b_data_duration_ms$x[which.max(b_data_duration_ms$y)]
 data_duration_ms_tran <- (data$duration_ms ^ lambda - 1) / lambda
 
 neg_loudness = data$loudness * (-1)
 b_data_loudness <- boxcox(lm(neg_loudness ~ 1))
+```
+```{r, fig.cap="Distribution of the Tempo Box-Cox Parameter"}
 lambda <- b_data_loudness$x[which.max(b_data_loudness$y)]
 data_loudness_tran <- (neg_loudness ^ lambda - 1) / lambda
 
@@ -1522,6 +1587,9 @@ simple_lda = lda(IsWinner ~ acousticness_tran + duration_ms_tran +
 pred_simple_lda = predict(simple_lda, newdata = test_tran_data,
                           type = "Response")
 
+
+```
+```{r, fig.cap="ROC Curve of LDA"}
 # ROC curve
 
 roc.out <- roc(test_set$IsWinner, as.numeric(pred_simple_lda$class) - 1)
@@ -1548,6 +1616,8 @@ simple_over_lda = lda(IsWinner ~ acousticness_tran + duration_ms_tran +
 pred_simple_over_lda = predict(simple_over_lda, newdata = test_tran_data,
                                type = "Response")
 
+```
+```{r, fig.cap="ROC Curve of Oversampled LDA"}
 # ROC curve
 
 roc.out <- roc(test_set$IsWinner, as.numeric(pred_simple_over_lda$class) - 1)
@@ -1558,11 +1628,13 @@ auc(roc.out)
 
 The ROC curve shows a slight improvement, but the value is just above 0.5. 
 
-#### Predictions\
+\newpage
 
-Making predictions on the oversampled LDA
+### Predictions for the Oversampled LDA
 
-##### Threshold = 0.4\
+Below, predictions are made on the oversampled LDA.
+
+### Threshold = 0.4
 ```{r}
 
 lda_over_predictions_04 = ifelse(pred_simple_over_lda$posterior[,1] > 0.4, 1, 0)
@@ -1581,7 +1653,7 @@ sensitivity_lda_over_04 = true_positive_lda_over_04 / positive_lda_over_04
 sensitivity_lda_over_04
 ```
 
-##### Threshold = 0.5\
+### Threshold = 0.5
 
 ```{r}
 lda_over_predictions_05 = list(pred_simple_over_lda$class)
@@ -1617,6 +1689,9 @@ qda = qda(IsWinner ~ acousticness_tran + duration_ms_tran +
 
 pred_qda = predict(qda, newdata = test_tran_data, type = "Response")
 
+```
+```{r, fig.cap="ROC Curve of QDA"}
+
 # ROC
 
 roc.out <- roc(test_set$IsWinner, as.numeric(pred_qda$class) - 1)
@@ -1636,6 +1711,9 @@ qda_over = qda(IsWinner ~ acousticness_tran + duration_ms_tran +
 
 pred_qda_over = predict(qda_over, newdata = test_tran_data, type = "Response")
 
+```
+```{r, fig.cap="ROC Curve of Oversampled QDA"}
+
 # ROC
 
 roc.out <- roc(test_set$IsWinner, as.numeric(pred_qda_over$class) - 1)
@@ -1646,9 +1724,9 @@ auc(roc.out)
 
 The ROC curve shows a significant improvement.
 
-#### Predictions\
+### Predictions for the QDA
 
-##### Threshold = 0.4\
+### Threshold = 0.4
 
 ```{r}
 # Predictions
@@ -1671,7 +1749,7 @@ sensitivity_qda_over_04 = true_positive_qda_over_04 / positive_qda_over_04
 sensitivity_qda_over_04
 ```
 
-##### Threshold = 0.5\
+### Threshold = 0.5
 
 ```{r}
 # Threshold 0.5
@@ -1702,7 +1780,7 @@ Regularized regression models are a type of regression with an additional constr
 
 Ridge regression exploits L2 regularization to shrink the estimated parameters towards zero.
 
-```{r}
+```{r, fig.cap="Misclassification Error of the Ridge Regression"}
 ## Ridge regression
 
 ridge_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train_data$IsWinner, alpha = 0, family = "binomial",
@@ -1732,7 +1810,7 @@ Ridge regression predictions showed a low Type I Error and Sensitivity, meaning 
 
 Lasso regression uses L1 regularization to force some of the estimated parameters to be exactly zero.
 
-```{r}
+```{r, fig.cap="Misclassification Error of the Lasso Regression"}
 ## Lasso regression
 
 lasso_cv = cv.glmnet(data.matrix(oversampled_train_data[,-1]), oversampled_train_data$IsWinner,
@@ -1803,7 +1881,7 @@ k_min
 
 After analyzing the original training data set, the KNN model determined 25 to be the most optimal number of neighbors to consider.
 
-```{r}
+```{r, fig.cap="ROC Curve of the KNN Model"}
 knn = knn(training_norm_data[,-1], test_norm_data[,-1],
           cl = training_norm_data$IsWinner_norm, k = k_min)
 
@@ -1857,7 +1935,7 @@ k_min_over
 
 The chosen value of "k" for the oversampled dataset is 14.
 
-```{r}
+```{r, fig.cap="ROC Curve of the Oversampled KNN Model"}
 knn_over = knn(training_norm_data_over[,-1], test_norm_data[,-1],
           cl = training_norm_data$IsWinner_norm, k = k_min_over)
 
@@ -1882,6 +1960,7 @@ sensitivity_knn_over
 
 Utilizing the chosen "k" value, the KNN model yields a classification accuracy of 84.5%, but again produces a very low Type I Error (0.027) and very low Sensitivity (0.0417), correctly classifying only one nominated song.
 
+\newpage
 # Results and Conclusions
 
 The below table makes a simple comparison of the predictive abilities of all the models created throughout this analysis:
