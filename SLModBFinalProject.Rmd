@@ -9,17 +9,17 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Can we use attributes and metrics of rock songs to predict their likelihood of winning the Grammy for "Best Rock Song?"
+## Can attributes and metrics of rock songs be used to predict their likelihood of winning the Grammy for "Best Rock Song?"
 
-What common traits, if any, do award winning rock songs contain? Can we look at intrinsic traits of songs, combined with metrics defined by Spotify, to determine award winning musical features? In this paper, we break down our data collection, data processing, and data analysis of a dataset containing roughly 1,000 popular songs, both award-winning and not.
+What common traits, if any, do award winning rock songs contain? Can intrinsic traits of songs, combined with metrics defined by Spotify, be looked at to determine award winning musical features? In this paper, we break down our data collection, data processing, and data analysis of a dataset containing roughly 1,000 popular songs, both award-winning and not.
 
 ## The Data
 
 ### Data Collection and Preparation
 
-In order to investigate this, we first collected a list of every song nominated for the "Best Rock Song" Grammy. The reason that we kept it within one award, rather than include other rock-related Grammy's ("Best Rock Performance," "Best Rock Album," etc.), is because they are disparate by nature, and nominations are awarded for completely different reasons. The Best Rock Song Grammy competition is between individual songs, allowing us to compare them to each other and determine what attributes mold a work worthy of a nomination.
+In order to investigate this, a list of every song nominated for the "Best Rock Song" Grammy was collected. The reason for keeping the scope of this project within one award, rather than include other rock-related Grammy's ("Best Rock Performance," "Best Rock Album," etc.), is because they are disparate by nature, and nominations are awarded for completely different reasons. The Best Rock Song Grammy competition is between individual songs, allowing us to compare them to each other and determine what attributes mold a work worthy of a nomination.
 
-In order to examine what sets these nominations apart from other rock songs, we collected the top 10 most streamed songs of each of these previously nominated artists on Spotify so that we could compare the features and attributes of their popular non-nominated songs to songs that earned a nomination. This created a dataset of 1,016 popular rock songs. As a final step of processing the data, we had to remove any songs that were released prior to the creation of this Grammy in 1992. Removing all songs older than 1992 yielded a final dataset of 867 songs.
+In order to examine what sets these nominations apart from other rock songs, the top 10 most streamed songs of each of these previously nominated artists on Spotify were collected so that the features and attributes of their popular non-nominated songs could be compared to songs that earned a nomination. This created a dataset of 1,016 popular rock songs. As a final step of processing the data, any songs that were released prior to the creation of this Grammy in 1992 were removed. Excluding all songs older than 1992 yielded a final dataset of 867 songs.
 
 ```{r warning = FALSE, echo = TRUE, message = FALSE}
 # Set the working directory to this file's folder
@@ -105,11 +105,11 @@ length(data$IsWinner[data$IsWinner == 0]) / (length(data$IsWinner[data$IsWinner 
 length(data$IsWinner[data$IsWinner == 1]) / (length(data$IsWinner[data$IsWinner == 0]) + length(data$IsWinner[data$IsWinner == 1]))
 ```
 
-From the balance check between the number of nominated and non-nominated songs, it is seen that the classes are highly imbalanced: 82% non-nominated songs, 18% nominated songs. We make note of this during the data processing stage so that we may take measures to address this during our analysis.
+From the balance check between the number of nominated and non-nominated songs, it is seen that the classes are highly imbalanced: 82% non-nominated songs, 18% nominated songs. A note of this is made during the data processing stage so that measures may be taken to address this during the analysis.
 
 ### Explanation of Variables
 
-In order to perform analysis of the songs, we decided to use metrics that are intrinsic to music as well as artificial metrics created and measured by the music streaming giant Spotify. The intrinsic metrics we used were: duration, musical key, modality (major or minor key), tempo, and time signature. Spotify also uses what they call ["audio features"](https://developer.spotify.com/documentation/web-api/reference/get-several-audio-features) (in the table below) to perform their own analysis of songs when creating playlists, suggesting music, etc. We used these professionally manufactured metrics to bolster the intrinsic metrics and increase our insight into what might make a song award-winning.
+Metrics that are intrinsic to music as well as artificial metrics created and measured by the music streaming giant Spotify were collected in order to perform analysis of the songs. The intrinsic metrics used were: duration, musical key, modality/mode (major or minor key), tempo, and time signature. Spotify also uses what they call ["audio features"](https://developer.spotify.com/documentation/web-api/reference/get-several-audio-features) (in the table below) to perform their own analysis of songs when creating playlists, suggesting music, etc. These professionally manufactured metrics were used to bolster the intrinsic metrics and increase the insight into what might make a song award-winning.
 
 Audio Feature | Definition
 ------------- | -------------
@@ -120,9 +120,9 @@ Instrumentalness | Predicts whether a track contains no vocals. "Ooh" and "aah" 
 Loudness      | The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db.
 Valence       | A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
 
-Although Spotify does not openly share the formulas behind how they determine these metrics, we found them suitable to assist in our analysis.
+Although Spotify does not openly share the formulas behind how they determine these metrics, they were found suitable to assist in this analysis.
 
-As a final processing step, we split the data into training and test datasets. The training dataset contains 80% of the original dataset, and the remaining 20% of the data in the test dataset will be used to test our model against after we have trained it. It is very important to test the model on never-before-seen data to determine not only how well the model performs, but also how well the model can generalize.
+As a final processing step, the data was split into training and test datasets. The training dataset contains 80% of the original dataset, and the remaining 20% of the data in the test dataset will be used to test the models against after they have been trained. It is very important to test the model on never-before-seen data to determine not only how well the model performs, but also how well the model can generalize.
 
 ```{r, echo = TRUE, eval = TRUE}
 # Splitting training and test set
@@ -153,7 +153,7 @@ length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$I
 
 ### Relationship Between Independent Variables
 
-At first, correlations between the independent variables were examined, which is the measurement of association between two variables. This is essentially a measurement of how similar the information we learn from different variables are. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and should avoid the pairing. It is preferable to utilize pairings of variables that offer different information to assist the model.
+At first, correlations between the independent variables were examined, which is the measurement of association between two variables. This is essentially a measurement of similarity between the information learned from different variables. The larger the correlation between independent variables (negative or positive), the higher their collinearity, meaning the information they each carry is similar. This means their use together is less beneficial due to redundancy and should avoid the pairing. It is preferable to utilize pairings of variables that offer different information to assist the model.
 
 It was important to understand the data better in these regards, so that it can be known which attribute pairings could give useful insight.
 
@@ -187,7 +187,7 @@ From evaluating this second type of plot showing the correlation between continu
 
 #### Correlation Between Categorical Variables
 
-In order to determine the strength of similarity between the categorical variables, we employed the Cramer's V measurement. This measurement is a normalized version of the chi-square statistic, returning a value of 0 if there is no association between the categorical variables, and returning 1 if there is a perfect association in which one variable is completely determined by the other.
+The Cramer's V measurement was employed in order to determine the strength of similarity between the categorical variables. This measurement is a normalized version of the chi-square statistic, returning a value of 0 if there is no association between the categorical variables, and returning 1 if there is a perfect association in which one variable is completely determined by the other.
 
 ```{r, warning=FALSE}
 # Association measure for categorical variables (Cramer's V is a normalized 
@@ -207,7 +207,7 @@ Although measurements of association between categorical variables are hard to i
 
 Next, associations between each of the categorical variables and all of the continuous variables were examined utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables. If ANOVA points out some feature combinations are significant, then that suggests the statistical means of the groups of continuous variables are different. The chosen threshold for significance was 5%.
 
-ANOVA makes some assumptions regarding the variances of the attributes which are not fully satisfied by all of our variables, meaning the obtained results should be considered carefully.
+ANOVA makes some assumptions regarding the variances of the attributes which are not fully satisfied by all of the variables, meaning the obtained results should be considered carefully.
 
 ```{r, warnings = FALSE}
 # Association between continuous and categorical variables
@@ -298,13 +298,13 @@ Key            | Danceability;  Energy
 Mode           | Acousticness;  Energy;  Loudness
 Time signature | Acousticness;  Danceability;  Duration;  Energy;  Instrumentalness;  Loudness;  Tempo;  Valence
 
-The fact that these groups were significant allows us to say there may be a strong enough correlation between these pairings to use them in our models in a beneficial manner. 
+The fact that these groups were significant suggests there may be a strong enough correlation between these pairings to use them in the models in a beneficial manner. 
 
 Interestingly, the time signature variable shows significance in combination with all other variables. This may be due to the fact that this variable is highly imbalanced, since 93.4% of the songs have a time signature of 4/4.
 
 #### Partial Correlations
 
-Because ANOVA does not convey which means were different from the others, it is necessary to perform a Multiple Comparison Procedure. To do this, we utilized partial correlations, an exhaustive search that compares each possible pairing of continuous variables.
+Because ANOVA does not convey which of the means were different from the others, it is necessary to perform a Multiple Comparison Procedure. Partial correlations was utilized in this case, which is an exhaustive search that compares each possible pairing of continuous variables.
 
 ```{r, warnings = FALSE}
 # Partial correlations
@@ -326,19 +326,19 @@ ggplot(data = training_set, aes(acousticness, energy)) + geom_jitter(color = "bl
 
 These three pairings are the same three largest correlations seen from the first correlation plots, confirming those findings. It is also interesting to see how the correlation value is lower once cleaned from the confounding effects.
 
+By definition, correlation speaks to linear relationships. This information will directly guide how linear models of the data are developed, but non-linear relationships between the highly correlated data points could still exist.
+
 ```{r}
 #Weird song, very long; outlier 
 which.max(data$duration_ms)
 data[448, ]
 ```
 
-The song Play by Dave Grohl is nearly 23 minutes long. We decided not to delete this song, even though it could be considered an outlier, since it can give meaningful insight on one of the reasons why a song may not gain popularity. Indeed, a song that is really long is less likely to be played on the radio or used in movies, so it may not be heard by many people. This can later influence its likelihood of being considered for a grammy nomination. 
-
-By definition, correlation speaks to linear relationships. This information will directly guide how we develop linear models of our data, but non-linear relationships between the highly correlated data points could still exist.
+As a quick note, the song "Play" by Dave Grohl stood out during the analysis, being nearly 23 minutes long. Even though it could be considered an outlier, the song was not removed from the dataset since it can give meaningful insight on one of the reasons why a song may not gain popularity. Intuitively, a song that is very long is less likely to be played on the radio or used in movies, so it may not be heard by many people. This can later influence its likelihood of being considered for a Grammy nomination. 
 
 ### Distributions
 
-We look at distributions to better understand the data and how we can interact with it. Some models we want to use are based on assumptions that are related to distributions, often times assuming a normal distribution of data. From gauging how different variables are distributed, we can create better models by taking their distribution assumptions into account.
+An examination of the variables' distributions can give insight to better understand the data and how it can be interacted with. Some models that will be used in this project are based on assumptions that are related to distributions, often times assuming a normal distribution of data. From gauging how different variables are distributed, better models can be created by taking their distribution assumptions into account.
 
 #### Continuous
 
@@ -362,9 +362,9 @@ hist(valence)
 knitr::include_graphics("distrib_contin_hist.png")
 ```
 
-From these histograms, it is clear that the danceability feature is the most normally distributed. All others have a small skew at best (valence) to larger skews (tempo, loudness, energy) to seemingly exponential skews or individual values (duration, acousticness, instrumentalness). As we build our models, we will keep these distributions in mind.
+From these histograms, it is clear that the danceability feature is the most normally distributed. All others have a small skew at best (valence) to larger skews (tempo, loudness, energy) to seemingly exponential skews or individual values (duration, acousticness, instrumentalness). These distributions will be considered as the models are constructed.
 
-We also compared the distributions and means of each variable for non-nominated and nominated songs. Most were very similar, but below we highlighted the attribute with the greatest difference: Valence.
+The distributions and means of each variable for non-nominated and nominated songs were also compared. Most were very similar, but highlighted below is the attribute with the greatest difference: Valence.
 
 ```{r}
 # Comparison IsWinner 0 vs 1 - Valence
@@ -394,7 +394,7 @@ text(x = mean(x) * 0.5,                   # Add text for mean
      cex = 1)
 ```
 
-The valence variable peaks at different locations for the two values of the dependent variable and has a different mean. This could point towards valence being an important factor in our predictions.
+The valence variable peaks at different locations for the two values of the dependent variable and has a different mean. This could point towards valence being an important factor for the models to consider.
 
 #### Categorical
 
@@ -408,9 +408,9 @@ barplot(table(mode), main = "Modality")
 barplot(table(time_signature), main = "Time signature")
 ```
 
-Both mode and time_signature have an obvious statistical mode. The value of 1 for the variable mode represents songs in major keys, making up a super majority of the songs, and almost every song uses the time_signature of 4 with only a handful using 3.
+Both mode and time_signature have an obvious statistical mode. The value of 1 for the variable mode represents songs in major keys, making up a super majority of the songs, and almost every song uses the time_signature of 4 with only a handful using 1, 3, or 5.
 
-We were again curious to compare the distribution of non-nominated to nominated songs for the categorical variables, and highlight the one that demonstrated the greatest difference: Key.
+The distributions of non-nominated to nominated songs for the categorical variables was again compared, and highlighted below is the variable that demonstrated the greatest difference: Key.
 
 ```{r}
 # Comparison IsWinner 0 vs 1 - Key
@@ -423,9 +423,9 @@ x <- data[data$IsWinner == 1,]$key
 barplot(table(x), main = "Key: Nominated/Winner")
 ```
 
-Although the distribution of key for both values of the dependent variable look very similar, there are some important differences. We see a much larger proportion of non-nominated songs written in key 4 (corresponding to the key of E) and key 7 (corresponding to the key of G) when compared to nominated songs. The opposite can be said about key 11 (key of B), with a larger proportion of nominated songs in that key when compared to non-nominated songs.
+Although the distribution of key for both values of the dependent variable look very similar, there are some important differences. There is a much larger proportion of non-nominated songs written in key 4 (corresponding to the key of E) and key 7 (corresponding to the key of G) when compared to nominated songs. The opposite can be said about key 11 (key of B), with a larger proportion of nominated songs in that key when compared to non-nominated songs.
 
-While these patterns are observable, the effect size may not be substantial enough to reach statistical significance, as we will see in the Chi-Squared tests performed. In other words, while key '11' may appear more often in nominated songs, the difference may not be large enough to confidently conclude that it has a significant impact on nominations.
+While these patterns are observable, the effect size may not be substantial enough to reach statistical significance, will be seen in the Chi-Squared tests performed. In other words, while key '11' may appear more often in nominated songs, the difference may not be large enough to confidently conclude that it has a significant impact on nominations.
 
 #### Relationship Between Independent and Dependent Variables
 
@@ -450,11 +450,11 @@ boxplot(tempo ~ training_set$IsWinner, xlab='Nominee Boolean')
 boxplot(valence ~ training_set$IsWinner, xlab='Nominee Boolean')
 ```
 
-The difference in median seen for the energy and valence variables points towards them being possibly valuable to our models. The difference in interquartile range for acousticness, energy, and valence is also interesting to see.
+The difference in median seen for the energy and valence variables points towards them being possibly valuable to the models. The difference in interquartile range for acousticness, energy, and valence is also interesting to see.
 
 ##### Categorical
 
-To measure the independent/dependent variables association for the categorical variables, we utilized the Chi Squared Test. It will pass judgement on the level of independence between the variables.
+The Chi Squared Test was utilized to measure the independent/dependent variables association for the categorical variables. It will pass judgement on the level of independence between the variables.
 
 ```{r, warning=FALSE, message=FALSE}
 par(mfrow = c(1, 1))
@@ -464,9 +464,9 @@ chisq.test(mode, training_set$IsWinner)
 chisq.test(time_signature, training_set$IsWinner)
 ```
 
-The Chi-Squared Test revealed fairly high p-values for all of the categorical variables, and even produced a 1 for mode suggesting complete independence between mode and the dependent variable.
+The Chi-Squared Test revealed fairly high p-values for all of the categorical variables, and even produced a 1 for mode, suggesting complete independence between mode and the dependent variable.
 
-We also utilized the Cramer's V and obtained values that suggest some kind of dependence between the independent and dependent variables.
+The Cramer's V test was also applied and obtained values that suggest some kind of dependence between the independent and dependent variables.
 
 ```{r}
 cramersv(matrix(c(as.numeric(key), as.numeric(training_set$IsWinner)), ncol = 2))
@@ -476,21 +476,21 @@ cramersv(matrix(c(as.numeric(time_signature), as.numeric(training_set$IsWinner))
 
 #### Summary
 
-Correlations between continuous variables were found, specially high correlations between audio features such as acousticness/energy and loudness/energy. However no categorical variables were shown to have any significant association with the dependent variable.
+From this exploratory data analysis, correlations between continuous variables were certainly found. Especially high correlations exist between the audio features acousticness/energy and loudness/energy. No categorical variables were shown to have any significant association with the dependent variable.
 
-We examined the distribution for both continuous and categorical variables. Most continuous variables showed non-normal distributions, which should be considered when building models. Categorical variables like mode and time signature had high frequencies of specific values.
+After examining the distribution for both continuous and categorical variables, most continuous variables showed non-normal distributions, which should be considered when building models. Categorical variables like mode and time signature had high frequencies of specific values.
 
-For continuous variables, we used box plots to visualize differences between nominated and non-nominated songs. Notably, energy and valence showed differences in medians. For categorical variables, Chi-Squared tests and Cramer's V indicated that these variables might not be strongly associated with the Grammy nomination status.
+For continuous variables, box plots visualized differences between nominated and non-nominated songs. Notably, energy and valence showed differences in medians. For categorical variables, Chi-Squared tests and Cramer's V indicated that these variables might not be strongly associated with the Grammy nomination status.
 
-From this analysis we can extract that features like energy and valence may play a role in distinguishing nominated from non-nominated songs. On the other hand, categorical variables didn't showed significant impact on nominations. This information is surely valuable for the next step, model development.
+From this analysis, one can extract that features like energy and valence may play a role in distinguishing nominated from non-nominated songs. On the other hand, categorical variables did not show significant impact on nominations. This information is surely valuable for the next step, model development.
 
 ## Model Development
 
-In our model development strategy, we adopt a progressive approach, beginning with a logistic model and refining it through oversampling and variable selection techniques. We also explore models such as ridge and lasso regression, and K-nearest neighbors (KNN) to enhance predictive accuracy. Model performance is assessed through Type 1 Error, Sensitivity, and ROC curve analysis, while also considering discriminant analysis assuming normal distribution of key variables.
+In this project's model development strategy, a progressive approach was deployed, beginning with a logistic model and refining it through oversampling and variable selection techniques. Models such as ridge and lasso regression and K-nearest neighbors (KNN) were then explored to enhance predictive accuracy. Model performance is assessed through Type I Error, Sensitivity, and ROC curve analysis, while also considering discriminant analysis assuming normal distribution of key variables.
 
 ### Oversampling
 
-Because of the imbalanced nature of the dataset that was shown previously, an oversampled version of the dataset will be used in an attempt to further improve our models. This oversampling creates synthetic data of the minority class (nominated) with data values for all variables similar to and determined by the real data points of the minority class. This creates a dataset of balanced non-nominated and nominated songs.
+Because of the imbalanced nature of the dataset that was shown previously, an oversampled version of the dataset will be used in an attempt to further improve the models. This oversampling creates synthetic data of the minority class (nominated) with data values for all variables similar to and determined by the real data points of the minority class. This creates a dataset of balanced non-nominated and nominated songs.
 
 ```{r}
 ## Oversampling
@@ -508,7 +508,7 @@ sum(oversampled_train_data$IsWinner == 1)
 
 ### Logistic Model
 
-We started by considering the logistic regression, a model that belongs to the category of the generalized linear model. The logistic regression models the probability of an event to occur (in our case of a song to be nominated) by having the log-odds of the event to be a linear combination of the independent variables.
+The logistic regression model was considered initially, a model that belongs to the category of the generalized linear models. The logistic regression model predicts the probability of an event to occur (in this case, of a song to be nominated) by having the log-odds of the event to become a linear combination of the independent variables.
 
 ```{r}
 ## Simple logistic model
@@ -557,15 +557,15 @@ sensitivity_logistic_full_02 = true_positive_logistic_full_02 / positive_logisti
 sensitivity_logistic_full_02
 ```
 
-At a classification threshold of 0.2, the Type 1 Error (False Positive Rate), defined as False Positive classifications / Total Negative songs, was 0.32. That means around a third of the non-nominated songs were misclassified as nominated 
+At a classification threshold of 0.2, the Type I Error (False Positive Rate), defined as False Positive classifications / Total Negative songs, was 0.32. That means around a third of the non-nominated songs were misclassified as nominated 
 
 The Sensitivity (True Positive Rate), defined as True Positive classifications / Total positive songs was 0.5. Contextually, this means that half of the nominated songs were classified correctly.
 
-Ideally, the Type 1 error should be lower than this and the Sensitivity should be much higher.
+Ideally, the Type I error should be lower than this and the Sensitivity should be much higher.
 
 ##### Threshold = 0.3
 
-In an attempt to improve the classification of songs from our model, the threshold was increased to 0.3.
+In an attempt to improve the classification of songs from the model, the threshold was increased to 0.3.
 
 ```{r}
 # Threshold = 0.3
@@ -590,7 +590,7 @@ sensitivity_logistic_full_03 = true_positive_logistic_full_03 / positive_logisti
 sensitivity_logistic_full_03
 ```
 
-With an increase in threshold to 0.3, the Type 1 Error decreased to 0.113. This was an improvement, as it means there were fewer non-nominated songs classified as nominated, but to get a full picture Sensitivity still needed to be examined.
+With an increase in threshold to 0.3, the Type I Error decreased to 0.113. This was an improvement, as it means there were fewer non-nominated songs classified as nominated, but to get a full picture Sensitivity still needed to be examined.
 
 The Sensitivity also decreased to 0.083, which is not optimal behavior. This means that at a classification threshold of 0.3, the model correctly predicts only 8% of the nominated songs.
 
@@ -623,7 +623,7 @@ sensitivity_logistic_full_04 = true_positive_logistic_full_04 / positive_logisti
 sensitivity_logistic_full_04
 ```
 
-With an increase in threshold to 0.4, the Type 1 Error decreased further to 0.013. This again was an improvement, but it may be detrimental to the overall model accuracy.
+With an increase in threshold to 0.4, the Type I Error decreased further to 0.013. This again was an improvement, but it may be detrimental to the overall model accuracy.
 
 The Sensitivity reached 0. This means the model managed to properly classify 0 nominated songs
 
@@ -631,7 +631,7 @@ Overall, increasing the threshold was detrimental.
 
 #### ROC Curve
 
-An ROC Curve is meant to display the performance of a classification model. It plots the True Positive Rate (Sensitivity) against the False positive Rate (Type 1 Error) across different confidence thresholds. This takes into account both sides of the classification accuracy we discussed above and paints a comprehensive picture of how well the model can classify the song data.
+An ROC Curve is meant to display the performance of a classification model. It plots the True Positive Rate (Sensitivity) against the False Positive Rate (Type I Error) across different confidence thresholds. This takes into account both sides of the classification accuracy discussed above and paints a comprehensive picture of how well the model can classify the song data.
 
 ```{r}
 # ROC curve
@@ -641,11 +641,11 @@ plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab
 auc(roc.out)
 ```
 
-The ROC curve produced by the logistic model touts an Area Under the ROC Curve (AUR/AUC) of 0.598, meaning it achieves almost 60% diagnostic accuracy. A model producing an AUC greater than 50% is needed to make a model more efficient than a coin flip, so the basic logistic model does attain some predictive capabilities.
+The ROC curve produced by the logistic model touts an Area Under the ROC Curve (AUR/AUC) of 0.598, meaning it achieves almost 60% diagnostic accuracy. An AUC larger than 0.5 or 50% is needed to make a model more efficient than a coin flip, so the basic logistic model does attain some predictive capabilities.
 
-### Stepwise Variable Selection and Reduced Model
+### Stepwise Variable Selection and Reduced Logistic Model
 
-Stepwise variable selection was performed in an attempt to further improve the logistic model. This process removes the least beneficial variable from the model's consideration. As it removes more and more variables, it also goes back and checks if re-adding a previously removed variable would benefit the current state of the model at that time.
+Stepwise variable selection was performed in an attempt to further improve the logistic model. This process examines each variable in the model and removes the least beneficial one from the model's consideration. Once it removes one, it re-examines the remaining variables and repeats the process. As it removes more and more variables, it also goes back and checks if re-adding a previously removed variable would benefit the current state of the model at that time.
 
 ```{r}
 # Stepwise variable selection
@@ -699,9 +699,9 @@ sensitivity_logistic_02 = true_positive_logistic_02 / positive_logistic_02
 sensitivity_logistic_02
 ```
 
-At a confidence threshold of 0.2, the model produces a Type 1 Error of 0.37, incorrectly classifying 37% of the non-nominated songs as nominated. This is slightly worse than the 0.32 seen from the full model.
+At a confidence threshold of 0.2, the model produces a Type I Error of 0.37, incorrectly classifying 37% of the non-nominated songs as nominated. This is slightly worse than the 0.32 seen from the full model.
 
-It also produces a sensitivity of 0.54, meaning it correctly classifies 54% of the nominated songs, a slight improvement to the 0.5 produced from the full model at this threshold.
+It also produces a Sensitivity of 0.54, meaning it correctly classifies 54% of the nominated songs, a slight improvement to the 0.5 produced from the full model at this threshold.
 
 ##### Threshold = 0.3
 ```{r}
@@ -727,7 +727,7 @@ sensitivity_logistic_03 = true_positive_logistic_03 / positive_logistic_03
 sensitivity_logistic_03
 ```
 
-As seen before with the full model, increasing the threshold to 0.3 decreased the Type 1 Error, but to a more significant degree. It now produces a value of 0.04, which is a significant drop in misclassifications of non-nominated songs. Coupled with that, however, was a significant drop in Sensitivity, reaching 0.042.
+As seen before with the full model, increasing the threshold to 0.3 decreased the Type I Error, but to a more significant degree. It now produces a value of 0.04, which is a significant drop in misclassifications of non-nominated songs. Coupled with that, however, was a significant drop in Sensitivity, reaching 0.042.
 
 ##### Threshold = 0.4
 ```{r}
@@ -753,7 +753,7 @@ sensitivity_logistic_04 = true_positive_logistic_04 / positive_logistic_04
 sensitivity_logistic_04
 ```
 
-As was done with the full logistic model, the threshold was increased to 0.4. With this change, the model classified no songs as nominated, producing values of N/A from the calculations.
+As was done with the full logistic model, the threshold was increased to 0.4. With this change, the model classified no songs as nominated, producing values of N/A from the Type I Error and Sensitivity calculations.
 
 #### ROC Curve
 
@@ -780,7 +780,7 @@ logistic_over = glm(as.numeric(unlist(oversampled_train_data[1])) ~ .,
 summary(logistic_over)
 ```
 
-Using the oversampled dataset, the full logistic model now determines the following variables to be significant: year, acousticness, duration, key5, key11, loudness, and valence. This is quite a difference compared to the previous logistic model based on the original dataset, which only listed 3 variables (year, duration, and valence) as significant.
+Using the oversampled dataset, the full logistic model now determines the following variables to be significant: year, acousticness, duration, key5, key11, loudness, and valence. This is quite a difference compared to the previous logistic model based on the original dataset, which only listed 3 variables (acousticness, duration, and valence) as significant.
 
 #### Predictions
 
@@ -815,9 +815,9 @@ sensitivity_logistic_over_full_02 = true_positive_logistic_over_full_02 / positi
 sensitivity_logistic_over_full_02
 ```
 
-At threshold 0.2, the Type 1 Error (False Positive Rate) was 0.853, meaning 85.3% of the non-nominated songs were misclassified as nominated. This is a fairly large error.
+At threshold 0.2, the Type I Error (False Positive Rate) was 0.853, meaning 85.3% of the non-nominated songs were misclassified as nominated. This is a fairly large error.
 
-The Sensitivity (True Positive Rate) was .958, a fantastic value, showing the the oversampled full logistic model correctly classified 95.8% of the nominated songs. However, knowing the value of the Type 1 Error, it is clear that this value is so high because the model is classifying a vast majority of the data points as nominated. While it misses very few of the truly nominated songs, it misclassifies a large number of the non-nominated songs.
+The Sensitivity (True Positive Rate) was .958, a fantastic value, showing the the oversampled full logistic model correctly classified 95.8% of the nominated songs. However, knowing the value of the Type I Error, it is clear that this value is so high because the model is classifying a vast majority of the data points as nominated. While it misses very few of the truly nominated songs, it misclassifies a large number of the non-nominated songs.
 
 ##### Threshold = 0.3
 
@@ -842,7 +842,7 @@ sensitivity_logistic_over_full_03 = true_positive_logistic_over_full_03 / positi
 sensitivity_logistic_over_full_03
 ```
 
-At a threshold of 0.3, the Type 1 Error improves to 0.693, misclassifying fewer non-nominated songs than at threshold 0.2, but the Sensitivity also decreases to 0.792 meaning the model is missing more of the nominated songs.
+At a threshold of 0.3, the Type I Error improves to 0.693, misclassifying fewer non-nominated songs than at threshold 0.2, but the Sensitivity also decreases to 0.792 meaning the model is missing more of the nominated songs.
 
 ##### Threshold = 0.4
 
@@ -867,7 +867,7 @@ sensitivity_logistic_over_full_04 = true_positive_logistic_over_full_04 / positi
 sensitivity_logistic_over_full_04
 ```
 
-At a classification threshold of 0.4, the model's Type 1 Error decreases a fair amount to 0.5, but the sensitivity also decreases slightly to 0.75. In comparison to the full logistic model using the original dataset, which at this threshold obtained the worst Sensitivity value of 0, the oversampled full logistic model performs much better (again, at this threshold). The ROC curve will exhibit how well the model performs overall.
+At a classification threshold of 0.4, the model's Type I Error decreases a fair amount to 0.5, but the Sensitivity also decreases slightly to 0.75. In comparison to the full logistic model using the original dataset, which at this threshold obtained the worst Sensitivity value of 0, the oversampled full logistic model performs much better (again, at this threshold). The ROC curve will exhibit how well the model performs overall.
 
 #### ROC Curve
 
@@ -881,7 +881,7 @@ auc(roc.out)
 
 Overall, the ROC curve shows that the full oversampled logistic model produces a diagnostic accuracy of 0.579, which is slightly lower than the ROC curve produced by the full logistic model using the original data.
 
-### Stepwise Variable Selection and Reduced Model of the Oversampled Dataset
+### Stepwise Variable Selection and Reduced Logistic Model of the Oversampled Dataset
 
 Stepwise variable selection is again performed on the oversampled logistic model in an attempt to improve the model's classification accuracy by only utilizing the most insightful variables.
 
@@ -955,7 +955,7 @@ sensitivity_logistic_reduced_over_02 = true_positive_logistic_reduced_over_02 / 
 sensitivity_logistic_reduced_over_02
 ```
 
-At this threshold, the Type 1 Error was 0.853 and the Sensitivity was 0.958, which are the same exact values for the full oversampled logistic model at this threshold.
+At this threshold, the Type I Error was 0.853 and the Sensitivity was 0.958, which are the same exact values for the full oversampled logistic model at this threshold.
 
 ##### Threshold = 0.3
 
@@ -980,7 +980,7 @@ sensitivity_logistic_reduced_over_03 = true_positive_logistic_reduced_over_03 / 
 sensitivity_logistic_reduced_over_03
 ```
 
-With a threshold of 0.3, when compared to threshold 0.2, the model again produced a lower Type 1 Error of 0.68 and a lower Sensitivity of 0.792. These values are very similar to the full oversampled logistic model at this threshold as well.
+With a threshold of 0.3, when compared to threshold 0.2, the model again produced a lower Type I Error of 0.68 and a lower Sensitivity of 0.792. These values are very similar to the full oversampled logistic model at this threshold as well.
 
 ##### Threshold = 0.4
 
@@ -1005,7 +1005,7 @@ sensitivity_logistic_reduced_over_04 = true_positive_logistic_reduced_over_04 / 
 sensitivity_logistic_reduced_over_04
 ```
 
-Using the threshold of 0.4 again produced the same results to the full oversampled logistic model, with a Type 1 Error of 0.5 and a Sensitivity of 0.75. This suggests the models are extremely similar.
+Using the threshold of 0.4 again produced the same results to the full oversampled logistic model, with a Type I Error of 0.5 and a Sensitivity of 0.75. This suggests the models are extremely similar.
 
 #### ROC Curve
 
@@ -1021,10 +1021,7 @@ The ROC curve adds to the evidence that the models are very similar, producing t
 
 ### Discriminant Analysis
 
-Discriminant analysis is a statistical technique based on the Bayes theorem used to solve classification problems.
-
-This technique assumes that the distributions of the independent variables conditioned to the dependent variable are normal. 
-In order to verify if our variables satisfy this condition we computed the Shapiro-Wilk test. The null hypothesis of this test is that a sample comes from a Normal distribution. We reject the null hypothesis if the p-value is less then 0.05, which means that the probability of that sample to have been generated from a Normal distribution is less that 5%.
+Discriminant analysis is a statistical technique based on the Bayes theorem used to solve classification problems. This technique assumes that the distributions of the independent variables conditioned to the dependent variable are normal. The Shapiro-Wilk test was computed in order to verify if the variables satisfied this condition. The null-hypothesis of this test is that a sample comes from a normal distribution. The null-hypothesis rejected if the p-value is less than 0.05, which means the probability of that sample to have been generated from a normal distribution is less that 5%.
 
 ```{r}
 shapiro.test(danceability[IsWinner == 0]) # Yes
@@ -1054,7 +1051,7 @@ shapiro.test(valence[IsWinner == 1]) # No
 
 #### QQ-plots of the conditioned independent variables
 
-We also used a visual tool to check if the variables follow a Normal distribution.
+A visual tool was also used to check if the variables followed a normal distribution.
 
 ##### Danceability
 ```{r}
@@ -1084,7 +1081,7 @@ grid()
 qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-Acousticness is heavily not Normal, following a S-shape.
+Acousticness is heavily not normal, following an S-shape.
 
 ##### Duration
 ```{r}
@@ -1175,14 +1172,13 @@ grid()
 qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 ```
 
-The valence variable seems close to a normal distribution exept for the tails.
+The valence variable seems close to a normal distribution, except for the tails.
 
 #### Transformations
 
-The only variable to have passed the test is Danceability, so we decided to apply a transformation to the other variables to make them more Normal-like.
-We decided to use the Box-Cox transform estimating the parameter.
+The only variable to have passed the test is danceability, so transformations were applied to the other variables to make them more normal-like. Specifically, the Box-Cox transformation was used to estimate the parameter.
 
-We then test them looking again at the Shapiro test and at the plots to check if the transformation succeeded in making the distributions more Normal-like.
+The variables were then tested again. Examining the new output from the Shapiro test and the Q-Q plots, the variables were checked to see if the transformations succeeded in making the distributions more normal-like.
 
 ##### Acousticness
 
@@ -1207,7 +1203,7 @@ shapiro.test(acousticness_tran[IsWinner == 0]) # No
 shapiro.test(acousticness_tran[IsWinner == 1]) # No
 ```
 
-The transformed variable didn't pass the test but the plots show a good improvement, so we will use the transformed variable.
+The transformed variable did not pass the test, but the plots showed a good improvement, so the transformed variable will be used.
 
 ##### Duration
 
@@ -1234,7 +1230,7 @@ shapiro.test(duration_ms_tran[IsWinner == 0]) # No
 shapiro.test(duration_ms_tran[IsWinner == 1]) # No
 ```
 
-The transformed variable didn't pass the test but the plots show an improvement in the tails, so we will use the transformed variable.
+The transformed variable did not pass the test but the plots show an improvement in the tails, so the transformed variable will be used.
 
 ##### Energy
 
@@ -1259,7 +1255,7 @@ shapiro.test(energy_tran[IsWinner == 0]) # No
 shapiro.test(energy_tran[IsWinner == 1]) # No
 ```
 
-The transformed variable didn't pass the test and the plots don't show improvements so we decided to keep the original values.
+The transformed variable did not pass the test and the plots don't show improvements, so the original values will be kept.
 
 ##### Instrumentalness
 
@@ -1289,7 +1285,7 @@ shapiro.test(instrumentalness_tran[IsWinner == 0]) # No
 shapiro.test(instrumentalness_tran[IsWinner == 1]) # No
 ```
 
-We could not directly apply the boxcox transformation to the instrumentalness variable because of the presence of zeros, so we added a small value and then applied it. The new variable did not pass the test and the plots did not improve, so we decided to keep the original data.
+The Box-Cox transformation could not be directly applied to the instrumentalness variable because of the presence of zeros, so a small value was added and then applied to it. The new variable did not pass the test and the plots did not improve, so the original data was kept.
 
 ##### Loudness
 
@@ -1316,7 +1312,7 @@ shapiro.test(loudness_tran[IsWinner == 0]) # Yes
 shapiro.test(loudness_tran[IsWinner == 1]) # Yes
 ```
 
-We could not directly apply the boxcox transformation to the variable loudness because the variable takes negative values. We multiplied the values by -1 and then applied the transformation. The new variable passed the test and the plots confirm the result of the test. Since we have multiplied the variable by -1 the interpretation of the variable will be mirrored.
+The Box-Cox transformation could also not be directly applied to the variable loudness because the variable takes negative values. As a workaround, the values were multiplied by -1 and then the transformation was applied. The new variable passed the test and the plots confirmed the result of the test. Since the variable was multiplied by -1, the interpretation of the variable will be mirrored.
 
 ##### Tempo
 
@@ -1343,7 +1339,11 @@ shapiro.test(tempo_tran[IsWinner == 0]) # No
 shapiro.test(tempo_tran[IsWinner == 1]) # No
 ```
 
-The transformed tempo variable showed slight improvement in the plots but still didn't pass the test, we used the transformed variable.
+The transformed tempo variable showed slight improvement in the plots, but still did not pass the test, so we used the transformed variable.
+
+WAS TEMPO TRANSFORMATION USED OR NOT?
+
+IN THE END, WHICH TRANSFORMATIONS WERE ACTUALLY USED? DOUBLE CHECK!
 
 ##### Valence
 
@@ -1370,7 +1370,7 @@ shapiro.test(valence_tran[IsWinner == 0]) # No
 shapiro.test(valence_tran[IsWinner == 1]) # No
 ```
 
-The transformed variable didn't change much so we kept the original data.
+The transformed variable did not change much, so the original data was kept.
 
 (SHOULD WE COMPARE A FEW OF THE QQ PLOTS BEFORE AND AFTER THE TRANSFORMATION SIDE-BY-SIDE AS A GOOD VISUAL? FOR THE FEATURES THAT CHANGED AND FOR ONE THAT DID NOT?)
 
@@ -1405,7 +1405,7 @@ training_tran_data = tran_data[train_ind,]
 
 test_tran_data = tran_data[-train_ind,]
 
-colnames_tran_data = c("IsWinner", "acousticness_tran", "duration_ms_tran",
+colnames_tran_data = c("IsWinner", "acousticness_tran","duration_ms_tran",
                        "energy","instrumentalness", "loudness_tran",
                        "tempo_tran", "valence")
 
@@ -1422,7 +1422,7 @@ tran_data = as.data.frame(tran_data)
 
 ### Linear Discriminant Analysis
 
-Linear discriminant analysis is a technique based on the Bayes theorem and finds a linear combination of variables that best separates the classes of the dependent variable.
+Linear Discriminant Analysis (LDA) is a technique based on the Bayes theorem, and finds a linear combination of variables that best separates the classes of the dependent variable.
 
 ```{r}
 ## LDA
@@ -1442,7 +1442,7 @@ plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate",
 auc(roc.out)
 ```
 
-The ROC curve tells us that the predictions computed with this method are worse than a coin toss, so we try to fit the model to the oversampled dataset.
+The ROC curve tells us that the predictions computed with this method are worse than a coin toss. In hope of improving this, the model will also be fit to the oversampled dataset.
 
 ### Oversampled LDA 
 
@@ -1513,12 +1513,12 @@ sensitivity_lda_over_05
 
 ```
 
-Setting the threshold to 0.4 leads to high type I error and sensitivity,
-this means that the model is able to detect the nominated song but classifies many not nominated songs as nominated. While setting the threshold to 0.5 leads to low type I error and sensitivity, which means that many nominated songs are classified as not nominated, but most not nominated songs are correctly classified. 
+Setting the threshold to 0.4 leads to high Type I Error and Sensitivity.
+This means that the model is able to detect the nominated songs, but classifies many non-nominated songs as nominated. Setting the threshold to 0.5 leads to low Type I Error and Sensitivity, which means that many nominated songs are classified as non-nominated, but most non-nominated songs are correctly classified.
 
-#### Quadratic discriminant analysis
+#### Quadratic Discriminant Analysis
 
-Quadratic discriminant analysis is a generalization of LDA and does not assume that dependent variable have the same variance.
+Quadratic Discriminant Analysis (QDA) is a generalization of LDA and does not assume that dependent variable have the same variance.
 
 ```{r}
 ## QDA
@@ -1537,7 +1537,7 @@ plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate",
 auc(roc.out)
 ```
 
-The ROC curve shows a slight improvement compared to the linear discriminant analysis, but the area under the curve is still just above 0.5, so we try to fit the model to the oversampled dataset.
+The ROC curve shows a slight improvement compared to the linear discriminant analysis, but the area under the curve is still just above 0.5, so again the model will be fit to the oversampled dataset in an attempt to improve it.
 
 ```{r}
 # QDA oversampled
@@ -1604,7 +1604,7 @@ sensitivity_qda_over_05 = true_positive_qda_over_05 / positive_qda_over_05
 sensitivity_qda_over_05
 ```
 
-Setting the threshold to 0.5 gave better results both in terms of type I error and sensitivity, in particular the model classifies as not nominated 50% of the songs that weren't nominated and classifies 70% of the song that were nominated as nominated.
+Setting the threshold to 0.5 gave better results both in terms of Type I Error and Sensitivity. In particular, the model correctly classifies songs that weren't nominated as non-nominated 53% of the time and correctly classifies 71% of the songs that were nominated as nominated.
 
 ## Regularized Regression
 
@@ -1638,11 +1638,11 @@ sensitivity_ridge = true_positive_ridge / positive_ridge
 sensitivity_ridge
 ```
 
-Ridge regression predictions showed a low type I error and sensitivity, meaning that the model is able to identify not nominated songs, but struggles to correctly classify nominated songs.
+Ridge regression predictions showed a low Type I Error and Sensitivity, meaning that the model is able to identify non-nominated songs, but struggles to correctly classify nominated songs.
 
 ### Lasso Regression
 
-Lasso regression uses L1 regularization to force some of the estimated parameter to be exactly zero.
+Lasso regression uses L1 regularization to force some of the estimated parameters to be exactly zero.
 
 ```{r}
 ## Lasso regression
@@ -1669,11 +1669,11 @@ sensitivity_lasso = true_positive_lasso / positive_lasso
 sensitivity_lasso
 ```
 
-Lasso regression gave similar results compared to ridge regression in terms of type I error and slightly worse results in terms of sensitivity, therefore the same comments apply.
+Lasso regression gave similar results when compared to ridge regression in terms of the Type I Error, and slightly worse results in terms of Sensitivity, therefore the same comments apply.
 
 ## KNN
 
-KNN (K-Nearest Neighbors) models are non-parametric and offer a flexible decision boundary for classification problems. The model will classify a song based on the "k" nearest neighbors of said song in the parameter space.
+KNN (K-Nearest Neighbors) models are non-parametric and offer a flexible decision boundary for classification problems. The model will classify a song based on the "k" nearest neighbors (measured by Euclidean distance) of said song in the parameter space.
 
 ```{r}
 # K-NN
@@ -1722,6 +1722,7 @@ knn = knn(training_norm_data[,-1], test_norm_data[,-1],
 knn_pred_min = as.factor(knn)
 
 table(test_norm_data$IsWinner_norm, knn)
+# ADD IN Type1eror and sensitivity code
 ```
 
 Utilizing the chosen K value, the model yields an accuracy of 86.8% and predicts all of the non-nominated songs correctly, but only one of the nominated songs correctly. This points towards a heavy bias classifying songs as non-nominated.
@@ -1762,6 +1763,7 @@ knn_over = knn(training_norm_data_over[,-1], test_norm_data[,-1],
 knn_pred_min_over = as.factor(knn_over)
 
 table(test_norm_data$IsWinner_norm, knn_over)
+# Add in type1error and sensitivity code
 ```
 
 Utilizing the chosen "k" value, the KNN model yields a classification accuracy of 84.5%, but again only one of the nominated songs were correctly classified.
@@ -1772,7 +1774,7 @@ In the end...
 
 SHOW TABLES, GRAPHS, CHARTS, HIGHLIGHT THE MOST IMPORTANT INFORMATION ONLY. DO NOT INUNDATE THIS SECTION.
 
-Future work could expand upon our research by...
+Future work could expand upon this research by...
 
 - Change the time_signature to be binary; 4 or not_4
 - the addition of new variables for the songs
