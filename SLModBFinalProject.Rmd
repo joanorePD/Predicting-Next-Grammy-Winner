@@ -2,9 +2,9 @@
 title: "What Makes a Rock Song Award-Winning?"
 author: "Cristian Granchelli, Joan Orellana Rios, Cameron Kelahan"
 output:
-  pdf_document:
-    fig_caption: yes
   html_document: 
+    fig_caption: yes
+  pdf_document:
     fig_caption: yes
 urlcolor: blue
 header-includes:
@@ -2103,5 +2103,6 @@ KNN Oversampled | 0.027 | 0.417
 
 Overall, the models that produced the highest diagnostic accuracy were the Logistic Full, Logistic Oversampled Reduced, and QDA Oversampled. As a reminder, although the AUC of the ROC for the Logistic Full model is the largest, it's sensitivity at the thresholds tested were poor. Since Sensitivity is the metric this research question values most highly (properly classifying the nominated songs), the fact that the QDA Oversampled and the Logistic Oversampled Reduced models maintained high values across multiple classification thresholds suggests that they are the best models for the job.
 
-Future work could expand upon this research by consulting experts in the music industry, such as musicologists, to gain insight into other possible features. Adding new variables could allo the models to discover new connections it did not previously had and lead to higher classification abilities. Different types of models could also be considered, or modifications to the models considered here. Changing the accuracy metrics during the training and hyperparameter tuning stages of the KNN and/or early stopping could be implemented. Incorporating a lager data set with more recent data (if available) could also improve the models' abilities to classify nominated songs.
-Employing alternate, more advanced strategies to handle the imbalanced dataset could improve the output as well. Inspecting analysis over time may be a useful perspecive, offering insight into how trends over time may influence the likelihood of a type of song to be nominated.
+Future work could expand upon this research by consulting experts in the music industry, such as musicologists, to gain insight into other possible features. Adding new variables could allow the models to discover new connections they did not previously have and lead to higher classification abilities. Different types of models could also be considered, or modifications to the models considered here. Changing the accuracy metrics during the training and hyperparameter tuning stages of the KNN and/or early stopping could be implemented. Incorporating a larger data set with more recent data (if available) could also improve the models' abilities to classify nominated songs. Employing alternate, more advanced strategies to handle the imbalanced dataset could improve the output as well. Finally, inspecting analysis over time may be a useful perspective, offering insight into how trends over time may influence the likelihood of a type of song to be nominated.
+
+Overall, the models produced in this project do offer some insight into what makes a rock song worthy of Grammy nomination, but cannot be reliably used to predict a nomination.
