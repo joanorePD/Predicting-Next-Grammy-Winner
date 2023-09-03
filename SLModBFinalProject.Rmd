@@ -2,7 +2,9 @@
 title: "What Makes a Rock Song Award-Winning?"
 author: "Cristian Granchelli, Joan Orellana Rios, Cameron Kelahan"
 date: "2023-08-25"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -99,10 +101,12 @@ summary(data)
 # Checking balance between classes
 
 # Non-Grammy nominated songs
-length(data$IsWinner[data$IsWinner == 0]) / (length(data$IsWinner[data$IsWinner == 0]) + length(data$IsWinner[data$IsWinner == 1]))
+length(data$IsWinner[data$IsWinner == 0]) /(length(data$IsWinner[data$IsWinner == 0]) +
+                                            length(data$IsWinner[data$IsWinner == 1]))
 
 # Grammy nominated songs
-length(data$IsWinner[data$IsWinner == 1]) / (length(data$IsWinner[data$IsWinner == 0]) + length(data$IsWinner[data$IsWinner == 1]))
+length(data$IsWinner[data$IsWinner == 1]) / (length(data$IsWinner[data$IsWinner == 0]) +
+                                             length(data$IsWinner[data$IsWinner == 1]))
 ```
 
 From the balance check between the number of nominated and non-nominated songs, it is seen that the classes are highly imbalanced: 82% non-nominated songs, 18% nominated songs. A note of this is made during the data processing stage so that measures may be taken to address this during the analysis.
@@ -138,15 +142,23 @@ summary(training_set)
 
 # Ratio of training set:
 # - not-nominated
-length(training_set$IsWinner[data$IsWinner == 0]) / (length(training_set$IsWinner[data$IsWinner == 0]) + length(training_set$IsWinner[data$IsWinner == 1]))
+length(training_set$IsWinner[data$IsWinner == 0]) /
+      (length(training_set$IsWinner[data$IsWinner == 0]) +
+       length(training_set$IsWinner[data$IsWinner == 1]))
 # - nominated
-length(training_set$IsWinner[data$IsWinner == 1]) / (length(training_set$IsWinner[data$IsWinner == 0]) + length(training_set$IsWinner[data$IsWinner == 1]))
+length(training_set$IsWinner[data$IsWinner == 1]) /
+      (length(training_set$IsWinner[data$IsWinner == 0]) +
+       length(training_set$IsWinner[data$IsWinner == 1]))
 
 # Ratio of Test Set
 # - not-nominated
-length(test_set$IsWinner[data$IsWinner == 0]) / (length(test_set$IsWinner[data$IsWinner == 0]) + length(test_set$IsWinner[data$IsWinner == 1]))
+length(test_set$IsWinner[data$IsWinner == 0]) /
+      (length(test_set$IsWinner[data$IsWinner == 0]) +
+       length(test_set$IsWinner[data$IsWinner == 1]))
 # - nominated
-length(test_set$IsWinner[data$IsWinner == 1]) / (length(test_set$IsWinner[data$IsWinner == 0]) + length(test_set$IsWinner[data$IsWinner == 1]))
+length(test_set$IsWinner[data$IsWinner == 1]) /
+      (length(test_set$IsWinner[data$IsWinner == 0]) +
+       length(test_set$IsWinner[data$IsWinner == 1]))
 ```
 
 ## Exploratory Data Analysis
@@ -164,6 +176,7 @@ attach(training_set)
 # Correlations between continuous variables
 cor_matrix = cor(training_set[,c(-1, -2, -9, -11, -13)])
 ```
+
 ```{r, eval=FALSE}
 # Plot the correlation
 corrplot.mixed(cor_matrix, tl.pos='lt')
@@ -1189,18 +1202,27 @@ b_acousticness <- boxcox(lm(acousticness ~ 1))
 lambda <- b_acousticness$x[which.max(b_acousticness$y)]
 acousticness_tran <- (acousticness ^ lambda - 1) / lambda
 
-par(mfrow = c(1, 2))
+par(mfrow = c(2, 2))
 
-qqnorm(acousticness_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+qqnorm(acousticness_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
 grid()               
 qqline(acousticness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(acousticness_tran[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(acousticness_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
 grid()               
 qqline(acousticness_tran[IsWinner == 1],lwd = 2, col = "red")
 
 shapiro.test(acousticness_tran[IsWinner == 0]) # No 
 shapiro.test(acousticness_tran[IsWinner == 1]) # No
+
+# Original Q-Q Plots
+qqnorm(acousticness[IsWinner == 0], main="Original Q-Q Non-Nominated")
+grid()               
+qqline(acousticness[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(acousticness[IsWinner == 1], main="Original Q-Q Nominated")
+grid()               
+qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed variable did not pass the test, but the plots showed a good improvement, so the transformed variable will be used.
@@ -1216,18 +1238,30 @@ b_duration_ms <- boxcox(lm(duration_ms ~ 1))
 lambda <- b_duration_ms$x[which.max(b_duration_ms$y)]
 duration_ms_tran <- (duration_ms ^ lambda - 1) / lambda
 
-par(mfrow = c(1, 2))
+par(mfrow = c(2, 2))
 
-qqnorm(duration_ms_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+# Transformed data
+
+qqnorm(duration_ms_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
 grid()               
 qqline(duration_ms_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(duration_ms_tran[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(duration_ms_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
 grid()               
 qqline(duration_ms_tran[IsWinner == 1],lwd = 2, col = "red")
 
 shapiro.test(duration_ms_tran[IsWinner == 0]) # No 
 shapiro.test(duration_ms_tran[IsWinner == 1]) # No
+
+# Original data
+
+qqnorm(duration_ms[IsWinner == 0], main="Original Q-Q Non-Nominated")
+grid()               
+qqline(duration_ms[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(duration_ms[IsWinner == 1], main="Original Q-Q Nominated")
+grid()               
+qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed variable did not pass the test but the plots show an improvement in the tails, so the transformed variable will be used.
@@ -1241,18 +1275,30 @@ b_energy <- boxcox(lm(energy ~ 1))
 lambda <- b_energy$x[which.max(b_energy$y)]
 energy_tran <- (energy ^ lambda - 1) / lambda
 
-par(mfrow = c(1, 2))
+par(mfrow = c(2, 2))
 
-qqnorm(energy_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+# Transformed data
+
+qqnorm(energy_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
 grid()               
 qqline(energy_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(energy_tran[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(energy_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
 grid()               
 qqline(energy_tran[IsWinner == 1],lwd = 2, col = "red")
 
 shapiro.test(energy_tran[IsWinner == 0]) # No 
 shapiro.test(energy_tran[IsWinner == 1]) # No
+
+# Original data
+
+qqnorm(energy[IsWinner == 0], main="Original Q-Q Non-Nominated")
+grid()               
+qqline(energy[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(energy[IsWinner == 1], main="Original Q-Q Nominated")
+grid()               
+qqline(energy[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed variable did not pass the test and the plots don't show improvements, so the original values will be kept.
@@ -1271,18 +1317,30 @@ b_instrumentalness <- boxcox(lm(new_instrumentalness ~ 1))
 lambda <- b_instrumentalness$x[which.max(b_instrumentalness$y)]
 instrumentalness_tran <- (new_instrumentalness ^ lambda - 1) / lambda
 
-par(mfrow = c(1, 2))
+par(mfrow = c(2, 2))
 
-qqnorm(instrumentalness_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+# Transformed data
+
+qqnorm(instrumentalness_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
 grid()               
 qqline(instrumentalness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(instrumentalness_tran[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(instrumentalness_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
 grid()               
 qqline(instrumentalness_tran[IsWinner == 1],lwd = 2, col = "red")
 
 shapiro.test(instrumentalness_tran[IsWinner == 0]) # No 
 shapiro.test(instrumentalness_tran[IsWinner == 1]) # No
+
+# Original data
+
+qqnorm(instrumentalness[IsWinner == 0], main="Original Q-Q Non-Nominated")
+grid()               
+qqline(instrumentalness[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(instrumentalness[IsWinner == 1], main="Original Q-Q Nominated")
+grid()               
+qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The Box-Cox transformation could not be directly applied to the instrumentalness variable because of the presence of zeros, so a small value was added and then applied to it. The new variable did not pass the test and the plots did not improve, so the original data was kept.
@@ -1298,18 +1356,30 @@ b_loudness <- boxcox(lm(new_loudness ~ 1))
 lambda <- b_loudness$x[which.max(b_loudness$y)]
 loudness_tran <- (new_loudness ^ lambda - 1) / lambda
 
-par(mfrow = c(1, 2))
+par(mfrow = c(2, 2))
 
-qqnorm(loudness_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+# Transformed data
+
+qqnorm(loudness_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
 grid()               
 qqline(loudness_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(loudness_tran[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(loudness_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
 grid()               
 qqline(loudness_tran[IsWinner == 1],lwd = 2, col = "red")
 
 shapiro.test(loudness_tran[IsWinner == 0]) # Yes
 shapiro.test(loudness_tran[IsWinner == 1]) # Yes
+
+# Original data
+
+qqnorm(loudness[IsWinner == 0], main="Original Q-Q Non-Nominated")
+grid()               
+qqline(loudness[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(loudness[IsWinner == 1], main="Original Q-Q Nominated")
+grid()               
+qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The Box-Cox transformation could also not be directly applied to the variable loudness because the variable takes negative values. As a workaround, the values were multiplied by -1 and then the transformation was applied. The new variable passed the test and the plots confirmed the result of the test. Since the variable was multiplied by -1, the interpretation of the variable will be mirrored.
@@ -1325,25 +1395,33 @@ b_tempo <- boxcox(lm(tempo ~ 1))
 lambda <- b_tempo$x[which.max(b_tempo$y)]
 tempo_tran <- (tempo ^ lambda - 1) / lambda
 
-par(mfrow = c(1, 2))
+par(mfrow = c(2, 2))
 
-qqnorm(tempo_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+# Transformed Data
+
+qqnorm(tempo_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
 grid()               
 qqline(tempo_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(tempo_tran[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(tempo_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
 grid()               
 qqline(tempo_tran[IsWinner == 1],lwd = 2, col = "red")
 
 shapiro.test(tempo_tran[IsWinner == 0]) # No
 shapiro.test(tempo_tran[IsWinner == 1]) # No
+
+# Original data
+
+qqnorm(tempo[IsWinner == 0], main="Original Q-Q Non-Nominated")
+grid()               
+qqline(tempo[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(tempo[IsWinner == 1], main="Original Q-Q Nominated")
+grid()               
+qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed tempo variable showed slight improvement in the plots, but still did not pass the test, so we used the transformed variable.
-
-WAS TEMPO TRANSFORMATION USED OR NOT?
-
-IN THE END, WHICH TRANSFORMATIONS WERE ACTUALLY USED? DOUBLE CHECK!
 
 ##### Valence
 
@@ -1356,23 +1434,33 @@ b_valence <- boxcox(lm(valence ~ 1))
 lambda <- b_valence$x[which.max(b_valence$y)]
 valence_tran <- (valence ^ lambda - 1) / lambda
 
-par(mfrow = c(1, 2))
+par(mfrow = c(2, 2))
 
-qqnorm(valence_tran[IsWinner == 0], main="Normal Q-Q Non-Nominated")
+# Transformed data
+
+qqnorm(valence_tran[IsWinner == 0], main="Transformed Q-Q Non-Nominated")
 grid()               
 qqline(valence_tran[IsWinner == 0],lwd = 2, col = "red")
 
-qqnorm(valence_tran[IsWinner == 1], main="Normal Q-Q Nominated")
+qqnorm(valence_tran[IsWinner == 1], main="Transformed Q-Q Nominated")
 grid()               
 qqline(valence_tran[IsWinner == 1],lwd = 2, col = "red")
 
 shapiro.test(valence_tran[IsWinner == 0]) # No
 shapiro.test(valence_tran[IsWinner == 1]) # No
+
+# Original data
+
+qqnorm(valence[IsWinner == 0], main="Original Q-Q Non-Nominated")
+grid()               
+qqline(valence[IsWinner == 0],lwd = 2, col = "red")
+
+qqnorm(valence[IsWinner == 1], main="Original Q-Q Nominated")
+grid()               
+qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 ```
 
 The transformed variable did not change much, so the original data was kept.
-
-(SHOULD WE COMPARE A FEW OF THE QQ PLOTS BEFORE AND AFTER THE TRANSFORMATION SIDE-BY-SIDE AS A GOOD VISUAL? FOR THE FEATURES THAT CHANGED AND FOR ONE THAT DID NOT?)
 
 ### Data transformation
 
@@ -1516,7 +1604,7 @@ sensitivity_lda_over_05
 Setting the threshold to 0.4 leads to high Type I Error and Sensitivity.
 This means that the model is able to detect the nominated songs, but classifies many non-nominated songs as nominated. Setting the threshold to 0.5 leads to low Type I Error and Sensitivity, which means that many nominated songs are classified as non-nominated, but most non-nominated songs are correctly classified.
 
-#### Quadratic Discriminant Analysis
+### Quadratic Discriminant Analysis
 
 Quadratic Discriminant Analysis (QDA) is a generalization of LDA and does not assume that dependent variable have the same variance.
 
@@ -1738,7 +1826,7 @@ sensitivity_knn = true_positive_knn / positive_knn
 sensitivity_knn
 ```
 
-Utilizing the chosen K value, the model yields an accuracy of 86.8% and predicts all of the non-nominated songs correctly, but only one of the nominated songs correctly. This points towards a heavy bias classifying songs as non-nominated.
+Utilizing the chosen K value, the model yields an accuracy of 86.8% and obtains a Type I Error of 0, predicting all of the non-nominated songs correctly. However, it also yields a Sensitivity of 0.0417, barely classifying any nominated songs correctly. The AUC of the ROC curve is only 0.521.
 
 ### Oversampling
 
@@ -1792,13 +1880,33 @@ sensitivity_knn_over = true_positive_knn_over / positive_knn_over
 sensitivity_knn_over
 ```
 
-Utilizing the chosen "k" value, the KNN model yields a classification accuracy of 84.5%, but again only one of the nominated songs were correctly classified.
+Utilizing the chosen "k" value, the KNN model yields a classification accuracy of 84.5%, but again produces a very low Type I Error (0.027) and very low Sensitivity (0.0417), correctly classifying only one nominated song.
 
 # Results and Conclusions
 
-In the end...
+The below table makes a simple comparison of the predictive abilities of all the models created throughout this analysis:
 
-SHOW TABLES, GRAPHS, CHARTS, HIGHLIGHT THE MOST IMPORTANT INFORMATION ONLY. DO NOT INUNDATE THIS SECTION.
+Model Type                      | ROC
+--------------------------------|:----:
+Logistic Full                   | 0.598
+Logistic Reduced                | 0.576
+Logistic Oversampled Full       | 0.579
+Logistic Oversampled Reduced    | 0.579
+Linear Discriminant Analysis    | 0.497
+LDA Oversampled                 | 0.508
+Quadratic Discriminant Analysis | 0.518
+QDA Oversampled                 | 0.591
+K-Nearest Neighbors             | 0.521
+KNN Oversampled                 | 0.508
+
+Model Type | Type I Error | Sensitivity
+-----------|--------------|------------
+Ridge Regression | 0.353 | 0.417
+Lasso Regression | 0.353 | 0.417
+K-Nearest Neighbors | 0 | 0.0417
+KNN Oversampled | 0.027 | 0.417
+
+Overall, the models that produced the highest diagnostic accuracy were the Logistic Full, Logistic Oversampled Reduced, and QDA Oversampled. As a reminder, although the AUC of the ROC for the Logistic Full model is the largest, it's sensitivity at the thresholds tested were poor. Since Sensitivity is the metric this research question values most highly (properly classifying the nominated songs), the fact that the QDA Oversampled and the Logistic Oversampled Reduced models maintained high values across multiple classification thresholds suggests that they are the best models for the job.
 
 Future work could expand upon this research by...
 
@@ -1810,4 +1918,3 @@ Future work could expand upon this research by...
 - Using more advance techniques for handling class imbalance
 - Perform analysis over time -> trends might also influence which songs get nominated, which could also be detected with a larger dataset
 - More insights on the music industry (by maybe contacting musicologists/experts) could maybe give us valuable information on which other features could be included
-

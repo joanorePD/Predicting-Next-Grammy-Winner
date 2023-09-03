@@ -9,7 +9,6 @@ Log Oversampled Reduced: ROC 0.579
 Lin Discr Analy: ROC 0.497 (no better than a coin toss)
 Over LDA: ROC 0.508
 QDA: ROC 0.518
-#################### ADD HEADER SECTION FOR QDA OVERSAMPLED IN MARKDOWN
 QDA Over: ROC 0.591
 
 Ridge Regression: Type 1 Error 0.353
@@ -21,7 +20,6 @@ KNN: Type1Error FP / N = 0
 KNN: Sensitivity TP / P = 1/24 = 0.0417
 KNN Over: Type1Error = 0.027
 KNN Over: Sensitivity = .0417
-########### ADD IN TYPE1ERROR AND SENSITIVITY PRINTOUTS TO THE CODE SECTION
 
 The models with the worst performance were...
 
