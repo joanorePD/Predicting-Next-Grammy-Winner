@@ -1183,6 +1183,20 @@ knn_pred_min = as.factor(knn)
 
 table(test_norm_data$IsWinner_norm, knn)
 
+roc.out <- roc(test_set$IsWinner, as.numeric(knn) - 1)
+plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
+auc(roc.out)
+
+false_positive_knn = table(test_set$IsWinner, as.numeric(knn) - 1)[3]
+negative_knn = table(test_set$IsWinner, as.numeric(knn) - 1)[1] + table(test_set$IsWinner, as.numeric(knn) - 1)[3]
+typeIerror_knn = false_positive_knn / negative_knn
+typeIerror_knn
+
+true_positive_knn = table(test_set$IsWinner, as.numeric(knn) - 1)[4]
+positive_knn = table(test_set$IsWinner, as.numeric(knn) - 1)[2] + table(test_set$IsWinner, as.numeric(knn) - 1)[4]
+sensitivity_knn = true_positive_knn / positive_knn
+sensitivity_knn
+
 # oversampled
 
 test_over_error = numeric(kmax)
@@ -1214,14 +1228,13 @@ roc.out <- roc(test_set$IsWinner, as.numeric(knn_over) - 1)
 plot(roc.out, print.auc=TRUE, legacy.axes=TRUE, xlab="False positive rate", ylab="True positive rate")
 auc(roc.out)
 
+false_positive_knn_over = table(test_set$IsWinner, as.numeric(knn_over) - 1)[3]
+negative_knn_over = table(test_set$IsWinner, as.numeric(knn_over) - 1)[1] + table(test_set$IsWinner, as.numeric(knn_over) - 1)[3]
+typeIerror_knn_over = false_positive_knn_over / negative_knn_over
+typeIerror_knn_over
 
-false_positive_knn = table(test_set$IsWinner, as.numeric(knn_over) - 1)[3]
-negative_knn = table(test_set$IsWinner, as.numeric(knn_over) - 1)[1] + table(test_set$IsWinner, as.numeric(knn_over) - 1)[3]
-typeIerror_knn = false_positive_knn / negative_knn
-typeIerror_knn
-
-true_positive_knn = table(test_set$IsWinner, as.numeric(knn_over) - 1)[4]
-positive_knn = table(test_set$IsWinner, as.numeric(knn_over) - 1)[2] + table(test_set$IsWinner, as.numeric(knn_over) - 1)[4]
-sensitivity_knn = true_positive_knn / positive_knn
-sensitivity_knn
+true_positive_knn_over = table(test_set$IsWinner, as.numeric(knn_over) - 1)[4]
+positive_knn_over = table(test_set$IsWinner, as.numeric(knn_over) - 1)[2] + table(test_set$IsWinner, as.numeric(knn_over) - 1)[4]
+sensitivity_knn_over = true_positive_knn_over / positive_knn_over
+sensitivity_knn_over
 
