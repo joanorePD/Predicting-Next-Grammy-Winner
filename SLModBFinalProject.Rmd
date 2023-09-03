@@ -1318,7 +1318,7 @@ The variables were then tested again. Examining the new output from the Shapiro 
 
 ### Acousticness
 
-```{r, fig.cap="Distribution of the Acousticness Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Acousticness Box-Cox Parameter"}
 par(mfrow = c(1, 1))
 
 b_acousticness <- boxcox(lm(acousticness ~ 1))
@@ -1356,7 +1356,7 @@ The transformed variable did not pass the test, but the plots showed a good impr
 
 ### Duration
 
-```{r, fig.cap="Distribution of the Duration Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Duration Box-Cox Parameter"}
 # duration_ms plots improved, test not passed
 
 par(mfrow = c(1, 1))
@@ -1399,7 +1399,7 @@ The transformed variable did not pass the test but the plots show an improvement
 
 ### Energy
 
-```{r, fig.cap="Distribution of the Energy Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Energy Box-Cox Parameter"}
 par(mfrow = c(1, 1))
 
 b_energy <- boxcox(lm(energy ~ 1))
@@ -1440,7 +1440,7 @@ The transformed variable did not pass the test and the plots don't show improvem
 
 ### Instrumentalness
 
-```{r, fig.cap="Distribution of the Instrumentalness Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Instrumentalness Box-Cox Parameter"}
 # instrumentalness can't apply the boxcox transformation because there are some 0's
 
 par(mfrow = c(1, 1))
@@ -1486,7 +1486,7 @@ The Box-Cox transformation could not be directly applied to the instrumentalness
 
 ### Loudness
 
-```{r, fig.cap="Distribution of the Loudness Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Loudness Box-Cox Parameter"}
 par(mfrow = c(1, 1))
 
 new_loudness = loudness * (-1)
@@ -1529,7 +1529,7 @@ The Box-Cox transformation could also not be directly applied to the variable lo
 
 ### Tempo
 
-```{r, fig.cap="Distribution of the Tempo Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Tempo Box-Cox Parameter"}
 # tempo, slight improvement in the plots
 
 par(mfrow = c(1, 1))
@@ -1572,7 +1572,7 @@ The transformed tempo variable showed slight improvement in the plots, but still
 
 ### Valence
 
-```{r, fig.cap="Distribution of the Valence Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Valence Box-Cox Parameter"}
 # valence, pretty much the same
 
 par(mfrow = c(1, 1))
@@ -1615,25 +1615,25 @@ The transformed variable did not change much, so the original data was kept.
 
 ### Data transformation
 
-```{r, fig.cap="Distribution of the Acousticness Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Acousticness Box-Cox Parameter"}
 par(mfrow = c(1, 1))
 
 b_data_acousticness <- boxcox(lm(data$acousticness ~ 1))
 ```
-```{r, fig.cap="Distribution of the Duration Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Duration Box-Cox Parameter"}
 lambda <- b_data_acousticness$x[which.max(b_data_acousticness$y)]
 data_acousticness_tran <- (data$acousticness ^ lambda - 1) / lambda
 
 b_data_duration_ms <- boxcox(lm(data$duration_ms ~ 1))
 ```
-```{r, fig.cap="Distribution of the Loudness Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Loudness Box-Cox Parameter"}
 lambda <- b_data_duration_ms$x[which.max(b_data_duration_ms$y)]
 data_duration_ms_tran <- (data$duration_ms ^ lambda - 1) / lambda
 
 neg_loudness = data$loudness * (-1)
 b_data_loudness <- boxcox(lm(neg_loudness ~ 1))
 ```
-```{r, fig.cap="Distribution of the Tempo Box-Cox Parameter"}
+```{r, fig.cap="Log-likelihood of the Tempo Box-Cox Parameter"}
 lambda <- b_data_loudness$x[which.max(b_data_loudness$y)]
 data_loudness_tran <- (neg_loudness ^ lambda - 1) / lambda
 
