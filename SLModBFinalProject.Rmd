@@ -3,8 +3,8 @@ title: "What Makes a Rock Song Award-Winning?"
 author: "Cristian Granchelli, Joan Orellana Rios, Cameron Kelahan"
 date: "2023-08-25"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -169,7 +169,7 @@ At first, correlations between the independent variables were examined, which is
 
 It was important to understand the data better in these regards, so that it can be known which attribute pairings could give useful insight.
 
-#### Correlation Between Contiuous Variables
+#### Correlation Between Contiuous Variables\
 
 ```{r, message = FALSE}
 attach(training_set)
@@ -198,7 +198,7 @@ knitr::include_graphics("corplot_indep_2.png")
 
 From evaluating this second type of plot showing the correlation between continuous, independent variables, one can understand the shape of the data and discover outliers as well as general trends. For example, almost the entire trend line of duration vs instrumentalness is caused by a single outlier. It also confirmed the high, positive correlation between loudness and energy, showing a nice upward direction of the trend line with the data points clustered around it. Furthermore, it showed the strong trend line between valence and danceability, although those data have higher variability and are less centered around the line. The highly negative correlation between acousticness and energy is also visualized, touting a firmly downward trend line.
 
-#### Correlation Between Categorical Variables
+#### Correlation Between Categorical Variables\
 
 The Cramer's V measurement was employed in order to determine the strength of similarity between the categorical variables. This measurement is a normalized version of the chi-square statistic, returning a value of 0 if there is no association between the categorical variables, and returning 1 if there is a perfect association in which one variable is completely determined by the other.
 
@@ -216,7 +216,7 @@ cramersv(matrix(c(as.numeric(mode), as.numeric(time_signature)), ncol = 2))
 
 Although measurements of association between categorical variables are hard to interpret, the Cramer's V test still illuminates if there is full disassociation or full association between said variables. From the data, it can be seen that key/mode and key/time_signature are definitely not fully disassociated or fully associated. The same can be said about mode/time_signature, although the measured value was closer to 0.
 
-#### ANOVA Test
+#### ANOVA Test\
 
 Next, associations between each of the categorical variables and all of the continuous variables were examined utilizing ANOVA. ANOVA (or ANalysis Of VAriation) offers a way to compare continuous and categorical variables. If ANOVA points out some feature combinations are significant, then that suggests the statistical means of the groups of continuous variables are different. The chosen threshold for significance was 5%.
 
@@ -315,7 +315,7 @@ The fact that these groups were significant suggests there may be a strong enoug
 
 Interestingly, the time signature variable shows significance in combination with all other variables. This may be due to the fact that this variable is highly imbalanced, since 93.4% of the songs have a time signature of 4/4.
 
-#### Partial Correlations
+#### Partial Correlations\
 
 Because ANOVA does not convey which of the means were different from the others, it is necessary to perform a Multiple Comparison Procedure. Partial correlations was utilized in this case, which is an exhaustive search that compares each possible pairing of continuous variables.
 
@@ -353,7 +353,7 @@ As a quick note, the song "Play" by Dave Grohl stood out during the analysis, be
 
 An examination of the variables' distributions can give insight to better understand the data and how it can be interacted with. Some models that will be used in this project are based on assumptions that are related to distributions, often times assuming a normal distribution of data. From gauging how different variables are distributed, better models can be created by taking their distribution assumptions into account.
 
-#### Continuous
+#### Continuous\
 
 ```{r, warnings = FALSE, eval=FALSE}
 # Checking distributions
@@ -409,7 +409,7 @@ text(x = mean(x) * 0.5,                   # Add text for mean
 
 The valence variable peaks at different locations for the two values of the dependent variable and has a different mean. This could point towards valence being an important factor for the models to consider.
 
-#### Categorical
+#### Categorical\
 
 ```{r}
 # Categorical variables
@@ -440,11 +440,11 @@ Although the distribution of key for both values of the dependent variable look 
 
 While these patterns are observable, the effect size may not be substantial enough to reach statistical significance, will be seen in the Chi-Squared tests performed. In other words, while key '11' may appear more often in nominated songs, the difference may not be large enough to confidently conclude that it has a significant impact on nominations.
 
-#### Relationship Between Independent and Dependent Variables
+#### Relationship Between Independent and Dependent Variables\
 
 Examining the association between independent and dependent variables can give insight into the data of independent variables which exhibit notable differences between the two possible values of the dependent variable.
 
-##### Continuous
+##### Continuous\
 
 Box plots were utilized to visualize these relationships:
 
@@ -465,7 +465,7 @@ boxplot(valence ~ training_set$IsWinner, xlab='Nominee Boolean')
 
 The difference in median seen for the energy and valence variables points towards them being possibly valuable to the models. The difference in interquartile range for acousticness, energy, and valence is also interesting to see.
 
-##### Categorical
+##### Categorical\
 
 The Chi Squared Test was utilized to measure the independent/dependent variables association for the categorical variables. It will pass judgement on the level of independence between the variables.
 
@@ -487,7 +487,7 @@ cramersv(matrix(c(as.numeric(mode), as.numeric(training_set$IsWinner)), ncol = 2
 cramersv(matrix(c(as.numeric(time_signature), as.numeric(training_set$IsWinner)), ncol = 2))
 ```
 
-#### Summary
+#### Summary\
 
 From this exploratory data analysis, correlations between continuous variables were certainly found. Especially high correlations exist between the audio features acousticness/energy and loudness/energy. No categorical variables were shown to have any significant association with the dependent variable.
 
@@ -533,7 +533,7 @@ summary(logistic)
 
 From the creation of the model, it determined valence, duration, and acousticness to be significant variables.
 
-#### Predictions
+#### Predictions\
 
 ```{r}
 # Computing predictions
@@ -545,7 +545,7 @@ logistic_predictions_full = predict(logistic,
 
 Below are the predictions as computed by the logistic model created above, using different thresholds of classification. The threshold defines at which confidence level the model will classify a song as "nominated."
 
-##### Threshold = 0.2
+##### Threshold = 0.2\
 
 ```{r}
 # Threshold = 0.2
@@ -576,7 +576,7 @@ The Sensitivity (True Positive Rate), defined as True Positive classifications /
 
 Ideally, the Type I error should be lower than this and the Sensitivity should be much higher.
 
-##### Threshold = 0.3
+##### Threshold = 0.3\
 
 In an attempt to improve the classification of songs from the model, the threshold was increased to 0.3.
 
@@ -609,7 +609,7 @@ The Sensitivity also decreased to 0.083, which is not optimal behavior. This mea
 
 The combined information from these two tests suggests the model is classifying more songs as non-nominated, avoiding false positives while also missing correct classifications of nominated songs.
 
-##### Threshold = 0.4
+##### Threshold = 0.4\
 
 For a final comparison, the threshold was set to 0.4.
 
@@ -642,7 +642,7 @@ The Sensitivity reached 0. This means the model managed to properly classify 0 n
 
 Overall, increasing the threshold was detrimental.
 
-#### ROC Curve
+#### ROC Curve\
 
 An ROC Curve is meant to display the performance of a classification model. It plots the True Positive Rate (Sensitivity) against the False Positive Rate (Type I Error) across different confidence thresholds. This takes into account both sides of the classification accuracy discussed above and paints a comprehensive picture of how well the model can classify the song data.
 
@@ -678,7 +678,7 @@ summary(logistic_reduced)
 
 Utilizing the information gained from the stepwise variable selection, a reduced version of the logistic model was created.
 
-#### Predicting
+#### Predicting\
 
 ```{r}
 # Computing predictions
@@ -688,7 +688,7 @@ logistic_predictions = predict(logistic_reduced, newdata = test_set[,c(-1, -2)],
 
 As done with the full logistic model, predictions using different thresholds were examined to ascertain the performance of the reduced model.
 
-##### Threshold = 0.2
+##### Threshold = 0.2\
 ```{r}
 # Threshold = 0.2
 
@@ -716,7 +716,7 @@ At a confidence threshold of 0.2, the model produces a Type I Error of 0.37, inc
 
 It also produces a Sensitivity of 0.54, meaning it correctly classifies 54% of the nominated songs, a slight improvement to the 0.5 produced from the full model at this threshold.
 
-##### Threshold = 0.3
+##### Threshold = 0.3\
 ```{r}
 # Threshold = 0.3
 
@@ -742,7 +742,7 @@ sensitivity_logistic_03
 
 As seen before with the full model, increasing the threshold to 0.3 decreased the Type I Error, but to a more significant degree. It now produces a value of 0.04, which is a significant drop in misclassifications of non-nominated songs. Coupled with that, however, was a significant drop in Sensitivity, reaching 0.042.
 
-##### Threshold = 0.4
+##### Threshold = 0.4\
 ```{r}
 # Threshold = 0.4
 
@@ -768,7 +768,7 @@ sensitivity_logistic_04
 
 As was done with the full logistic model, the threshold was increased to 0.4. With this change, the model classified no songs as nominated, producing values of N/A from the Type I Error and Sensitivity calculations.
 
-#### ROC Curve
+#### ROC Curve\
 
 ```{r}
 # ROC curve
@@ -795,7 +795,7 @@ summary(logistic_over)
 
 Using the oversampled dataset, the full logistic model now determines the following variables to be significant: year, acousticness, duration, key5, key11, loudness, and valence. This is quite a difference compared to the previous logistic model based on the original dataset, which only listed 3 variables (acousticness, duration, and valence) as significant.
 
-#### Predictions
+#### Predictions\
 
 ```{r}
 # Computing predictions
@@ -805,7 +805,7 @@ logistic_over_predictions_full = predict(logistic_over, newdata = test_set[,c(-1
 
 Below are the predictions as computed by the oversampled, full logistic model created above, using different thresholds of classification. The same thresholds that were explored in the original-dataset full logistic model will he highlighted again: 0.2, 0.3, and 0.4
 
-##### Threshold = 0.2
+##### Threshold = 0.2\
 
 ```{r}
 # Threshold = 0.2
@@ -832,7 +832,7 @@ At threshold 0.2, the Type I Error (False Positive Rate) was 0.853, meaning 85.3
 
 The Sensitivity (True Positive Rate) was .958, a fantastic value, showing the the oversampled full logistic model correctly classified 95.8% of the nominated songs. However, knowing the value of the Type I Error, it is clear that this value is so high because the model is classifying a vast majority of the data points as nominated. While it misses very few of the truly nominated songs, it misclassifies a large number of the non-nominated songs.
 
-##### Threshold = 0.3
+##### Threshold = 0.3\
 
 ```{r}
 # Threshold = 0.3
@@ -857,7 +857,7 @@ sensitivity_logistic_over_full_03
 
 At a threshold of 0.3, the Type I Error improves to 0.693, misclassifying fewer non-nominated songs than at threshold 0.2, but the Sensitivity also decreases to 0.792 meaning the model is missing more of the nominated songs.
 
-##### Threshold = 0.4
+##### Threshold = 0.4\
 
 ```{r}
 # Threshold = 0.4
@@ -882,7 +882,7 @@ sensitivity_logistic_over_full_04
 
 At a classification threshold of 0.4, the model's Type I Error decreases a fair amount to 0.5, but the Sensitivity also decreases slightly to 0.75. In comparison to the full logistic model using the original dataset, which at this threshold obtained the worst Sensitivity value of 0, the oversampled full logistic model performs much better (again, at this threshold). The ROC curve will exhibit how well the model performs overall.
 
-#### ROC Curve
+#### ROC Curve\
 
 ```{r}
 # ROC curve
@@ -935,7 +935,7 @@ logistic_reduced_over = glm(response_variable_over ~ Year + acousticness
                             family = "binomial")
 ```
 
-#### Predictions
+#### Predictions\
 
 ```{r}
 logistic_reduced_over_predictions = predict(logistic_reduced_over,
@@ -945,7 +945,7 @@ logistic_reduced_over_predictions = predict(logistic_reduced_over,
 
 In order to compare to the previously created models with ease, the reduced oversampled logistic model was tested on the same three thresholds that the other models were tested on.
 
-##### Threshold = 0.2
+##### Threshold = 0.2\
 
 ```{r}
 # Threshold = 0.2
@@ -970,7 +970,7 @@ sensitivity_logistic_reduced_over_02
 
 At this threshold, the Type I Error was 0.853 and the Sensitivity was 0.958, which are the same exact values for the full oversampled logistic model at this threshold.
 
-##### Threshold = 0.3
+##### Threshold = 0.3\
 
 ```{r}
 # Threshold = 0.3
@@ -995,7 +995,7 @@ sensitivity_logistic_reduced_over_03
 
 With a threshold of 0.3, when compared to threshold 0.2, the model again produced a lower Type I Error of 0.68 and a lower Sensitivity of 0.792. These values are very similar to the full oversampled logistic model at this threshold as well.
 
-##### Threshold = 0.4
+##### Threshold = 0.4\
 
 ```{r}
 # Threshold = 0.4
@@ -1020,7 +1020,7 @@ sensitivity_logistic_reduced_over_04
 
 Using the threshold of 0.4 again produced the same results to the full oversampled logistic model, with a Type I Error of 0.5 and a Sensitivity of 0.75. This suggests the models are extremely similar.
 
-#### ROC Curve
+#### ROC Curve\
 
 ```{r}
 # ROC curve
@@ -1062,11 +1062,11 @@ shapiro.test(valence[IsWinner == 0]) # No
 shapiro.test(valence[IsWinner == 1]) # No
 ```
 
-#### QQ-plots of the conditioned independent variables
+#### QQ-plots of the conditioned independent variables\
 
 A visual tool was also used to check if the variables followed a normal distribution.
 
-##### Danceability
+##### Danceability\
 ```{r}
 par(mfrow = c(1, 2))
 
@@ -1081,7 +1081,7 @@ qqline(danceability[IsWinner == 1],lwd = 2, col = "red")
 
 Danceability looks normal confirming the result of the test.
 
-##### Acousticness
+##### Acousticness\
 ```{r}
 par(mfrow = c(1, 2))
 
@@ -1096,7 +1096,7 @@ qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 
 Acousticness is heavily not normal, following an S-shape.
 
-##### Duration
+##### Duration\
 ```{r}
 par(mfrow = c(1, 2))
 
@@ -1111,7 +1111,7 @@ qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
 
 Duration shows a heavy right tail.
 
-##### Energy
+##### Energy\
 ```{r}
 par(mfrow = c(1, 2))
 
@@ -1126,7 +1126,7 @@ qqline(energy[IsWinner == 1],lwd = 2, col = "red")
 
 The energy feature shows not normal tails.
 
-##### Instrumentalness
+##### Instrumentalness\
 ```{r}
 par(mfrow = c(1, 2))
 
@@ -1141,7 +1141,7 @@ qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 
 Instrumentalness shows a very heavy  right tail.
 
-##### Loudness
+##### Loudness\
 ```{r}
 par(mfrow = c(1, 2))
 
@@ -1156,7 +1156,7 @@ qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
 
 Loudness shows not normal tails.
 
-##### Tempo
+##### Tempo\
 ```{r}
 par(mfrow = c(1, 2))
 
@@ -1171,7 +1171,7 @@ qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
 
 The tempo variable seems close to a normal distribution.
 
-##### Valence
+##### Valence\
 ```{r}
 # valence tails slightly not normal
 par(mfrow = c(1, 2))
@@ -1187,13 +1187,13 @@ qqline(valence[IsWinner == 1],lwd = 2, col = "red")
 
 The valence variable seems close to a normal distribution, except for the tails.
 
-#### Transformations
+#### Transformations\
 
 The only variable to have passed the test is danceability, so transformations were applied to the other variables to make them more normal-like. Specifically, the Box-Cox transformation was used to estimate the parameter.
 
 The variables were then tested again. Examining the new output from the Shapiro test and the Q-Q plots, the variables were checked to see if the transformations succeeded in making the distributions more normal-like.
 
-##### Acousticness
+##### Acousticness\
 
 ```{r}
 par(mfrow = c(1, 1))
@@ -1227,7 +1227,7 @@ qqline(acousticness[IsWinner == 1],lwd = 2, col = "red")
 
 The transformed variable did not pass the test, but the plots showed a good improvement, so the transformed variable will be used.
 
-##### Duration
+##### Duration\
 
 ```{r}
 # duration_ms plots improved, test not passed
@@ -1266,7 +1266,7 @@ qqline(duration_ms[IsWinner == 1],lwd = 2, col = "red")
 
 The transformed variable did not pass the test but the plots show an improvement in the tails, so the transformed variable will be used.
 
-##### Energy
+##### Energy\
 
 ```{r}
 par(mfrow = c(1, 1))
@@ -1303,7 +1303,7 @@ qqline(energy[IsWinner == 1],lwd = 2, col = "red")
 
 The transformed variable did not pass the test and the plots don't show improvements, so the original values will be kept.
 
-##### Instrumentalness
+##### Instrumentalness\
 
 ```{r}
 # instrumentalness can't apply the boxcox transformation because there are some 0's
@@ -1345,7 +1345,7 @@ qqline(instrumentalness[IsWinner == 1],lwd = 2, col = "red")
 
 The Box-Cox transformation could not be directly applied to the instrumentalness variable because of the presence of zeros, so a small value was added and then applied to it. The new variable did not pass the test and the plots did not improve, so the original data was kept.
 
-##### Loudness
+##### Loudness\
 
 ```{r}
 par(mfrow = c(1, 1))
@@ -1384,7 +1384,7 @@ qqline(loudness[IsWinner == 1],lwd = 2, col = "red")
 
 The Box-Cox transformation could also not be directly applied to the variable loudness because the variable takes negative values. As a workaround, the values were multiplied by -1 and then the transformation was applied. The new variable passed the test and the plots confirmed the result of the test. Since the variable was multiplied by -1, the interpretation of the variable will be mirrored.
 
-##### Tempo
+##### Tempo\
 
 ```{r}
 # tempo, slight improvement in the plots
@@ -1423,7 +1423,7 @@ qqline(tempo[IsWinner == 1],lwd = 2, col = "red")
 
 The transformed tempo variable showed slight improvement in the plots, but still did not pass the test, so we used the transformed variable.
 
-##### Valence
+##### Valence\
 
 ```{r}
 # valence, pretty much the same
@@ -1558,11 +1558,11 @@ auc(roc.out)
 
 The ROC curve shows a slight improvement, but the value is just above 0.5. 
 
-#### Predictions
+#### Predictions\
 
 Making predictions on the oversampled LDA
 
-##### Threshold = 0.4
+##### Threshold = 0.4\
 ```{r}
 
 lda_over_predictions_04 = ifelse(pred_simple_over_lda$posterior[,1] > 0.4, 1, 0)
@@ -1581,7 +1581,7 @@ sensitivity_lda_over_04 = true_positive_lda_over_04 / positive_lda_over_04
 sensitivity_lda_over_04
 ```
 
-##### Threshold = 0.5
+##### Threshold = 0.5\
 
 ```{r}
 lda_over_predictions_05 = list(pred_simple_over_lda$class)
@@ -1646,9 +1646,9 @@ auc(roc.out)
 
 The ROC curve shows a significant improvement.
 
-#### Predictions
+#### Predictions\
 
-##### Threshold = 0.4
+##### Threshold = 0.4\
 
 ```{r}
 # Predictions
@@ -1671,7 +1671,7 @@ sensitivity_qda_over_04 = true_positive_qda_over_04 / positive_qda_over_04
 sensitivity_qda_over_04
 ```
 
-##### Threshold = 0.5
+##### Threshold = 0.5\
 
 ```{r}
 # Threshold 0.5
