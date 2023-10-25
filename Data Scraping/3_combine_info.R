@@ -9,25 +9,13 @@ library(tidyverse)
 library(stringr)
 library(stringdist)
 
-setwd("/Users/joanorellanarios/Library/CloudStorage/GoogleDrive-joanorellanarios@gmail.com/La meva unitat/Master/Second Semester/Statistical Learning Mod B/SL_Project")
-
-# Set up your API credentials for Spotify and YouTube
-#spotify_client_id <- '74a2687466954d4e92633e8f0f370cce'
-#spotify_client_secret <- '953a979b453d49c582a46ce3034f818b'
-
-client_ids <- c('57abed2d54534b1f95b70d674aedf5d8', '80f9fede3ffe465ea696f0d2c27ad5c5',
-                'ba70d73f54904db698438f2953815210', 'c4395de6a4e540e99bffd3d2f6be14f4',
-                '74a2687466954d4e92633e8f0f370cce', 'ebe882b66bc543b08550a5bf31bd59d0')
-
-client_secrets <- c('8f6215f6c1f6413da48c04938cac0ab7', '2729fc14045d449c8f6489ae96f0472c',
-                    '50e5fc54f7254501b43414092361626d', '0f71fdc18faa4a9f879a9a19277e7430',
-                    '953a979b453d49c582a46ce3034f818b', 'b693aab3e9d44aa28565aa570cf7efad')
-
 cont <- 1
 idx <- 1
 
-spotify_client_id <- client_ids[idx]
-spotify_client_secret <- client_secrets[idx]
+setwd() #<- set your current working directory
+# Set up your API credentials for Spotify and YouTube
+spotify_client_id <- #insert your Spotify API client ID - create a list with at list 6 credentials, otherwise the limit of calls is reached
+spotify_client_secret <- #insert your Spotify API client secret - create a list with at list 6 credentials, otherwise the limit of calls is reached (ex: list('1234', '1235', '1236', '1237', '1238', '1239'))
 
 Sys.setenv(SPOTIFY_CLIENT_ID = spotify_client_id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = spotify_client_secret)

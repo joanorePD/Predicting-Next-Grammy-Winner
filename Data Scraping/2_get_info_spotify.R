@@ -1,4 +1,4 @@
-# Load thenecessary packages
+# Load the necessary packages
 library(httr)
 library(jsonlite)
 library(dplyr)
@@ -9,11 +9,10 @@ library(tidyverse)
 library(stringr)
 library(stringdist)
 
-setwd("/Users/joanorellanarios/Library/CloudStorage/GoogleDrive-joanorellanarios@gmail.com/La meva unitat/Master/Second Semester/Statistical Learning Mod B/SL_Project")
-
+setwd() #<- set your current working directory
 # Set up your API credentials for Spotify and YouTube
-spotify_client_id <- '74a2687466954d4e92633e8f0f370cce'
-spotify_client_secret <- '953a979b453d49c582a46ce3034f818b'
+spotify_client_id <- #insert your Spotify API client ID
+spotify_client_secret <- #insert your Spotify API client secret
 
 Sys.setenv(SPOTIFY_CLIENT_ID = spotify_client_id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = spotify_client_secret)
@@ -102,4 +101,4 @@ grammyspoti <- grammyspoti %>%
   mutate_all(as.character)
 
 write.csv(grammyspoti, "grammy_trackid.csv", row.names=TRUE)
-
+#perform filtering (see pdf for more info) and save the file as final_grammy.csv
