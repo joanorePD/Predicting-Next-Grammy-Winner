@@ -1,4 +1,4 @@
-# What make a rock song award winning?
+# What makes a rock song award winning?
 
 ## Introduction
 
