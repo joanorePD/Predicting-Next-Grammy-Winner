@@ -37,9 +37,9 @@ Despite the outcome not meeting our initial expectations, we take pride in the c
 - **SLModBFinalProject.Rmd:** Main R Markdown file for project execution.
 - **SLModBFinalProject.pdf:** PDF version of the main R Markdown file.
 - **Data Scraping:**
-  1. **1_get_info_grammy.R:** Grammy website data scraping script.
-  2. **2_get_info_spotify.R:** Spotify data scraping script.
-  3. **3_combine_info.R:** Script to merge and clean data for the final dataset.
+  1. **01_Grammy_Scraping.R:** Grammy website data scraping script.
+  2. **02_Spotify_Scraping.R:** Spotify data scraping script.
+  4. **03_Generate_Dataset.R:** Script to merge and clean data for the final dataset.
 
 ## Conclusion
 
